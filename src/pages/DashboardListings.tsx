@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { Eye, EyeOff, Package, PackagePlus, Plus, Search } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -7,31 +7,30 @@ import { OwnerListingCard } from "@/components/equipment/OwnerListingCard";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { LoadingSkeleton } from "@/components/shared/LoadingSkeleton";
-import { useEquipmentList } from "@/hooks/useEquipment";
+import { useMyEquipment } from "@/hooks/useMyEquipment";
 import { getApiErrorDetail } from "@/services/api";
 import * as equipmentService from "@/services/equipment.service";
-import { useAuthStore } from "@/store/authStore";
 import { cn } from "@/utils/cn";
+import { useNotificationHighlight } from "@/hooks/useNotificationHighlight";
 
 export function DashboardListings() {
   const navigate = useNavigate();
-  const user = useAuthStore((s) => s.user);
-  const { equipment, isLoading, refetch } = useEquipmentList({
-    availableOnly: false,
-    pageSize: 100,
-  });
+  const [searchParams] = useSearchParams();
+  const { equipment: mine, isLoading, refetch } = useMyEquipment();
+  const highlightedId = useNotificationHighlight(refetch);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
+
+  useEffect(() => {
+    if (searchParams.get("highlight")) {
+      setQuery("");
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     const main = document.querySelector("main");
     main?.scrollTo(0, 0);
   }, []);
-
-  const mine = useMemo(
-    () => (user ? equipment.filter((e) => e.owner.id === user.id) : []),
-    [equipment, user]
-  );
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -40,13 +39,19 @@ export function DashboardListings() {
       (e) =>
         e.title.toLowerCase().includes(q) ||
         e.location.toLowerCase().includes(q) ||
-        e.category.toLowerCase().includes(q)
+        e.category.name.toLowerCase().includes(q) ||
+        e.category.slug.toLowerCase().includes(q)
     );
   }, [mine, query]);
 
   const stats = useMemo(() => {
-    const live = mine.filter((e) => e.isAvailable).length;
-    return { total: mine.length, live, hidden: mine.length - live };
+    const pending = mine.filter((e) => e.approvalStatus === "PENDING").length;
+    const live = mine.filter((e) => e.approvalStatus === "APPROVED" && e.isAvailable).length;
+    const hidden = mine.filter(
+      (e) => e.approvalStatus === "APPROVED" && !e.isAvailable
+    ).length;
+    const rejected = mine.filter((e) => e.approvalStatus === "REJECTED").length;
+    return { total: mine.length, pending, live, hidden, rejected };
   }, [mine]);
 
   async function setAvailability(id: string, isAvailable: boolean) {
@@ -82,8 +87,8 @@ export function DashboardListings() {
             My Listings
           </h2>
           <p className="mt-1 max-w-md text-sm text-stone-500">
-            Manage visibility, pricing, and photos. Hidden listings stay on your dashboard but
-            won&apos;t appear in search.
+            New listings are reviewed by our team before they appear in search. After approval,
+            use the visibility toggle to go live.
           </p>
         </div>
         <Link
@@ -96,11 +101,12 @@ export function DashboardListings() {
       </motion.div>
 
       {mine.length > 0 ? (
-        <div className="grid gap-3 sm:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {[
             { label: "Total listings", value: stats.total, icon: Package, tone: "bg-stone-50 text-stone-700" },
+            { label: "Pending review", value: stats.pending, icon: Package, tone: "bg-amber-50 text-amber-800" },
             { label: "Live in search", value: stats.live, icon: Eye, tone: "bg-green-50 text-green-700" },
-            { label: "Hidden", value: stats.hidden, icon: EyeOff, tone: "bg-amber-50 text-amber-800" },
+            { label: "Hidden / rejected", value: stats.hidden + stats.rejected, icon: EyeOff, tone: "bg-stone-100 text-stone-600" },
           ].map((stat) => {
             const Icon = stat.icon;
             return (
@@ -162,6 +168,7 @@ export function DashboardListings() {
               key={item.id}
               item={item}
               index={i}
+              highlighted={highlightedId === item.id}
               onSetAvailability={async (id, available) => {
                 try {
                   await setAvailability(id, available);

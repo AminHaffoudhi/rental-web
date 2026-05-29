@@ -48,6 +48,16 @@ export async function confirmDelivery(id: string): Promise<Booking> {
   return unwrap(res);
 }
 
+export async function ownerHandover(id: string): Promise<Booking> {
+  const res = await api.post(`/bookings/${id}/owner-handover`);
+  return unwrap(res);
+}
+
+export async function ownerCompleteReturn(id: string): Promise<Booking> {
+  const res = await api.post(`/bookings/${id}/owner-complete-return`);
+  return unwrap(res);
+}
+
 export async function requestReturn(id: string): Promise<Booking> {
   const res = await api.post(`/bookings/${id}/return-request`);
   return unwrap(res);

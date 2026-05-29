@@ -10,14 +10,16 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { GalleryZoomHint, ImageLightbox } from "@/components/shared/ImageLightbox";
 import { Switch } from "@/components/ui/switch";
-import { CATEGORY_OPTIONS } from "@/config/categories";
+import { CategoryIcon } from "@/components/equipment/CategoryIcon";
 import type { Equipment } from "@/types/equipment";
 import { cn } from "@/utils/cn";
 import { formatCurrency } from "@/utils/currency";
+import { equipmentReviewStats } from "@/utils/reviewStats";
 
 interface OwnerListingCardProps {
   item: Equipment;
   index?: number;
+  highlighted?: boolean;
   onSetAvailability: (id: string, isAvailable: boolean) => void | Promise<void>;
   onDelete: (id: string) => void;
 }
@@ -25,6 +27,7 @@ interface OwnerListingCardProps {
 export function OwnerListingCard({
   item,
   index = 0,
+  highlighted = false,
   onSetAvailability,
   onDelete,
 }: OwnerListingCardProps) {
@@ -32,11 +35,21 @@ export function OwnerListingCard({
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [available, setAvailable] = useState(item.isAvailable);
   const [toggling, setToggling] = useState(false);
-  const catMeta = CATEGORY_OPTIONS.find((c) => c.value === item.category);
-  const CatIcon = catMeta?.icon ?? Package;
+  const cat = item.category;
+  const isApproved = item.approvalStatus === "APPROVED";
+  const isPending = item.approvalStatus === "PENDING";
+  const isRejected = item.approvalStatus === "REJECTED";
+  const canToggleVisibility = isApproved;
+
+  const statusBadge = isPending
+    ? { label: "Pending review", className: "bg-amber-500 text-white" }
+    : isRejected
+      ? { label: "Rejected", className: "bg-red-600 text-white" }
+      : available
+        ? { label: "Live", className: "bg-green-500 text-white" }
+        : { label: "Hidden", className: "bg-stone-700 text-white" };
   const cover = item.images[0];
-  const reviews = item.reviews ?? [];
-  const reviewCount = reviews.length;
+  const { count: reviewCount } = equipmentReviewStats(item);
   const photos = item.images.filter(Boolean);
 
   useEffect(() => {
@@ -58,10 +71,16 @@ export function OwnerListingCard({
 
   return (
     <motion.li
+      id={`highlight-${item.id}`}
       initial={false}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.2, delay: index * 0.03 }}
-      className="overflow-hidden rounded-2xl border border-stone-100 bg-white shadow-sm"
+      className={cn(
+        "overflow-hidden rounded-2xl border bg-white shadow-sm transition-shadow duration-300",
+        highlighted
+          ? "border-brand-400 ring-2 ring-brand-500 ring-offset-2"
+          : "border-stone-100"
+      )}
     >
       <div className="flex flex-col md:flex-row">
         <div className="relative w-full shrink-0 md:w-56 lg:w-64">
@@ -79,16 +98,21 @@ export function OwnerListingCard({
               <img src={cover} alt="" className="h-full w-full object-cover" />
             ) : (
               <div className="flex h-full items-center justify-center text-brand-400/50">
-                <CatIcon className="h-14 w-14" strokeWidth={1.25} aria-hidden />
+                <CategoryIcon
+                  iconUrl={cat?.iconUrl}
+                  name={cat?.name}
+                  className="h-14 w-14"
+                  imgClassName="h-14 w-14"
+                />
               </div>
             )}
             <span
               className={cn(
                 "absolute left-3 top-3 rounded-full px-2.5 py-1 text-[11px] font-semibold shadow-sm",
-                available ? "bg-green-500 text-white" : "bg-stone-800/85 text-white"
+                statusBadge.className
               )}
             >
-              {available ? "Live" : "Hidden"}
+              {statusBadge.label}
             </span>
             {photos.length > 1 ? (
               <span className="absolute bottom-3 right-3 rounded-full bg-black/50 px-2 py-0.5 text-[10px] font-medium text-white">
@@ -103,8 +127,8 @@ export function OwnerListingCard({
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
-                <span className={cn("badge text-[10px]", catMeta?.color ?? "badge-brand")}>
-                  {catMeta?.label ?? item.category}
+                <span className={cn("badge text-[10px]", cat?.color ?? "badge-brand")}>
+                  {cat?.name ?? "Equipment"}
                 </span>
                 <span className="text-[11px] text-stone-400">
                   {reviewCount > 0
@@ -183,16 +207,31 @@ export function OwnerListingCard({
               ) : null}
             </div>
 
-            <div className="flex items-center justify-between gap-4 rounded-xl border border-stone-100 bg-stone-50 px-4 py-3 sm:min-w-[220px]">
+            <div
+              className={cn(
+                "flex items-center justify-between gap-4 rounded-xl border px-4 py-3 sm:min-w-[220px]",
+                canToggleVisibility
+                  ? "border-stone-100 bg-stone-50"
+                  : "border-amber-100 bg-amber-50/50"
+              )}
+            >
               <div className="min-w-0">
                 <p className="text-xs font-semibold text-stone-700">Visible in search</p>
                 <p className="text-[11px] text-stone-500">
-                  {available ? "Renters can find this" : "Hidden from browse"}
+                  {isPending
+                    ? "Waiting for admin approval"
+                    : isRejected
+                      ? item.rejectionNote
+                        ? item.rejectionNote
+                        : "Edit listing to resubmit for review"
+                      : available
+                        ? "Renters can find this"
+                        : "Approved — turn on to go live"}
                 </p>
               </div>
               <Switch
                 checked={available}
-                disabled={toggling}
+                disabled={toggling || !canToggleVisibility}
                 onCheckedChange={(checked) => void handleAvailabilityChange(checked)}
                 className="shrink-0 data-[state=checked]:bg-green-500"
                 aria-label={available ? "Hide from search" : "Show in search"}

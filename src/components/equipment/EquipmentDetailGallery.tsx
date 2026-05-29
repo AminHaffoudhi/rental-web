@@ -1,7 +1,7 @@
 import { ChevronLeft, ChevronRight, Package } from "lucide-react";
 import { useState } from "react";
 import { GalleryZoomHint, ImageLightbox } from "@/components/shared/ImageLightbox";
-import { CATEGORY_OPTIONS } from "@/config/categories";
+import { CategoryIcon } from "@/components/equipment/CategoryIcon";
 import type { Equipment } from "@/types/equipment";
 import { cn } from "@/utils/cn";
 
@@ -13,8 +13,7 @@ export function EquipmentDetailGallery({ equipment }: EquipmentDetailGalleryProp
   const imgs = equipment.images.filter(Boolean);
   const [main, setMain] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
-  const catMeta = CATEGORY_OPTIONS.find((c) => c.value === equipment.category);
-  const PlaceholderIcon = catMeta?.icon ?? Package;
+  const cat = equipment.category;
 
   function goPrev() {
     setMain((i) => (i <= 0 ? imgs.length - 1 : i - 1));
@@ -27,7 +26,12 @@ export function EquipmentDetailGallery({ equipment }: EquipmentDetailGalleryProp
   if (!imgs.length) {
     return (
       <div className="flex aspect-[4/3] items-center justify-center rounded-2xl border border-stone-100 bg-gradient-to-br from-brand-50 to-stone-50 md:aspect-[16/9]">
-        <PlaceholderIcon className="h-24 w-24 text-brand-300" strokeWidth={1} aria-hidden />
+        <CategoryIcon
+          iconUrl={cat?.iconUrl}
+          name={cat?.name}
+          className="h-24 w-24 text-brand-300"
+          imgClassName="h-24 w-24"
+        />
       </div>
     );
   }

@@ -5,6 +5,7 @@ import {
   CalendarDays,
   Check,
   ChevronRight,
+  Clock,
   Coins,
   Home,
   LayoutDashboard,
@@ -13,22 +14,25 @@ import {
   Shield,
   Star,
   Truck,
+  XCircle,
 } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { useMemo, useState } from "react";
 import { BookingForm } from "@/components/booking/BookingForm";
 import { EquipmentDetailGallery } from "@/components/equipment/EquipmentDetailGallery";
 import { EmptyState } from "@/components/shared/EmptyState";
+import { ReviewForm } from "@/components/review/ReviewForm";
 import { ReviewCard } from "@/components/user/ReviewCard";
 import { UserAvatar } from "@/components/user/UserAvatar";
-import { CATEGORY_OPTIONS } from "@/config/categories";
 import { useEquipmentDetail } from "@/hooks/useEquipment";
+import { useNotificationHighlight } from "@/hooks/useNotificationHighlight";
 import * as bookingService from "@/services/booking.service";
 import { getApiErrorDetail } from "@/services/api";
 import { useAuthStore } from "@/store/authStore";
 import type { Equipment } from "@/types/equipment";
 import { cn } from "@/utils/cn";
 import { formatCurrency } from "@/utils/currency";
+import { equipmentReviewStats } from "@/utils/reviewStats";
 
 function DetailSkeleton() {
   return (
@@ -152,12 +156,9 @@ function PricingCard({ equipment }: { equipment: Equipment }) {
 }
 
 function EquipmentHeader({ equipment }: { equipment: Equipment }) {
-  const cat =
-    CATEGORY_OPTIONS.find((c) => c.value === equipment.category)?.label ?? equipment.category;
+  const cat = equipment.category?.name ?? "Equipment";
   const listed = format(parseISO(equipment.createdAt), "MMMM yyyy");
-  const reviews = equipment.reviews ?? [];
-  const avg =
-    reviews.length > 0 ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length : null;
+  const { count: reviewCount, average: avg } = equipmentReviewStats(equipment);
 
   return (
     <header>
@@ -184,7 +185,7 @@ function EquipmentHeader({ equipment }: { equipment: Equipment }) {
           {avg !== null ? (
             <>
               <span className="font-medium text-stone-700">{avg.toFixed(1)}</span>
-              <span>({reviews.length} reviews)</span>
+              <span>({reviewCount} reviews)</span>
             </>
           ) : (
             "No reviews yet"
@@ -197,46 +198,115 @@ function EquipmentHeader({ equipment }: { equipment: Equipment }) {
 
 function OwnerCard({ equipment }: { equipment: Equipment }) {
   const owner = equipment.owner;
-  const reviews = equipment.reviews ?? [];
-  const avg =
-    reviews.length > 0 ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length : null;
-  const since = format(parseISO(owner.createdAt), "MMMM yyyy");
+  const { count: reviewCount, average: avg } = equipmentReviewStats(equipment);
+  const since = owner.createdAt
+    ? format(parseISO(owner.createdAt), "MMMM yyyy")
+    : "recently";
+  const isVerified = owner.kycStatus === "APPROVED";
 
   return (
-    <section className="rounded-2xl border border-stone-100 bg-white p-6 shadow-sm">
-      <h3 className="text-xs font-semibold uppercase tracking-widest text-stone-400">Hosted by</h3>
-      <div className="mt-4 flex gap-4">
-        <UserAvatar user={owner} size="lg" />
-        <div className="min-w-0 flex-1">
-          <h4 className="font-display text-lg font-semibold text-stone-900">{owner.name}</h4>
-          <p className="text-sm text-stone-500">Member since {since}</p>
-          <div className="mt-2 flex flex-wrap items-center gap-2 text-sm">
-            {avg !== null ? (
-              <>
-                <Star className="h-4 w-4 fill-amber-400 text-amber-400" aria-hidden />
-                <span className="font-medium text-stone-700">{avg.toFixed(1)}</span>
-                <span className="text-stone-500">({reviews.length} reviews)</span>
-              </>
-            ) : (
-              <span className="text-stone-500">No reviews yet</span>
-            )}
+    <section className="overflow-hidden rounded-2xl border border-stone-100 bg-white shadow-sm">
+      <div className="p-6">
+        <h3 className="text-xs font-semibold uppercase tracking-widest text-stone-400">
+          Hosted by
+        </h3>
+        <div className="mt-4 flex gap-4 sm:gap-5">
+          <div className="shrink-0 rounded-2xl bg-gradient-to-br from-stone-50 to-brand-50/40 p-1 ring-1 ring-stone-100">
+            <UserAvatar
+              user={owner}
+              size="lg"
+              className="h-16 w-16 text-lg sm:h-[4.5rem] sm:w-[4.5rem]"
+            />
           </div>
-          {owner.kycStatus === "APPROVED" ? (
-            <span className="badge badge-green mt-3 inline-flex items-center gap-1">
-              <BadgeCheck className="h-3.5 w-3.5" aria-hidden />
-              Verified owner
-            </span>
-          ) : null}
-          <Link to={`/profile/${owner.id}`} className="btn btn-secondary btn-sm mt-4 inline-flex">
-            View profile
-          </Link>
+          <div className="min-w-0 flex-1 space-y-2">
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5">
+              <h4 className="font-display text-lg font-semibold leading-tight text-stone-900">
+                {owner.name}
+              </h4>
+              {isVerified ? (
+                <span
+                  className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold leading-none text-emerald-800 shadow-sm"
+                  title="Identity verified on RentMarket"
+                >
+                  <BadgeCheck className="h-3.5 w-3.5 shrink-0 text-emerald-600" strokeWidth={2.5} />
+                  Verified owner
+                </span>
+              ) : null}
+            </div>
+            <p className="text-sm text-stone-500">Member since {since}</p>
+            <div className="flex flex-wrap items-center gap-2 text-sm">
+              {avg !== null ? (
+                <span className="inline-flex items-center gap-1.5 rounded-lg bg-amber-50 px-2.5 py-1 text-amber-900">
+                  <Star className="h-3.5 w-3.5 fill-amber-500 text-amber-500" aria-hidden />
+                  <span className="font-semibold tabular-nums">{avg.toFixed(1)}</span>
+                  <span className="text-amber-800/80">
+                    · {reviewCount} {reviewCount === 1 ? "review" : "reviews"} on this listing
+                  </span>
+                </span>
+              ) : (
+                <span className="text-stone-500">No reviews yet</span>
+              )}
+            </div>
+          </div>
         </div>
+      </div>
+
+      <div className="border-t border-stone-100 bg-stone-50/70 px-4 py-3 sm:px-6 sm:py-4">
+        <Link
+          to={`/users/${owner.id}`}
+          className="group flex w-full items-center justify-center gap-2 rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm font-semibold text-stone-800 shadow-sm transition-all hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700 hover:shadow-md"
+        >
+          View profile
+          <ChevronRight
+            className="h-4 w-4 text-stone-400 transition-transform group-hover:translate-x-0.5 group-hover:text-brand-600"
+            aria-hidden
+          />
+        </Link>
       </div>
     </section>
   );
 }
 
+function OwnerApprovalBanner({ equipment }: { equipment: Equipment }) {
+  if (equipment.approvalStatus === "APPROVED") return null;
+
+  const pending = equipment.approvalStatus === "PENDING";
+  return (
+    <div
+      className={cn(
+        "flex gap-3 rounded-2xl border px-4 py-3 text-sm",
+        pending
+          ? "border-amber-200 bg-amber-50 text-amber-950"
+          : "border-red-200 bg-red-50 text-red-950"
+      )}
+      role="status"
+    >
+      {pending ? (
+        <Clock className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" aria-hidden />
+      ) : (
+        <XCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-600" aria-hidden />
+      )}
+      <div>
+        <p className="font-semibold">
+          {pending ? "Pending admin review" : "Listing was rejected"}
+        </p>
+        <p className="mt-1 text-[13px] opacity-90">
+          {pending
+            ? "Renters cannot find this until an admin approves it. You'll get a notification when it's ready."
+            : equipment.rejectionNote
+              ? equipment.rejectionNote
+              : "Update your listing and save to resubmit for review."}
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function OwnerManagePanel({ equipment }: { equipment: Equipment }) {
+  const approved = equipment.approvalStatus === "APPROVED";
+  const pending = equipment.approvalStatus === "PENDING";
+  const rejected = equipment.approvalStatus === "REJECTED";
+
   return (
     <div className="overflow-hidden rounded-2xl border border-stone-100 bg-white shadow-lg">
       <div className="bg-stone-900 px-5 py-4 text-white">
@@ -244,17 +314,37 @@ function OwnerManagePanel({ equipment }: { equipment: Equipment }) {
         <p className="mt-1 font-display text-lg font-semibold">Manage from dashboard</p>
       </div>
       <div className="space-y-4 p-5 text-sm text-stone-600">
-        <p>
-          This is how renters see your listing. Toggle visibility or delete it from{" "}
-          <strong className="text-stone-800">My Listings</strong>.
-        </p>
+        {pending ? (
+          <p>Submitted for review. You can preview it here; it won&apos;t appear in search until approved.</p>
+        ) : rejected ? (
+          <p>
+            Edit this listing from <strong className="text-stone-800">My Listings</strong> and save to
+            resubmit for review.
+          </p>
+        ) : (
+          <p>
+            Toggle visibility or delete from <strong className="text-stone-800">My Listings</strong>.
+          </p>
+        )}
         <div
           className={cn(
             "rounded-xl px-3 py-2 text-center text-xs font-semibold",
-            equipment.isAvailable ? "bg-green-50 text-green-800" : "bg-stone-100 text-stone-600"
+            pending
+              ? "bg-amber-50 text-amber-900"
+              : rejected
+                ? "bg-red-50 text-red-900"
+                : equipment.isAvailable
+                  ? "bg-green-50 text-green-800"
+                  : "bg-stone-100 text-stone-600"
           )}
         >
-          {equipment.isAvailable ? "Live in search" : "Hidden from search"}
+          {pending
+            ? "Pending review"
+            : rejected
+              ? "Rejected — edit to resubmit"
+              : equipment.isAvailable
+                ? "Live in search"
+                : "Approved — hidden from search"}
         </div>
         <Link
           to="/dashboard/listings"
@@ -268,24 +358,33 @@ function OwnerManagePanel({ equipment }: { equipment: Equipment }) {
   );
 }
 
-function ReviewsSection({ equipment }: { equipment: Equipment }) {
-  const reviews = equipment.reviews ?? [];
-  const avg =
-    reviews.length > 0 ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length : null;
+function ReviewsSection({
+  equipment,
+  canReview,
+  onReviewSubmitted,
+  highlightedReviewId,
+}: {
+  equipment: Equipment;
+  canReview: boolean;
+  onReviewSubmitted?: () => void;
+  highlightedReviewId?: string | null;
+}) {
+  const { count: reviewCount, average: avg, approvedReviews } = equipmentReviewStats(equipment);
+  const displayReviews = equipment.reviews ?? [];
 
   const breakdown = useMemo(() => {
     const counts = [0, 0, 0, 0, 0];
-    for (const r of reviews) {
+    for (const r of approvedReviews) {
       if (r.rating >= 1 && r.rating <= 5) counts[r.rating - 1]++;
     }
     const max = Math.max(...counts, 1);
     return { counts, max };
-  }, [reviews]);
+  }, [approvedReviews]);
 
   return (
     <section className="rounded-2xl border border-stone-100 bg-white p-6 shadow-sm">
       <h3 className="font-display text-xl font-semibold text-stone-900">Reviews</h3>
-      {reviews.length > 0 && avg !== null ? (
+      {reviewCount > 0 && avg !== null ? (
         <div className="mt-6 flex flex-wrap items-end gap-8 border-b border-stone-100 pb-8">
           <div>
             <p className="font-display text-5xl font-semibold text-stone-900">{avg.toFixed(1)}</p>
@@ -300,7 +399,7 @@ function ReviewsSection({ equipment }: { equipment: Equipment }) {
                 />
               ))}
             </div>
-            <p className="mt-1 text-sm text-stone-500">{reviews.length} reviews</p>
+            <p className="mt-1 text-sm text-stone-500">{reviewCount} published reviews</p>
           </div>
           <div className="min-w-[200px] flex-1 space-y-1.5">
             {[5, 4, 3, 2, 1].map((star) => {
@@ -318,14 +417,36 @@ function ReviewsSection({ equipment }: { equipment: Equipment }) {
           </div>
         </div>
       ) : null}
+      {canReview ? (
+        <div className="mt-6">
+          <ReviewForm
+            variant="equipment"
+            equipmentId={equipment.id}
+            title="Review this listing"
+            description="Rate the equipment. Your review appears after admin approval."
+            onSuccess={onReviewSubmitted}
+          />
+        </div>
+      ) : null}
       <div className="mt-6 space-y-4">
-        {reviews.length ? (
-          reviews.map((r) => <ReviewCard key={r.id} review={r} />)
+        {displayReviews.length ? (
+          displayReviews.map((r) => (
+            <div
+              key={r.id}
+              id={`highlight-${r.id}`}
+              className={cn(
+                "rounded-2xl transition-shadow duration-300",
+                highlightedReviewId === r.id && "ring-2 ring-brand-500 ring-offset-2"
+              )}
+            >
+              <ReviewCard review={r} showStatus />
+            </div>
+          ))
         ) : (
           <EmptyState
             icon={MessageSquare}
             title="No reviews yet"
-            subtitle="Be the first to rent this equipment and leave a review."
+            subtitle="Be the first to review this listing."
           />
         )}
       </div>
@@ -336,13 +457,13 @@ function ReviewsSection({ equipment }: { equipment: Equipment }) {
 export function EquipmentDetail() {
   const { id } = useParams<{ id: string }>();
   const user = useAuthStore((s) => s.user);
-  const { equipment, isLoading, error } = useEquipmentDetail(id);
+  const { equipment, isLoading, error, refetch } = useEquipmentDetail(id);
+  const highlightedReviewId = useNotificationHighlight(refetch);
   const [submitting, setSubmitting] = useState(false);
 
   const isOwner = Boolean(user && equipment && user.id === equipment.owner.id);
-  const catSlug =
-    equipment &&
-    (CATEGORY_OPTIONS.find((c) => c.value === equipment.category)?.label ?? "Equipment");
+  const catSlug = equipment?.category?.name ?? "Equipment";
+  const catFilterSlug = equipment?.category?.slug;
 
   async function handleBook(data: { startDate: Date; endDate: Date; notes?: string }) {
     if (!equipment) return;
@@ -386,7 +507,10 @@ export function EquipmentDetail() {
             Home
           </Link>
           <ChevronRight className="h-4 w-4 opacity-40" aria-hidden />
-          <Link to={`/search?category=${equipment.category}`} className="hover:text-brand-600">
+          <Link
+            to={catFilterSlug ? `/search?category=${encodeURIComponent(catFilterSlug)}` : "/search"}
+            className="hover:text-brand-600"
+          >
             {catSlug}
           </Link>
           <ChevronRight className="h-4 w-4 opacity-40" aria-hidden />
@@ -395,6 +519,11 @@ export function EquipmentDetail() {
       </div>
 
       <div className="container py-8 pb-16">
+        {isOwner ? (
+          <div className="mb-6">
+            <OwnerApprovalBanner equipment={equipment} />
+          </div>
+        ) : null}
         <div className="flex flex-col gap-10 lg:flex-row lg:items-start">
           <div className="min-w-0 max-w-full flex-1 space-y-6 overflow-hidden">
             <EquipmentDetailGallery equipment={equipment} />
@@ -422,7 +551,16 @@ export function EquipmentDetail() {
               </ul>
             </section>
             <OwnerCard equipment={equipment} />
-            <ReviewsSection equipment={equipment} />
+            <ReviewsSection
+              equipment={equipment}
+              canReview={Boolean(
+                user &&
+                  !isOwner &&
+                  !(equipment.reviews ?? []).some((r) => r.reviewer.id === user.id)
+              )}
+              onReviewSubmitted={() => void refetch()}
+              highlightedReviewId={highlightedReviewId}
+            />
           </div>
 
           <aside className="w-full shrink-0 lg:sticky lg:top-24 lg:w-[380px]">
@@ -446,7 +584,7 @@ export function EquipmentDetail() {
         </div>
       </div>
 
-      {!isOwner && equipment.isAvailable ? (
+      {!isOwner && equipment.approvalStatus === "APPROVED" && equipment.isAvailable ? (
         <div className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-between gap-4 border-t border-stone-100 bg-white/95 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-8px_32px_rgba(0,0,0,0.08)] backdrop-blur-sm lg:hidden">
           <div>
             <p className="text-[11px] font-medium uppercase tracking-wide text-stone-400">From</p>

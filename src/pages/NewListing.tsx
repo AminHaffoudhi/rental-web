@@ -30,19 +30,19 @@ export function NewListing() {
           <div>
             <h1 className="font-display text-3xl font-bold text-stone-900">List your equipment</h1>
             <p className="mt-1 max-w-lg text-sm leading-relaxed text-stone-500">
-              Add photos, set your rates, and publish when you&apos;re ready. Renters will find your
-              listing in search.
+              Add photos and rates, then submit for review. Once an admin approves your listing,
+              you can make it visible in search.
             </p>
           </div>
         </div>
       </motion.div>
 
       <EquipmentForm
-        submitLabel="Publish listing"
+        submitLabel="Submit for review"
         onSubmit={async (data) => {
           try {
             await equipmentService.createEquipment(data);
-            toast.success("Listing created");
+            toast.success("Listing submitted — we'll notify you when it's approved");
             navigate("/dashboard/listings");
           } catch (e) {
             toast.error(getApiErrorDetail(e).message);

@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import {
   AlertTriangle,
@@ -17,7 +17,7 @@ import {
 import { BookingActions } from "@/components/booking/BookingActions";
 import { BookingStatus } from "@/components/booking/BookingStatus";
 import { BookingTimeline } from "@/components/booking/BookingTimeline";
-import { ManualPaymentInstructions } from "@/components/booking/ManualPaymentInstructions";
+import { StripePaymentSection } from "@/components/booking/StripePaymentSection";
 import { DeliveryStatus } from "@/components/delivery/DeliveryStatus";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -25,7 +25,7 @@ import { PLATFORM_FEE_PERCENT } from "@/config/constants";
 import { useBookingDetail } from "@/hooks/useBooking";
 import { useUpload } from "@/hooks/useUpload";
 import * as deliveryService from "@/services/delivery.service";
-import * as reviewService from "@/services/review.service";
+import { ReviewForm } from "@/components/review/ReviewForm";
 import { getApiErrorDetail } from "@/services/api";
 import { useAuthStore } from "@/store/authStore";
 import type { BookingStatus as TB } from "@/types/booking";
@@ -158,98 +158,60 @@ function BookingReviewSection({
   bookingId,
   ownerId,
   equipmentId,
+  onReviewSubmitted,
 }: {
   bookingId: string;
   ownerId: string;
   equipmentId: string;
+  onReviewSubmitted?: () => void;
 }) {
-  const [rating, setRating] = useState(5);
-  const [comment, setComment] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setSubmitting(true);
-    try {
-      await reviewService.createReview({
-        bookingId,
-        revieweeId: ownerId,
-        equipmentId,
-        rating,
-        comment: comment.trim() || undefined,
-      });
-      toast.success("Thanks — your review was submitted.");
-      setComment("");
-    } catch (err) {
-      toast.error(getApiErrorDetail(err).message);
-    } finally {
-      setSubmitting(false);
-    }
-  }
-
   return (
-    <section id="review" className="scroll-mt-24 rounded-2xl border border-stone-100 bg-white p-6 shadow-sm">
-      <h3 className="font-display text-lg font-semibold text-stone-900">Leave a review</h3>
-      <p className="mt-1 text-sm text-stone-500">
-        Share feedback about the owner and equipment — it helps the community.
-      </p>
-      <form onSubmit={(e) => void handleSubmit(e)} className="mt-4 space-y-4">
-        <div>
-          <p className="mb-2 text-sm font-medium text-stone-700">Rating</p>
-          <div className="flex gap-1">
-            {[1, 2, 3, 4, 5].map((n) => (
-              <button
-                key={n}
-                type="button"
-                onClick={() => setRating(n)}
-                className="rounded-md p-1 transition-colors"
-                aria-label={`${n} stars`}
-              >
-                <Star
-                  className={cn(
-                    "h-6 w-6",
-                    n <= rating
-                      ? "fill-amber-400 text-amber-400"
-                      : "text-stone-300 hover:text-amber-300"
-                  )}
-                />
-              </button>
-            ))}
-          </div>
-        </div>
-        <div>
-          <label htmlFor="review-comment" className="mb-2 block text-sm font-medium text-stone-700">
-            Comment (optional)
-          </label>
-          <Textarea
-            id="review-comment"
-            rows={4}
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            placeholder="How was the equipment and communication?"
-            className="input resize-y text-sm"
-          />
-        </div>
-        <button type="submit" disabled={submitting} className="btn btn-primary btn-sm">
-          {submitting ? (
-            <>
-              <Loader2 className="mr-2 inline h-4 w-4 animate-spin" />
-              Submitting…
-            </>
-          ) : (
-            "Submit review"
-          )}
-        </button>
-      </form>
-    </section>
+    <div id="review" className="scroll-mt-24 space-y-6">
+      <ReviewForm
+        variant="booking"
+        bookingId={bookingId}
+        revieweeId={ownerId}
+        equipmentId={equipmentId}
+        title="Review the owner"
+        description="Share feedback about the host. Visible after admin approval."
+        onSuccess={onReviewSubmitted}
+      />
+      <ReviewForm
+        variant="equipment"
+        equipmentId={equipmentId}
+        title="Review the equipment"
+        description="Rate the listing and equipment condition."
+        onSuccess={onReviewSubmitted}
+      />
+    </div>
   );
 }
 
 export function BookingDetail() {
   const { id } = useParams<{ id: string }>();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { upload, isUploading } = useUpload({ folder: "delivery" });
   const user = useAuthStore((s) => s.user);
   const { booking, isLoading, error, refetch } = useBookingDetail(id);
+
+  useEffect(() => {
+    const payment = searchParams.get("payment");
+    if (!payment) return;
+    if (payment === "success") {
+      toast.success("Payment received — thank you!");
+      void refetch();
+    } else if (payment === "cancelled") {
+      toast("Payment cancelled. You can try again when ready.");
+    }
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        next.delete("payment");
+        return next;
+      },
+      { replace: true }
+    );
+  }, [searchParams, refetch, setSearchParams]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -350,7 +312,7 @@ export function BookingDetail() {
                       <span>
                         Owner:{" "}
                         <Link
-                          to={`/profile/${booking.owner.id}`}
+                          to={`/users/${booking.owner.id}`}
                           className="font-medium text-stone-900 hover:text-brand-600"
                         >
                           {booking.owner.name}
@@ -362,7 +324,7 @@ export function BookingDetail() {
                       <span>
                         Renter:{" "}
                         <Link
-                          to={`/profile/${booking.renter.id}`}
+                          to={`/users/${booking.renter.id}`}
                           className="font-medium text-stone-900 hover:text-brand-600"
                         >
                           {booking.renter.name}
@@ -449,7 +411,7 @@ export function BookingDetail() {
             ) : null}
 
             {booking.status === "PAYMENT_PENDING" && isRenter ? (
-              <ManualPaymentInstructions />
+              <StripePaymentSection booking={booking} />
             ) : null}
 
             {booking.status === "COMPLETED" && isRenter ? (
@@ -457,6 +419,7 @@ export function BookingDetail() {
                 bookingId={booking.id}
                 ownerId={booking.owner.id}
                 equipmentId={booking.equipment.id}
+                onReviewSubmitted={() => void refetch()}
               />
             ) : null}
           </div>

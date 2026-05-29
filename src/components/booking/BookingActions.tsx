@@ -47,6 +47,18 @@ export function BookingActions({ booking, onUpdated }: BookingActionsProps) {
   const canDisputeInspecting =
     booking.status === "INSPECTING" && (isOwner || isRenter);
 
+  const canOwnerHandover =
+    isOwner &&
+    (booking.status === "PAID" ||
+      booking.status === "PICKUP_SCHEDULED" ||
+      booking.status === "IN_TRANSIT");
+
+  const canOwnerCompleteReturn =
+    isOwner &&
+    (booking.status === "RETURN_SCHEDULED" ||
+      booking.status === "RETURNING" ||
+      booking.status === "INSPECTING");
+
   return (
     <div className="flex flex-wrap gap-2">
       {booking.status === "PENDING" && isOwner ? (
@@ -75,6 +87,20 @@ export function BookingActions({ booking, onUpdated }: BookingActionsProps) {
         </Button>
       ) : null}
 
+      {canOwnerHandover ? (
+        <Button
+          type="button"
+          onClick={() =>
+            void run(
+              () => bookingService.ownerHandover(booking.id),
+              "Marked as handed over — rental is now active"
+            )
+          }
+        >
+          Handed over to renter
+        </Button>
+      ) : null}
+
       {booking.status === "IN_TRANSIT" && isRenter ? (
         <Button
           type="button"
@@ -86,6 +112,20 @@ export function BookingActions({ booking, onUpdated }: BookingActionsProps) {
           }
         >
           Confirm receipt
+        </Button>
+      ) : null}
+
+      {canOwnerCompleteReturn ? (
+        <Button
+          type="button"
+          onClick={() =>
+            void run(
+              () => bookingService.ownerCompleteReturn(booking.id),
+              "Return accepted — booking completed"
+            )
+          }
+        >
+          Return received — complete
         </Button>
       ) : null}
 

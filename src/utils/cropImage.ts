@@ -9,17 +9,19 @@ function loadImage(url: string): Promise<HTMLImageElement> {
   });
 }
 
-/** Renders the cropped region to a square canvas and returns a JPEG blob. */
+/** Renders the cropped region to a canvas and returns a JPEG blob. */
 export async function getCroppedImageBlob(
   imageSrc: string,
   pixelCrop: Area,
-  outputSize = 512,
+  outputWidth = 512,
+  outputHeight?: number,
   quality = 0.9
 ): Promise<Blob> {
+  const height = outputHeight ?? outputWidth;
   const image = await loadImage(imageSrc);
   const canvas = document.createElement("canvas");
-  canvas.width = outputSize;
-  canvas.height = outputSize;
+  canvas.width = outputWidth;
+  canvas.height = height;
   const ctx = canvas.getContext("2d");
   if (!ctx) {
     throw new Error("Could not get canvas context");
@@ -32,8 +34,8 @@ export async function getCroppedImageBlob(
     pixelCrop.height,
     0,
     0,
-    outputSize,
-    outputSize
+    outputWidth,
+    height
   );
   return new Promise((resolve, reject) => {
     canvas.toBlob(

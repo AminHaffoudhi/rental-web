@@ -2,9 +2,10 @@ import { Link } from "react-router-dom";
 import { Heart, MapPin, Package, Star } from "lucide-react";
 import { useState } from "react";
 import { UserAvatar } from "@/components/user/UserAvatar";
-import { CATEGORY_OPTIONS } from "@/config/categories";
+import { CategoryIcon } from "@/components/equipment/CategoryIcon";
 import type { Equipment } from "@/types/equipment";
 import { cn } from "@/utils/cn";
+import { equipmentReviewStats } from "@/utils/reviewStats";
 
 interface EquipmentCardProps {
   equipment: Equipment;
@@ -12,15 +13,10 @@ interface EquipmentCardProps {
 
 export function EquipmentCard({ equipment }: EquipmentCardProps) {
   const img = equipment.images[0];
-  const catMeta = CATEGORY_OPTIONS.find((c) => c.value === equipment.category);
-  const catLabel = catMeta?.label ?? equipment.category;
-  const PlaceholderIcon = catMeta?.icon ?? Package;
+  const cat = equipment.category;
+  const catLabel = cat?.name ?? "Equipment";
 
-  const reviews = equipment.reviews ?? [];
-  const reviewCount = reviews.length;
-  const avgRating =
-    reviewCount > 0 ? reviews.reduce((s, r) => s + r.rating, 0) / reviewCount : null;
-
+  const { count: reviewCount, average: avgRating } = equipmentReviewStats(equipment);
   const roundedRating = avgRating !== null ? Math.round(avgRating * 10) / 10 : null;
 
   const [favorited, setFavorited] = useState(false);
@@ -61,7 +57,12 @@ export function EquipmentCard({ equipment }: EquipmentCardProps) {
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center text-brand-500/40">
-              <PlaceholderIcon className="h-16 w-16" strokeWidth={1.25} aria-hidden />
+              <CategoryIcon
+                iconUrl={cat?.iconUrl}
+                name={catLabel}
+                className="h-16 w-16"
+                imgClassName="h-16 w-16"
+              />
             </div>
           )}
           <span className="badge badge-brand absolute left-2 top-2 z-10 shadow-sm">{catLabel}</span>

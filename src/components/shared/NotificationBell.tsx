@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useClickOutside } from "@/hooks/useClickOutside";
 import { formatDistanceToNow } from "date-fns";
 import { AnimatePresence, motion } from "framer-motion";
@@ -12,6 +13,17 @@ import {
 import { api, unwrap } from "@/services/api";
 import { useAuthStore } from "@/store/authStore";
 import { cn } from "@/utils/cn";
+import {
+  applyNotificationState,
+  dismissAllNotifications,
+  dismissNotification,
+  markAllNotificationsRead,
+  markNotificationRead,
+} from "@/lib/notificationState";
+import {
+  equipmentIdFromNotification,
+  notificationTargetPath,
+} from "@/lib/notificationNavigation";
 
 export interface AppNotification {
   id: string;
@@ -38,6 +50,12 @@ const TYPE_CONFIG: Record<string, { emoji: string; color: string }> = {
   dispute_opened: { emoji: "⚠️", color: "bg-red-50" },
   dispute_admin: { emoji: "⚠️", color: "bg-red-50" },
   payout_sent: { emoji: "💸", color: "bg-green-50" },
+  equipment_pending: { emoji: "📦", color: "bg-amber-50" },
+  equipment_approved: { emoji: "✅", color: "bg-green-50" },
+  equipment_rejected: { emoji: "❌", color: "bg-red-50" },
+  review_owner_received: { emoji: "⭐", color: "bg-amber-50" },
+  review_equipment_received: { emoji: "📦", color: "bg-amber-50" },
+  review_approved: { emoji: "✅", color: "bg-green-50" },
   general: { emoji: "🔔", color: "bg-stone-50" },
 };
 
@@ -47,10 +65,13 @@ function loadNotifications(): AppNotification[] {
     if (!raw) {
       return [];
     }
-    return (JSON.parse(raw) as AppNotification[]).map((n) => ({
-      ...n,
-      timestamp: new Date(n.timestamp),
-    }));
+    const parsed = applyNotificationState(
+      (JSON.parse(raw) as AppNotification[]).map((n) => ({
+        ...n,
+        timestamp: new Date(n.timestamp),
+      }))
+    );
+    return parsed;
   } catch {
     return [];
   }
@@ -75,6 +96,7 @@ interface ApiNotificationRow {
 }
 
 export default function NotificationBell() {
+  const navigate = useNavigate();
   const token = useAuthStore((s) => s.token);
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<AppNotification[]>(loadNotifications);
@@ -90,7 +112,7 @@ export default function NotificationBell() {
 
   const addNotification = useCallback((n: AppNotification) => {
     setNotifications((prev) => {
-      const updated = [n, ...prev].slice(0, 30);
+      const updated = applyNotificationState([n, ...prev].slice(0, 30));
       saveNotifications(updated);
       return updated;
     });
@@ -98,10 +120,19 @@ export default function NotificationBell() {
 
   useEffect(() => {
     const unsubscribe = onNotificationReceived((title, body, data) => {
-      const url = typeof data.url === "string" ? data.url : undefined;
       const type = (data.type as string) || "general";
+      const equipmentId =
+        typeof data.equipmentId === "string"
+          ? data.equipmentId
+          : null;
+      const rawUrl = typeof data.url === "string" ? data.url : undefined;
+      const url = rawUrl
+        ? notificationTargetPath(rawUrl, equipmentId)
+        : undefined;
       addNotification({
-        id: `push-${type}-${Date.now()}`,
+        id: equipmentId
+          ? `push-${type}-${equipmentId}-${Date.now()}`
+          : `push-${type}-${Date.now()}`,
         title,
         body,
         type,
@@ -136,9 +167,11 @@ export default function NotificationBell() {
           const existing = byId.get(n.id);
           byId.set(n.id, existing ? { ...n, read: existing.read } : n);
         }
-        const merged = [...byId.values()]
-          .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
-          .slice(0, 30);
+        const merged = applyNotificationState(
+          [...byId.values()]
+            .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
+            .slice(0, 30)
+        );
         saveNotifications(merged);
         return merged;
       });
@@ -171,8 +204,27 @@ export default function NotificationBell() {
 
   useClickOutside(dropdownRef, () => setOpen(false), open);
 
+  function markRead(id: string): void {
+    markNotificationRead(id);
+    setNotifications((prev) => {
+      const updated = prev.map((n) => (n.id === id ? { ...n, read: true } : n));
+      saveNotifications(updated);
+      return updated;
+    });
+  }
+
+  function openNotification(n: AppNotification): void {
+    if (!n.url) {
+      return;
+    }
+    const equipmentId = equipmentIdFromNotification(n);
+    const path = notificationTargetPath(n.url, equipmentId);
+    navigate(path);
+  }
+
   function markAllRead(): void {
     setNotifications((prev) => {
+      markAllNotificationsRead(prev.map((n) => n.id));
       const updated = prev.map((n) => ({ ...n, read: true }));
       saveNotifications(updated);
       return updated;
@@ -180,6 +232,7 @@ export default function NotificationBell() {
   }
 
   function dismiss(id: string): void {
+    dismissNotification(id);
     setNotifications((prev) => {
       const updated = prev.filter((n) => n.id !== id);
       saveNotifications(updated);
@@ -188,8 +241,11 @@ export default function NotificationBell() {
   }
 
   function clearAll(): void {
-    setNotifications([]);
-    saveNotifications([]);
+    setNotifications((prev) => {
+      dismissAllNotifications(prev.map((n) => n.id));
+      saveNotifications([]);
+      return [];
+    });
   }
 
   async function handleEnableNotifications(): Promise<void> {
@@ -338,8 +394,27 @@ export default function NotificationBell() {
                         animate={{ opacity: 1, height: "auto" }}
                         exit={{ opacity: 0, height: 0, marginBottom: 0 }}
                         transition={{ duration: 0.2 }}
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => {
+                          markRead(n.id);
+                          if (n.url) {
+                            setOpen(false);
+                            openNotification(n);
+                          }
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            markRead(n.id);
+                            if (n.url) {
+                              setOpen(false);
+                              openNotification(n);
+                            }
+                          }
+                        }}
                         className={cn(
-                          "group relative flex gap-3 border-b border-stone-50 px-4 py-3 transition-colors last:border-0",
+                          "group relative flex cursor-pointer gap-3 border-b border-stone-50 px-4 py-3 transition-colors last:border-0",
                           n.read ? "hover:bg-stone-50/60" : "bg-brand-50/30 hover:bg-brand-50/50"
                         )}
                       >
@@ -369,14 +444,9 @@ export default function NotificationBell() {
                               {formatDistanceToNow(n.timestamp, { addSuffix: true })}
                             </span>
                             {n.url ? (
-                              <a
-                                href={n.url}
-                                rel="noopener noreferrer"
-                                onClick={() => setOpen(false)}
-                                className="flex items-center gap-0.5 text-[10px] font-semibold text-brand-500 transition-colors hover:text-brand-600 hover:underline"
-                              >
+                              <span className="flex items-center gap-0.5 text-[10px] font-semibold text-brand-500">
                                 View <ExternalLink size={9} />
-                              </a>
+                              </span>
                             ) : null}
                           </div>
                         </div>
@@ -387,7 +457,10 @@ export default function NotificationBell() {
 
                         <button
                           type="button"
-                          onClick={() => dismiss(n.id)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            dismiss(n.id);
+                          }}
                           className="absolute right-2.5 top-2.5 flex h-5 w-5 items-center justify-center rounded-full bg-stone-100 opacity-0 transition-opacity hover:bg-stone-200 group-hover:opacity-100"
                           aria-label="Dismiss"
                         >

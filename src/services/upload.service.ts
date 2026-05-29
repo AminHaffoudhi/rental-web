@@ -1,6 +1,6 @@
 import { api, getApiErrorDetail, unwrap } from "@/services/api";
 
-export type UploadFolder = "equipment" | "avatars" | "kyc" | "delivery";
+export type UploadFolder = "equipment" | "avatars" | "covers" | "kyc" | "delivery";
 
 export interface SignUploadResponse {
   uploadUrl: string;

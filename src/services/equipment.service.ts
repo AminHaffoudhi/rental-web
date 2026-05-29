@@ -1,12 +1,13 @@
 import { api, unwrap } from "@/services/api";
-import type { Category, Equipment } from "@/types/equipment";
+import type { Equipment } from "@/types/equipment";
 import { datesInRange } from "@/utils/dates";
 
 export type EquipmentSort = "recent" | "price_asc" | "price_desc" | "rating";
 
 export interface EquipmentFilters {
   q?: string;
-  category?: Category;
+  /** Category slug (e.g. `construction`) */
+  category?: string;
   minPrice?: number;
   maxPrice?: number;
   location?: string;
@@ -26,7 +27,7 @@ export interface EquipmentSearchResult {
 export interface CreateEquipmentData {
   title: string;
   description: string;
-  category: Category;
+  categoryId: string;
   dailyRate: number;
   weeklyRate?: number;
   depositAmount: number;
@@ -47,6 +48,11 @@ function serializeFilters(filters: EquipmentFilters): Record<string, unknown> {
 
 export async function searchEquipment(filters: EquipmentFilters): Promise<EquipmentSearchResult> {
   const res = await api.get(`/equipment`, { params: serializeFilters(filters) });
+  return unwrap(res);
+}
+
+export async function listMyEquipment(): Promise<EquipmentSearchResult> {
+  const res = await api.get("/equipment/mine");
   return unwrap(res);
 }
 

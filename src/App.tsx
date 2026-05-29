@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useParams } from "react-router-dom";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { MainLayout } from "@/components/layout/MainLayout";
@@ -18,6 +18,11 @@ import { PublicProfile } from "@/pages/PublicProfile";
 import { Register } from "@/pages/Register";
 import { Search } from "@/pages/Search";
 import { VerifyEmail } from "@/pages/VerifyEmail";
+
+function RedirectLegacyProfile() {
+  const { userId } = useParams<{ userId: string }>();
+  return <Navigate to={userId ? `/users/${userId}` : "/search"} replace />;
+}
 
 export default function App() {
   return (
@@ -41,7 +46,8 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/search" element={<Search />} />
         <Route path="/equipment/:id" element={<EquipmentDetail />} />
-        <Route path="/profile/:userId" element={<PublicProfile />} />
+        <Route path="/users/:userId" element={<PublicProfile />} />
+        <Route path="/profile/:userId" element={<RedirectLegacyProfile />} />
 
         <Route element={<ProtectedRoute />}>
           <Route path="/bookings" element={<Bookings />} />

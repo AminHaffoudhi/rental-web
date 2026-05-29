@@ -9,6 +9,7 @@ import { startOfDay } from "date-fns";
 import { Headphones, RotateCcw, Shield, Star } from "lucide-react";
 import { cn } from "@/utils/cn";
 import { useAuthStore } from "@/store/authStore";
+import { equipmentReviewStats } from "@/utils/reviewStats";
 
 interface BookingFormProps {
   equipment: Equipment;
@@ -70,11 +71,7 @@ export function BookingForm({
     return estimateTotals(equipment, start, end);
   }, [equipment, startStr, endStr]);
 
-  const reviews = equipment.reviews ?? [];
-  const avgRating =
-    reviews.length > 0
-      ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length
-      : null;
+  const { count: reviewCount, average: avgRating } = equipmentReviewStats(equipment);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -127,7 +124,7 @@ export function BookingForm({
               ))}
             </div>
             <span className="tabular-nums">{avgRating.toFixed(1)}</span>
-            <span className="text-stone-400">({reviews.length})</span>
+            <span className="text-stone-400">({reviewCount})</span>
           </div>
         ) : (
           <span className="text-sm text-stone-400">New listing</span>

@@ -18,7 +18,9 @@ import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { EquipmentGrid } from "@/components/equipment/EquipmentGrid";
-import { CATEGORIES, type CategoryFilterValue } from "@/config/categories";
+import { ALL_CATEGORY_FILTER, buildCategoryFilters } from "@/config/categories";
+import { CategoryIcon } from "@/components/equipment/CategoryIcon";
+import { useCategories } from "@/hooks/useCategories";
 import { useEquipmentList } from "@/hooks/useEquipment";
 import { cn } from "@/utils/cn";
 
@@ -63,21 +65,6 @@ const stats = [
   { value: "12,000+", label: "Rentals" },
   { value: "4.9", label: "Rating", showStar: true },
 ] as const;
-
-/** Browse grid order: specific categories first, then All. */
-const HOMEPAGE_CATEGORIES = [
-  ...CATEGORIES.filter((c) => c.value !== "ALL"),
-  ...CATEGORIES.filter((c) => c.value === "ALL"),
-];
-
-const CATEGORY_LISTING_COUNTS: Record<CategoryFilterValue, string> = {
-  ALL: "2,400+ listings available",
-  CONSTRUCTION: "820 listings available",
-  SPORTS: "540 listings available",
-  EVENTS: "310 listings available",
-  TOOLS: "490 listings available",
-  OTHER: "240 listings available",
-};
 
 const steps = [
   {
@@ -138,6 +125,11 @@ function SectionReveal({
 
 export function Home() {
   const { equipment, isLoading, error, refetch } = useEquipmentList({ limit: 6 });
+  const { categories } = useCategories();
+  const homepageCategories = [
+    ...buildCategoryFilters(categories).filter((c) => c.value !== ALL_CATEGORY_FILTER.value),
+    ALL_CATEGORY_FILTER,
+  ];
 
   const showFeaturedEmpty = !isLoading && (error || equipment.length === 0);
 
@@ -284,30 +276,51 @@ export function Home() {
             viewport={{ once: true, margin: "-80px" }}
             variants={gridContainerVariants}
           >
-            {HOMEPAGE_CATEGORIES.map((cat) => (
-              <motion.div key={cat.value} variants={gridItemVariants}>
-                <Link
-                  to={
-                    cat.value === "ALL" ? "/search" : `/search?category=${encodeURIComponent(cat.value)}`
-                  }
-                  className={cn(
-                    "group flex flex-col items-center rounded-2xl border border-stone-100 bg-white p-8 text-center shadow-sm transition-all duration-300",
-                    "hover:-translate-y-1 hover:border-brand-200 hover:bg-brand-50 hover:shadow-lg"
-                  )}
-                >
-                  <span
-                    className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-stone-50 text-stone-700 ring-1 ring-stone-100"
-                    aria-hidden
+            {homepageCategories.map((cat) => {
+              const iconUrl = "iconUrl" in cat ? cat.iconUrl : undefined;
+              const description =
+                "description" in cat && cat.description
+                  ? cat.description
+                  : cat.value === ALL_CATEGORY_FILTER.value
+                    ? "Browse everything in our catalog"
+                    : "Explore listings in this category";
+              return (
+                <motion.div key={cat.value} variants={gridItemVariants}>
+                  <Link
+                    to={
+                      cat.value === ALL_CATEGORY_FILTER.value
+                        ? "/search"
+                        : `/search?category=${encodeURIComponent(cat.value)}`
+                    }
+                    className={cn(
+                      "group flex flex-col items-center rounded-2xl border border-stone-100 bg-white p-8 text-center shadow-sm transition-all duration-300",
+                      "hover:-translate-y-1 hover:border-brand-200 hover:bg-brand-50 hover:shadow-lg"
+                    )}
                   >
-                    <cat.icon className="h-7 w-7" strokeWidth={1.75} />
-                  </span>
-                  <h4 className="font-display text-lg font-semibold text-stone-900">{cat.label}</h4>
-                  <p className="mt-2 text-sm text-stone-500">
-                    {CATEGORY_LISTING_COUNTS[cat.value]}
-                  </p>
-                </Link>
-              </motion.div>
-            ))}
+                    <span
+                      className={cn(
+                        "mb-4 flex h-14 w-14 items-center justify-center rounded-2xl ring-1 ring-stone-100",
+                        "color" in cat && cat.color ? cat.color : "bg-stone-50 text-stone-700"
+                      )}
+                      aria-hidden
+                    >
+                      {cat.value === ALL_CATEGORY_FILTER.value && cat.icon ? (
+                        <cat.icon className="h-7 w-7" strokeWidth={1.75} />
+                      ) : (
+                        <CategoryIcon
+                          iconUrl={iconUrl}
+                          name={cat.label}
+                          className="h-7 w-7"
+                          imgClassName="h-8 w-8"
+                        />
+                      )}
+                    </span>
+                    <h4 className="font-display text-lg font-semibold text-stone-900">{cat.label}</h4>
+                    <p className="mt-2 line-clamp-2 text-sm text-stone-500">{description}</p>
+                  </Link>
+                </motion.div>
+              );
+            })}
           </motion.div>
         </SectionReveal>
       </section>

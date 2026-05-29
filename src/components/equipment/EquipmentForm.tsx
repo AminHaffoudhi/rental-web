@@ -22,7 +22,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { CATEGORY_OPTIONS } from "@/config/categories";
+import { CategoryIcon } from "@/components/equipment/CategoryIcon";
+import { useCategories } from "@/hooks/useCategories";
 import type { CreateEquipmentData } from "@/services/equipment.service";
 import { cn } from "@/utils/cn";
 
@@ -64,9 +65,7 @@ const schema = z
         (v) => !hasAbsurdRun(v),
         "Description has an unbroken string that's too long — add spaces or line breaks"
       ),
-    category: z.enum(["CONSTRUCTION", "SPORTS", "EVENTS", "TOOLS", "OTHER"], {
-      message: "Choose a category",
-    }),
+    categoryId: z.string().min(1, "Choose a category"),
     dailyRate: z.preprocess(
       toRequiredNumber,
       z
@@ -203,13 +202,14 @@ export function EquipmentForm({
   onSubmit,
   submitLabel = "Save listing",
 }: EquipmentFormProps) {
+  const { categories, isLoading: categoriesLoading } = useCategories();
   const form = useForm<FormValues>({
     resolver: zodResolver(schema) as Resolver<FormValues>,
     mode: "onTouched",
     defaultValues: {
       title: defaultValues?.title ?? "",
       description: defaultValues?.description ?? "",
-      category: defaultValues?.category ?? undefined,
+      categoryId: defaultValues?.categoryId ?? undefined,
       dailyRate: defaultValues?.dailyRate,
       weeklyRate: defaultValues?.weeklyRate,
       depositAmount: defaultValues?.depositAmount ?? 0,
@@ -228,7 +228,7 @@ export function EquipmentForm({
     const payload: CreateEquipmentData = {
       title: values.title.trim(),
       description: values.description.trim(),
-      category: values.category,
+      categoryId: values.categoryId,
       dailyRate: values.dailyRate,
       weeklyRate: values.weeklyRate,
       depositAmount: values.depositAmount ?? 0,
@@ -316,47 +316,66 @@ export function EquipmentForm({
 
           <FormField
             control={form.control}
-            name="category"
+            name="categoryId"
             render={({ field }) => (
-              <FormItem data-field="category">
+              <FormItem data-field="categoryId">
                 <FormLabel>Category</FormLabel>
                 <FormControl>
-                  <motion.div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                    {CATEGORY_OPTIONS.map((c) => {
-                      const Icon = c.icon;
-                      const selected = field.value === c.value;
-                      return (
-                        <button
-                          key={c.value}
-                          type="button"
-                          onClick={() => field.onChange(c.value)}
-                          className={cn(
-                            "flex flex-col items-center gap-2 rounded-xl border-2 px-3 py-3 text-center transition-all duration-150",
-                            selected
-                              ? "border-brand-500 bg-brand-50 shadow-sm"
-                              : "border-stone-100 bg-stone-50/50 hover:border-stone-200 hover:bg-white"
-                          )}
-                        >
-                          <span
+                  {categoriesLoading && categories.length === 0 ? (
+                    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                      {Array.from({ length: 6 }).map((_, i) => (
+                        <div
+                          key={i}
+                          className="h-[72px] animate-pulse rounded-xl bg-stone-100"
+                        />
+                      ))}
+                    </div>
+                  ) : categories.length === 0 ? (
+                    <p className="text-sm text-amber-700">
+                      No categories available yet. Ask an admin to add categories.
+                    </p>
+                  ) : (
+                    <motion.div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                      {categories.map((c) => {
+                        const selected = field.value === c.id;
+                        return (
+                          <button
+                            key={c.id}
+                            type="button"
+                            onClick={() => field.onChange(c.id)}
                             className={cn(
-                              "flex h-9 w-9 items-center justify-center rounded-lg",
-                              c.color
+                              "flex flex-col items-center gap-2 rounded-xl border-2 px-3 py-3 text-center transition-all duration-150",
+                              selected
+                                ? "border-brand-500 bg-brand-50 shadow-sm"
+                                : "border-stone-100 bg-stone-50/50 hover:border-stone-200 hover:bg-white"
                             )}
                           >
-                            <Icon className="h-4 w-4" aria-hidden />
-                          </span>
-                          <span
-                            className={cn(
-                              "text-xs font-semibold",
-                              selected ? "text-brand-700" : "text-stone-600"
-                            )}
-                          >
-                            {c.label}
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </motion.div>
+                            <span
+                              className={cn(
+                                "flex h-9 w-9 items-center justify-center rounded-lg",
+                                c.color
+                              )}
+                            >
+                              <CategoryIcon
+                                iconUrl={c.iconUrl}
+                                name={c.name}
+                                className="h-4 w-4"
+                                imgClassName="h-4 w-4"
+                              />
+                            </span>
+                            <span
+                              className={cn(
+                                "text-xs font-semibold",
+                                selected ? "text-brand-700" : "text-stone-600"
+                              )}
+                            >
+                              {c.name}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </motion.div>
+                  )}
                 </FormControl>
                 <FormMessage />
               </FormItem>

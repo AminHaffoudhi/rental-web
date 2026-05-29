@@ -16,6 +16,9 @@ export interface User {
   name: string;
   email: string;
   image?: string;
+  coverImage?: string | null;
+  bio?: string;
+  location?: string | null;
   role: Role;
   kycStatus: KycStatus;
   phone?: string;

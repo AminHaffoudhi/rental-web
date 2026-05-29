@@ -31,6 +31,16 @@ export function useEquipmentList(filters: EquipmentFilters) {
     void refetch();
   }, [refetch]);
 
+  useEffect(() => {
+    function onVisible() {
+      if (document.visibilityState === "visible") {
+        void refetch();
+      }
+    }
+    document.addEventListener("visibilitychange", onVisible);
+    return () => document.removeEventListener("visibilitychange", onVisible);
+  }, [refetch]);
+
   return { equipment, total, isLoading, error, refetch };
 }
 
@@ -39,31 +49,36 @@ export function useEquipmentDetail(id: string | undefined) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  useEffect(() => {
+  const refetch = useCallback(async () => {
     if (!id) {
       setEquipment(null);
       return;
     }
-    let cancelled = false;
     setIsLoading(true);
     setError(null);
-    void equipmentService
-      .getEquipmentById(id)
-      .then((data) => {
-        if (!cancelled) setEquipment(data);
-      })
-      .catch((e: unknown) => {
-        if (!cancelled) {
-          setError(new Error(getApiErrorDetail(e).message));
-        }
-      })
-      .finally(() => {
-        if (!cancelled) setIsLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
+    try {
+      const data = await equipmentService.getEquipmentById(id);
+      setEquipment(data);
+    } catch (e: unknown) {
+      setError(new Error(getApiErrorDetail(e).message));
+    } finally {
+      setIsLoading(false);
+    }
   }, [id]);
 
-  return { equipment, isLoading, error };
+  useEffect(() => {
+    void refetch();
+  }, [refetch]);
+
+  useEffect(() => {
+    function onVisible() {
+      if (document.visibilityState === "visible" && id) {
+        void refetch();
+      }
+    }
+    document.addEventListener("visibilitychange", onVisible);
+    return () => document.removeEventListener("visibilitychange", onVisible);
+  }, [id, refetch]);
+
+  return { equipment, isLoading, error, refetch };
 }

@@ -9,6 +9,30 @@ export interface UpdateProfileData {
   name?: string;
   phone?: string;
   image?: string;
+  coverImage?: string;
+  bio?: string;
+  location?: string;
+}
+
+export interface PublicProfileStats {
+  listings: number;
+  reviews: number;
+  avgRating: number | null;
+}
+
+export interface PublicUserProfile {
+  id: string;
+  name: string;
+  image?: string | null;
+  coverImage?: string | null;
+  bio?: string;
+  location?: string | null;
+  role: User["role"];
+  kycStatus: User["kycStatus"];
+  createdAt: string;
+  stats: PublicProfileStats;
+  equipment: Equipment[];
+  reviewsReceived: Review[];
 }
 
 export async function updateProfile(data: UpdateProfileData): Promise<User> {
@@ -30,17 +54,6 @@ export async function uploadKycDocument(
 ): Promise<User> {
   await submitKyc({ documentUrl, documentType });
   return refreshProfile();
-}
-
-export interface PublicUserProfile {
-  id: string;
-  name: string;
-  email: string;
-  image?: string | null;
-  role: User["role"];
-  createdAt: string;
-  equipment: Equipment[];
-  reviewsReceived: Review[];
 }
 
 export async function getPublicProfile(userId: string): Promise<PublicUserProfile> {

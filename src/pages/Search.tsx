@@ -20,7 +20,6 @@ import {
 import { useEquipmentList } from "@/hooks/useEquipment";
 import { useDebounce } from "@/hooks/useDebounce";
 import type { EquipmentSort } from "@/services/equipment.service";
-import type { Category } from "@/types/equipment";
 import { cn } from "@/utils/cn";
 
 const PAGE_SIZE = 12;
@@ -32,13 +31,20 @@ const SORT_OPTIONS: { value: EquipmentSort; label: string }[] = [
   { value: "rating", label: "Top Rated" },
 ];
 
-function parseCategory(raw: string | null): Category | null {
-  if (
-    raw &&
-    ["CONSTRUCTION", "SPORTS", "EVENTS", "TOOLS", "OTHER"].includes(raw)
-  ) {
-    return raw as Category;
-  }
+const LEGACY_CATEGORY_SLUGS: Record<string, string> = {
+  CONSTRUCTION: "construction",
+  SPORTS: "sports",
+  EVENTS: "events",
+  TOOLS: "tools",
+  OTHER: "other",
+};
+
+function parseCategorySlug(raw: string | null): string | null {
+  if (!raw?.trim()) return null;
+  const upper = raw.trim().toUpperCase();
+  if (LEGACY_CATEGORY_SLUGS[upper]) return LEGACY_CATEGORY_SLUGS[upper];
+  const slug = raw.trim().toLowerCase();
+  if (/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) return slug;
   return null;
 }
 
@@ -62,7 +68,7 @@ export function Search() {
 
   const filters = useMemo(() => {
     const q = params.get("q")?.trim() || undefined;
-    const category = parseCategory(params.get("category"));
+    const category = parseCategorySlug(params.get("category"));
     const minRaw = params.get("minPrice");
     const maxRaw = params.get("maxPrice");
     const minPrice =
@@ -128,7 +134,7 @@ export function Search() {
     });
   }, [debouncedQ, patchParams, params]);
 
-  const selectedCategory = parseCategory(params.get("category"));
+  const selectedCategory = parseCategorySlug(params.get("category"));
 
   const sortValue = parseSort(params.get("sort"));
   const page = Math.max(1, parseInt(params.get("page") ?? "1", 10) || 1);
