@@ -2,42 +2,26 @@ import { Check } from "lucide-react";
 import type { BookingStatus } from "@/types/booking";
 import { cn } from "@/utils/cn";
 
-const STEPS = [
-  "Requested",
-  "Confirmed",
-  "Paid",
-  "Pickup scheduled",
-  "In transit",
-  "Active",
-  "Return scheduled",
-  "Returning",
-  "Inspecting",
-  "Completed",
-];
+const STEPS = ["Requested", "Pay", "Active rental", "Completed"] as const;
 
 function getStepIndex(status: BookingStatus): number | null {
   switch (status) {
     case "PENDING":
       return 0;
     case "CONFIRMED":
-      return 1;
     case "PAYMENT_PENDING":
+      return 1;
     case "PAID":
-      return 2;
     case "PICKUP_SCHEDULED":
-      return 3;
     case "IN_TRANSIT":
-      return 4;
+      return 2;
     case "ACTIVE":
-      return 5;
     case "RETURN_SCHEDULED":
-      return 6;
     case "RETURNING":
-      return 7;
     case "INSPECTING":
-      return 8;
+      return 2;
     case "COMPLETED":
-      return 9;
+      return 3;
     default:
       return null;
   }
@@ -54,9 +38,7 @@ export function BookingTimeline({ status }: BookingTimelineProps) {
     return (
       <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-900">
         <p className="font-semibold">Dispute in progress</p>
-        <p className="mt-1 text-red-800/90">
-          This booking is under dispute. Contact support if you need help.
-        </p>
+        <p className="mt-1 text-red-800/90">Contact support if you need help.</p>
       </div>
     );
   }
@@ -80,9 +62,8 @@ export function BookingTimeline({ status }: BookingTimelineProps) {
   return (
     <ul className="relative space-y-0 border-l border-stone-200 pl-6">
       {STEPS.map((label, i) => {
-        const complete = status === "COMPLETED" || i < idx;
+        const complete = status === "COMPLETED" ? i <= 3 : i < idx;
         const current = status !== "COMPLETED" && i === idx;
-        const pending = !complete && !current;
 
         return (
           <li key={label} className="relative pb-8 last:pb-0">
@@ -108,13 +89,13 @@ export function BookingTimeline({ status }: BookingTimelineProps) {
               <p
                 className={cn(
                   "text-sm font-medium leading-tight",
-                  pending ? "text-stone-400" : "text-stone-900"
+                  complete || current ? "text-stone-900" : "text-stone-400"
                 )}
               >
                 {label}
               </p>
               {current ? (
-                <p className="mt-0.5 text-xs text-brand-700">Current stage</p>
+                <p className="mt-0.5 text-xs text-brand-700">Current step</p>
               ) : null}
             </div>
           </li>

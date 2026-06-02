@@ -48,10 +48,10 @@ export function StripePaymentSection({ booking }: StripePaymentSectionProps) {
           <CreditCard className="h-5 w-5" aria-hidden />
         </div>
         <div className="min-w-0 flex-1">
-          <h3 className="font-display text-lg font-semibold text-stone-900">Pay with Stripe</h3>
+          <h3 className="font-display text-lg font-semibold text-stone-900">Pay & start rental</h3>
           <p className="mt-1 text-sm text-stone-600">
-            Secure card payment. Your booking moves to <strong>Paid</strong> as soon as payment
-            succeeds.
+            One secure payment — your rental becomes <strong>active</strong> immediately. Coordinate
+            pickup with the owner after paying.
           </p>
         </div>
       </div>

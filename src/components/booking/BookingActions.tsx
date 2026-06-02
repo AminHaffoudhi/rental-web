@@ -19,6 +19,13 @@ interface BookingActionsProps {
   onUpdated: () => Promise<void> | void;
 }
 
+const ACTIVE_LIKE = new Set([
+  "ACTIVE",
+  "RETURN_SCHEDULED",
+  "RETURNING",
+  "INSPECTING",
+]);
+
 export function BookingActions({ booking, onUpdated }: BookingActionsProps) {
   const userId = useAuthStore((s) => s.user?.id);
   const [rejectOpen, setRejectOpen] = useState(false);
@@ -44,20 +51,8 @@ export function BookingActions({ booking, onUpdated }: BookingActionsProps) {
     }
   }
 
-  const canDisputeInspecting =
-    booking.status === "INSPECTING" && (isOwner || isRenter);
-
-  const canOwnerHandover =
-    isOwner &&
-    (booking.status === "PAID" ||
-      booking.status === "PICKUP_SCHEDULED" ||
-      booking.status === "IN_TRANSIT");
-
-  const canOwnerCompleteReturn =
-    isOwner &&
-    (booking.status === "RETURN_SCHEDULED" ||
-      booking.status === "RETURNING" ||
-      booking.status === "INSPECTING");
+  const canComplete = ACTIVE_LIKE.has(booking.status) && (isOwner || isRenter);
+  const canStartRental = booking.status === "PAID" && isOwner;
 
   return (
     <div className="flex flex-wrap gap-2">
@@ -65,9 +60,14 @@ export function BookingActions({ booking, onUpdated }: BookingActionsProps) {
         <>
           <Button
             type="button"
-            onClick={() => void run(() => bookingService.approveBooking(booking.id), "Approved")}
+            onClick={() =>
+              void run(
+                () => bookingService.approveBooking(booking.id),
+                "Approved — renter can pay now"
+              )
+            }
           >
-            Approve
+            Approve booking
           </Button>
           <Button type="button" variant="destructive" onClick={() => setRejectOpen(true)}>
             Reject
@@ -87,62 +87,37 @@ export function BookingActions({ booking, onUpdated }: BookingActionsProps) {
         </Button>
       ) : null}
 
-      {canOwnerHandover ? (
+      {canStartRental ? (
         <Button
           type="button"
           onClick={() =>
             void run(
               () => bookingService.ownerHandover(booking.id),
-              "Marked as handed over — rental is now active"
+              "Rental started"
             )
           }
         >
-          Handed over to renter
+          Start rental
         </Button>
       ) : null}
 
-      {booking.status === "IN_TRANSIT" && isRenter ? (
+      {canComplete ? (
         <Button
           type="button"
           onClick={() =>
             void run(
-              () => bookingService.confirmDelivery(booking.id),
-              "Marked as received — rental active"
+              () => bookingService.completeRental(booking.id),
+              "Rental completed"
             )
           }
         >
-          Confirm receipt
+          Complete rental
         </Button>
       ) : null}
 
-      {canOwnerCompleteReturn ? (
-        <Button
-          type="button"
-          onClick={() =>
-            void run(
-              () => bookingService.ownerCompleteReturn(booking.id),
-              "Return accepted — booking completed"
-            )
-          }
-        >
-          Return received — complete
-        </Button>
-      ) : null}
-
-      {booking.status === "ACTIVE" && isRenter ? (
-        <Button
-          type="button"
-          onClick={() =>
-            void run(() => bookingService.requestReturn(booking.id), "Return requested")
-          }
-        >
-          Request return
-        </Button>
-      ) : null}
-
-      {canDisputeInspecting ? (
+      {canComplete ? (
         <Button type="button" variant="destructive" onClick={() => setDisputeOpen(true)}>
-          Raise dispute
+          Report a problem
         </Button>
       ) : null}
 
@@ -180,7 +155,7 @@ export function BookingActions({ booking, onUpdated }: BookingActionsProps) {
       <Dialog open={disputeOpen} onOpenChange={setDisputeOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Open dispute</DialogTitle>
+            <DialogTitle>Report a problem</DialogTitle>
           </DialogHeader>
           <Textarea
             value={disputeReason}
@@ -198,12 +173,12 @@ export function BookingActions({ booking, onUpdated }: BookingActionsProps) {
               onClick={() =>
                 void run(
                   () => bookingService.raiseDispute(booking.id, disputeReason.trim()),
-                  "Dispute opened",
+                  "Report submitted",
                   () => setDisputeOpen(false)
                 )
               }
             >
-              Submit dispute
+              Submit
             </Button>
           </DialogFooter>
         </DialogContent>

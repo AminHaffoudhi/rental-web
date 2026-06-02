@@ -9,22 +9,15 @@ import {
   ChevronRight,
   Clock,
   Home,
-  Loader2,
   Package,
   Star,
-  Truck,
 } from "lucide-react";
 import { BookingActions } from "@/components/booking/BookingActions";
 import { BookingStatus } from "@/components/booking/BookingStatus";
 import { BookingTimeline } from "@/components/booking/BookingTimeline";
 import { StripePaymentSection } from "@/components/booking/StripePaymentSection";
-import { DeliveryStatus } from "@/components/delivery/DeliveryStatus";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { PLATFORM_FEE_PERCENT } from "@/config/constants";
 import { useBookingDetail } from "@/hooks/useBooking";
-import { useUpload } from "@/hooks/useUpload";
-import * as deliveryService from "@/services/delivery.service";
 import { ReviewForm } from "@/components/review/ReviewForm";
 import { getApiErrorDetail } from "@/services/api";
 import { useAuthStore } from "@/store/authStore";
@@ -63,51 +56,33 @@ function statusBanner(status: TB): {
       return {
         wrap: "border-amber-100 bg-amber-50 text-amber-950",
         icon: <Clock className="h-6 w-6 text-amber-600" />,
-        title: "Awaiting payment",
-        subtitle: "Transfer funds using the instructions below.",
+        title: "Pay to start",
+        subtitle: "Use the button below — your rental begins right after payment.",
       };
     case "PAID":
       return {
         wrap: "border-emerald-100 bg-emerald-50 text-emerald-950",
         icon: <CheckCircle2 className="h-6 w-6 text-emerald-600" />,
-        title: "Payment received",
-        subtitle: "Scheduling pickup or delivery next.",
+        title: "Paid",
+        subtitle: "Owner can start the rental, or it may already be active.",
       };
     case "PICKUP_SCHEDULED":
-      return {
-        wrap: "border-cyan-100 bg-cyan-50 text-cyan-950",
-        icon: <Truck className="h-6 w-6 text-cyan-600" />,
-        title: "Pickup scheduled",
-        subtitle: "Your delivery window is being coordinated.",
-      };
     case "IN_TRANSIT":
-      return {
-        wrap: "border-teal-100 bg-teal-50 text-teal-950",
-        icon: <Truck className="h-6 w-6 text-teal-600" />,
-        title: "On the way",
-        subtitle: "Equipment is en route — confirm receipt when it arrives.",
-      };
     case "ACTIVE":
       return {
         wrap: "border-green-100 bg-green-50 text-green-950",
         icon: <CheckCircle2 className="h-6 w-6 text-green-600" />,
         title: "Rental active",
-        subtitle: "Enjoy your rental — request return when finished.",
+        subtitle: "Coordinate pickup with the owner. Tap Complete rental when finished.",
       };
     case "RETURN_SCHEDULED":
     case "RETURNING":
-      return {
-        wrap: "border-indigo-100 bg-indigo-50 text-indigo-950",
-        icon: <Truck className="h-6 w-6 text-indigo-600" />,
-        title: "Return in progress",
-        subtitle: "Pickup or drop-off for return is underway.",
-      };
     case "INSPECTING":
       return {
-        wrap: "border-slate-100 bg-slate-50 text-slate-950",
-        icon: <Clock className="h-6 w-6 text-slate-600" />,
-        title: "Inspection",
-        subtitle: "The owner is verifying equipment condition.",
+        wrap: "border-green-100 bg-green-50 text-green-950",
+        icon: <CheckCircle2 className="h-6 w-6 text-green-600" />,
+        title: "Rental active",
+        subtitle: "Tap Complete rental when the equipment is returned.",
       };
     case "COMPLETED":
       return {
@@ -190,7 +165,6 @@ function BookingReviewSection({
 export function BookingDetail() {
   const { id } = useParams<{ id: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { upload, isUploading } = useUpload({ folder: "delivery" });
   const user = useAuthStore((s) => s.user);
   const { booking, isLoading, error, refetch } = useBookingDetail(id);
 
@@ -198,7 +172,7 @@ export function BookingDetail() {
     const payment = searchParams.get("payment");
     if (!payment) return;
     if (payment === "success") {
-      toast.success("Payment received — thank you!");
+      toast.success("Payment received — your rental is now active!");
       void refetch();
     } else if (payment === "cancelled") {
       toast("Payment cancelled. You can try again when ready.");
@@ -432,93 +406,19 @@ export function BookingDetail() {
               </div>
             </section>
 
-            <section className="rounded-2xl border border-stone-100 bg-white p-6 shadow-sm">
-              <h3 className="font-display text-lg font-semibold text-stone-900">Delivery</h3>
-              <div className="mt-4 space-y-4">
-                {booking.delivery ? (
-                  <>
-                    <DeliveryStatus status={booking.delivery.status} />
-                    {(booking.delivery.agentName || booking.delivery.agentPhone) && (
-                      <div className="rounded-lg bg-stone-50 p-3 text-sm">
-                        <p className="font-medium text-stone-900">Agent</p>
-                        <p className="text-stone-600">
-                          {[booking.delivery.agentName, booking.delivery.agentPhone]
-                            .filter(Boolean)
-                            .join(" · ")}
-                        </p>
-                        {booking.delivery.deliverySlot ? (
-                          <p className="mt-2 text-xs text-stone-500">
-                            Scheduled: {booking.delivery.deliverySlot}
-                          </p>
-                        ) : null}
-                      </div>
-                    )}
-                    <div className="space-y-2">
-                      <p className="text-sm font-medium text-stone-800">Pickup photos</p>
-                      <div className="flex flex-wrap gap-2">
-                        {booking.delivery.pickupPhotos.map((url) => (
-                          <img
-                            key={url}
-                            src={url}
-                            alt=""
-                            className="h-20 w-20 rounded-lg border border-stone-100 object-cover"
-                          />
-                        ))}
-                      </div>
-                      <Button type="button" variant="secondary" disabled={isUploading} asChild>
-                        <label>
-                          <input
-                            type="file"
-                            accept="image/*"
-                            multiple
-                            className="hidden"
-                            onChange={(e) =>
-                              void (async () => {
-                                const files = e.target.files;
-                                if (!files?.length || !booking.delivery) return;
-                                try {
-                                  for (const file of Array.from(files)) {
-                                    const url = await upload(file);
-                                    await deliveryService.uploadPickupPhotos(booking.delivery!.id, [
-                                      url,
-                                    ]);
-                                  }
-                                  toast.success("Photos uploaded");
-                                  await refetch();
-                                } catch (err) {
-                                  toast.error(
-                                    err instanceof Error ? err.message : "Upload failed"
-                                  );
-                                }
-                                e.target.value = "";
-                              })()
-                            }
-                          />
-                          {isUploading ? "Uploading…" : "Add pickup photos"}
-                        </label>
-                      </Button>
-                    </div>
-                    {booking.delivery.returnPhotos.length ? (
-                      <div className="space-y-2">
-                        <p className="text-sm font-medium text-stone-800">Return photos</p>
-                        <div className="flex flex-wrap gap-2">
-                          {booking.delivery.returnPhotos.map((url) => (
-                            <img
-                              key={url}
-                              src={url}
-                              alt=""
-                              className="h-20 w-20 rounded-lg border border-stone-100 object-cover"
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    ) : null}
-                  </>
-                ) : (
-                  <p className="text-sm text-stone-500">No delivery record yet.</p>
-                )}
-              </div>
-            </section>
+            {booking.status !== "PENDING" &&
+            booking.status !== "REJECTED" &&
+            booking.status !== "CANCELLED" ? (
+              <section className="rounded-2xl border border-stone-100 bg-stone-50 p-5 text-sm text-stone-600">
+                <p className="font-medium text-stone-800">Pickup & return</p>
+                <p className="mt-1">
+                  Arrange handoff directly with {isOwner ? "the renter" : "the owner"} at{" "}
+                  <span className="font-medium text-stone-900">{booking.equipment.location}</span>.
+                  No separate delivery scheduling — one payment starts the rental, one button
+                  completes it.
+                </p>
+              </section>
+            ) : null}
 
             <section className="rounded-2xl border border-stone-100 bg-white p-6 shadow-sm">
               <h3 className="font-display text-lg font-semibold text-stone-900">Payment</h3>
