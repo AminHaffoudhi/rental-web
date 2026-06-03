@@ -23,8 +23,7 @@ export interface UploadProgress {
 }
 
 /**
- * Upload through the API (no direct browser → MinIO request).
- * Avoids MinIO CORS / connection issues when Vite uses another port.
+ * Upload through the API (files are stored in Cloudinary).
  */
 export async function uploadFile(
   file: File,
@@ -64,7 +63,7 @@ export async function uploadFile(
     const { message } = getApiErrorDetail(err);
     if (message.includes("ECONNREFUSED") || message.toLowerCase().includes("network")) {
       throw new Error(
-        "Storage server is unavailable. Start MinIO (port 9000) and restart rental-api."
+        "File upload is unavailable. Check Cloudinary settings in rental-api and restart the API."
       );
     }
     throw new Error(message);

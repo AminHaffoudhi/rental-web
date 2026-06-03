@@ -20,6 +20,7 @@ import { PLATFORM_FEE_PERCENT } from "@/config/constants";
 import { useBookingDetail } from "@/hooks/useBooking";
 import { ReviewForm } from "@/components/review/ReviewForm";
 import { getApiErrorDetail } from "@/services/api";
+import * as paymentService from "@/services/payment.service";
 import { useAuthStore } from "@/store/authStore";
 import type { BookingStatus as TB } from "@/types/booking";
 import { cn } from "@/utils/cn";
@@ -170,13 +171,8 @@ export function BookingDetail() {
 
   useEffect(() => {
     const payment = searchParams.get("payment");
-    if (!payment) return;
-    if (payment === "success") {
-      toast.success("Payment received — your rental is now active!");
-      void refetch();
-    } else if (payment === "cancelled") {
-      toast("Payment cancelled. You can try again when ready.");
-    }
+    if (!payment || !id) return;
+
     setSearchParams(
       (prev) => {
         const next = new URLSearchParams(prev);
@@ -185,7 +181,37 @@ export function BookingDetail() {
       },
       { replace: true }
     );
-  }, [searchParams, refetch, setSearchParams]);
+
+    if (payment === "success") {
+      void (async () => {
+        try {
+          await paymentService.verifyCheckoutReturn(id);
+          toast.success("Payment received — your rental is now active!");
+        } catch (e) {
+          toast.error(getApiErrorDetail(e).message);
+        } finally {
+          await refetch();
+        }
+      })();
+      return;
+    }
+
+    if (payment === "cancelled") {
+      toast("Payment cancelled. You can try again when ready.");
+    }
+  }, [searchParams, refetch, setSearchParams, id]);
+
+  useEffect(() => {
+    if (!booking || !id || !user?.id) return;
+    const isParticipant = user.id === booking.renter.id || user.id === booking.owner.id;
+    if (!isParticipant || booking.status !== "PAYMENT_PENDING") return;
+    if (searchParams.get("payment") === "success") return;
+
+    void paymentService.verifyCheckoutReturn(id).then(
+      () => refetch(),
+      () => undefined
+    );
+  }, [booking?.id, booking?.status, booking?.renter.id, booking?.owner.id, id, refetch, searchParams, user?.id]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -213,6 +239,7 @@ export function BookingDetail() {
   }
 
   const isRenter = user?.id === booking.renter.id;
+  const isOwner = user?.id === booking.owner.id;
   const days = getDaysBetween(booking.startDate, booking.endDate);
   const rentExclusive = booking.totalPrice - booking.platformFee - booking.deliveryFee;
   const banner = statusBanner(booking.status);

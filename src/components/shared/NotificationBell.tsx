@@ -3,7 +3,30 @@ import { useNavigate } from "react-router-dom";
 import { useClickOutside } from "@/hooks/useClickOutside";
 import { formatDistanceToNow } from "date-fns";
 import { AnimatePresence, motion } from "framer-motion";
-import { Bell, BellRing, CheckCheck, ExternalLink, X } from "lucide-react";
+import {
+  AlertTriangle,
+  Banknote,
+  Bell,
+  BellRing,
+  CalendarCheck,
+  CalendarClock,
+  CalendarX,
+  CheckCheck,
+  Clock,
+  CreditCard,
+  ExternalLink,
+  Package,
+  PackageCheck,
+  PackageX,
+  ShieldCheck,
+  ShieldX,
+  Star,
+  Truck,
+  UserPlus,
+  Wallet,
+  X,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import {
   getPermissionState,
   initOneSignal,
@@ -35,28 +58,34 @@ export interface AppNotification {
   read: boolean;
 }
 
-const TYPE_CONFIG: Record<string, { emoji: string; color: string }> = {
-  new_user: { emoji: "👤", color: "bg-blue-50" },
-  kyc_submitted: { emoji: "🪪", color: "bg-yellow-50" },
-  kyc_approved: { emoji: "✅", color: "bg-green-50" },
-  kyc_rejected: { emoji: "⚠️", color: "bg-red-50" },
-  booking_request: { emoji: "📬", color: "bg-brand-50" },
-  booking_approved: { emoji: "🎉", color: "bg-green-50" },
-  booking_rejected: { emoji: "❌", color: "bg-red-50" },
-  payment_confirmed: { emoji: "💳", color: "bg-green-50" },
-  payment_received: { emoji: "💰", color: "bg-green-50" },
-  delivery_scheduled: { emoji: "🚚", color: "bg-blue-50" },
-  return_reminder: { emoji: "⏰", color: "bg-yellow-50" },
-  dispute_opened: { emoji: "⚠️", color: "bg-red-50" },
-  dispute_admin: { emoji: "⚠️", color: "bg-red-50" },
-  payout_sent: { emoji: "💸", color: "bg-green-50" },
-  equipment_pending: { emoji: "📦", color: "bg-amber-50" },
-  equipment_approved: { emoji: "✅", color: "bg-green-50" },
-  equipment_rejected: { emoji: "❌", color: "bg-red-50" },
-  review_owner_received: { emoji: "⭐", color: "bg-amber-50" },
-  review_equipment_received: { emoji: "📦", color: "bg-amber-50" },
-  review_approved: { emoji: "✅", color: "bg-green-50" },
-  general: { emoji: "🔔", color: "bg-stone-50" },
+type NotificationVisual = {
+  Icon: LucideIcon;
+  bg: string;
+  iconClass: string;
+};
+
+const TYPE_CONFIG: Record<string, NotificationVisual> = {
+  new_user: { Icon: UserPlus, bg: "bg-blue-50", iconClass: "text-blue-600" },
+  kyc_submitted: { Icon: ShieldCheck, bg: "bg-amber-50", iconClass: "text-amber-600" },
+  kyc_approved: { Icon: ShieldCheck, bg: "bg-emerald-50", iconClass: "text-emerald-600" },
+  kyc_rejected: { Icon: ShieldX, bg: "bg-red-50", iconClass: "text-red-600" },
+  booking_request: { Icon: CalendarClock, bg: "bg-brand-50", iconClass: "text-brand-600" },
+  booking_approved: { Icon: CalendarCheck, bg: "bg-emerald-50", iconClass: "text-emerald-600" },
+  booking_rejected: { Icon: CalendarX, bg: "bg-red-50", iconClass: "text-red-600" },
+  payment_confirmed: { Icon: CreditCard, bg: "bg-emerald-50", iconClass: "text-emerald-600" },
+  payment_received: { Icon: Wallet, bg: "bg-emerald-50", iconClass: "text-emerald-600" },
+  delivery_scheduled: { Icon: Truck, bg: "bg-blue-50", iconClass: "text-blue-600" },
+  return_reminder: { Icon: Clock, bg: "bg-amber-50", iconClass: "text-amber-600" },
+  dispute_opened: { Icon: AlertTriangle, bg: "bg-red-50", iconClass: "text-red-600" },
+  dispute_admin: { Icon: AlertTriangle, bg: "bg-red-50", iconClass: "text-red-600" },
+  payout_sent: { Icon: Banknote, bg: "bg-emerald-50", iconClass: "text-emerald-600" },
+  equipment_pending: { Icon: Package, bg: "bg-amber-50", iconClass: "text-amber-600" },
+  equipment_approved: { Icon: PackageCheck, bg: "bg-emerald-50", iconClass: "text-emerald-600" },
+  equipment_rejected: { Icon: PackageX, bg: "bg-red-50", iconClass: "text-red-600" },
+  review_owner_received: { Icon: Star, bg: "bg-amber-50", iconClass: "text-amber-600" },
+  review_equipment_received: { Icon: Star, bg: "bg-amber-50", iconClass: "text-amber-600" },
+  review_approved: { Icon: Star, bg: "bg-emerald-50", iconClass: "text-emerald-600" },
+  general: { Icon: Bell, bg: "bg-stone-100", iconClass: "text-stone-500" },
 };
 
 function loadNotifications(): AppNotification[] {
@@ -386,6 +415,7 @@ export default function NotificationBell() {
                 <AnimatePresence initial={false}>
                   {notifications.map((n) => {
                     const config = TYPE_CONFIG[n.type] ?? TYPE_CONFIG.general;
+                    const { Icon } = config;
                     return (
                       <motion.div
                         key={n.id}
@@ -420,11 +450,11 @@ export default function NotificationBell() {
                       >
                         <div
                           className={cn(
-                            "mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-base",
-                            config.color
+                            "mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl",
+                            config.bg
                           )}
                         >
-                          {config.emoji}
+                          <Icon size={16} strokeWidth={2} className={config.iconClass} aria-hidden />
                         </div>
 
                         <div className="min-w-0 flex-1 pr-4">

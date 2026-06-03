@@ -23,3 +23,11 @@ export async function createCheckoutSession(
   const res = await api.post(`/payments/checkout/${bookingId}`);
   return unwrap(res);
 }
+
+/** Confirms payment after Stripe redirect when the webhook has not run yet. */
+export async function verifyCheckoutReturn(
+  bookingId: string
+): Promise<{ activated: boolean }> {
+  const res = await api.post(`/payments/verify/${bookingId}`);
+  return unwrap(res);
+}
