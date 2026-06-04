@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { TrendingDown, TrendingUp } from "lucide-react";
 import type {
@@ -23,7 +24,10 @@ const STATUS_META: Record<
   DISPUTED: { label: "Disputed", color: "#dc2626", order: 8 },
 };
 
-function statusLabel(status: BookingStatus | string): string {
+function statusLabel(status: BookingStatus | string, t: (key: string) => string): string {
+  const key = `bookingStatus.${status}`;
+  const translated = t(key);
+  if (translated !== key) return translated;
   return STATUS_META[status]?.label ?? status.replace(/_/g, " ").toLowerCase();
 }
 
@@ -59,14 +63,13 @@ function ChartCard({
 }
 
 export function EarningsBarChart({ months }: { months: OwnerEarningsMonth[] }) {
+  const { t } = useTranslation();
   const max = Math.max(...months.map((m) => m.net), 1);
 
   return (
-    <ChartCard title="Earnings trend" subtitle="Net revenue over the last 6 months">
+    <ChartCard title={t("charts.earningsTrend")} subtitle={t("charts.earningsSubtitle")}>
       {months.every((m) => m.net === 0) ? (
-        <p className="py-8 text-center text-sm text-stone-500">
-          No completed rentals yet. Earnings will appear here.
-        </p>
+        <p className="py-8 text-center text-sm text-stone-500">{t("charts.noEarnings")}</p>
       ) : (
         <div className="flex h-52 items-end justify-between gap-2 sm:gap-3">
           {months.map((m) => {
@@ -94,6 +97,7 @@ export function EarningsBarChart({ months }: { months: OwnerEarningsMonth[] }) {
 }
 
 export function BookingsTrendChart({ days }: { days: OwnerBookingsTrendDay[] }) {
+  const { t } = useTranslation();
   const max = Math.max(...days.map((d) => d.count), 1);
   const w = 100;
   const h = 48;
@@ -112,8 +116,8 @@ export function BookingsTrendChart({ days }: { days: OwnerBookingsTrendDay[] }) 
 
   return (
     <ChartCard
-      title="Booking activity"
-      subtitle={`${totalLast7} new requests in the last 7 days`}
+      title={t("charts.bookingActivity")}
+      subtitle={t("charts.requestsLast7", { count: totalLast7 })}
     >
       <div className="relative">
         <svg
@@ -159,6 +163,7 @@ export function BookingsStatusChart({
 }: {
   items: { status: BookingStatus; count: number }[];
 }) {
+  const { t } = useTranslation();
   const sorted = [...items]
     .filter((i) => i.count > 0)
     .sort(
@@ -169,8 +174,8 @@ export function BookingsStatusChart({
 
   if (total === 0) {
     return (
-      <ChartCard title="Bookings by status" subtitle="All-time breakdown">
-        <p className="py-8 text-center text-sm text-stone-500">No bookings yet.</p>
+      <ChartCard title={t("charts.byStatus")} subtitle={t("charts.allTimeBreakdown")}>
+        <p className="py-8 text-center text-sm text-stone-500">{t("charts.noBookingsChart")}</p>
       </ChartCard>
     );
   }
@@ -188,7 +193,10 @@ export function BookingsStatusChart({
     .join(", ");
 
   return (
-    <ChartCard title="Bookings by status" subtitle={`${total} total bookings`}>
+    <ChartCard
+      title={t("charts.byStatus")}
+      subtitle={t("charts.totalBookingsCount", { count: total })}
+    >
       <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
         <div
           className="mx-auto h-36 w-36 shrink-0 rounded-full sm:mx-0"
@@ -204,7 +212,7 @@ export function BookingsStatusChart({
                   className="h-2.5 w-2.5 shrink-0 rounded-full"
                   style={{ backgroundColor: statusColor(s.status) }}
                 />
-                <span className="truncate text-stone-700">{statusLabel(s.status)}</span>
+                <span className="truncate text-stone-700">{statusLabel(s.status, t)}</span>
               </span>
               <span className="shrink-0 tabular-nums font-semibold text-stone-900">
                 {s.count}
@@ -225,21 +233,25 @@ export function ListingsBreakdownChart({
 }: {
   breakdown: OwnerDashboardData["listingsBreakdown"];
 }) {
+  const { t } = useTranslation();
   const rows = [
-    { label: "Live in search", value: breakdown.live, color: "bg-green-500" },
-    { label: "Hidden (approved)", value: breakdown.hidden, color: "bg-stone-400" },
-    { label: "Pending review", value: breakdown.pending, color: "bg-amber-500" },
-    { label: "Rejected", value: breakdown.rejected, color: "bg-red-400" },
+    { label: t("charts.chartLive"), value: breakdown.live, color: "bg-green-500" },
+    { label: t("charts.chartHidden"), value: breakdown.hidden, color: "bg-stone-400" },
+    { label: t("charts.chartPending"), value: breakdown.pending, color: "bg-amber-500" },
+    { label: t("charts.chartRejected"), value: breakdown.rejected, color: "bg-red-400" },
   ].filter((r) => r.value > 0);
 
   const max = Math.max(...rows.map((r) => r.value), 1);
 
   return (
-    <ChartCard title="Equipment overview" subtitle={`${breakdown.total} listings total`}>
+    <ChartCard
+      title={t("charts.equipmentOverview")}
+      subtitle={t("charts.listingsTotal", { count: breakdown.total })}
+    >
       {breakdown.total === 0 ? (
         <p className="py-6 text-center text-sm text-stone-500">
           <Link to="/equipment/new" className="font-semibold text-brand-600 hover:text-brand-700">
-            Add your first listing →
+            {t("charts.addFirstListingLink")}
           </Link>
         </p>
       ) : (
@@ -265,7 +277,7 @@ export function ListingsBreakdownChart({
           to="/dashboard/listings"
           className="mt-4 inline-block text-sm font-medium text-brand-600 hover:text-brand-700"
         >
-          Manage listings →
+          {t("charts.manageListings")}
         </Link>
       ) : null}
     </ChartCard>
@@ -277,13 +289,14 @@ export function CategoryBreakdownChart({
 }: {
   categories: OwnerDashboardData["equipmentByCategory"];
 }) {
+  const { t } = useTranslation();
   const max = Math.max(...categories.map((c) => c.count), 1);
   const palette = ["#f97316", "#3b82f6", "#22c55e", "#a855f7", "#ec4899", "#14b8a6"];
 
   return (
-    <ChartCard title="Listings by category" subtitle="Distribution of your inventory">
+    <ChartCard title={t("charts.byCategory")} subtitle={t("charts.listingsBreakdown")}>
       {categories.length === 0 ? (
-        <p className="py-6 text-center text-sm text-stone-500">No categories yet.</p>
+        <p className="py-6 text-center text-sm text-stone-500">{t("charts.noCategories")}</p>
       ) : (
         <ul className="space-y-3">
           {categories.map((c, i) => (
@@ -316,21 +329,20 @@ export function TopEquipmentTable({
 }: {
   items: OwnerDashboardData["topEquipment"];
 }) {
+  const { t } = useTranslation();
   return (
-    <ChartCard title="Top performing equipment" subtitle="By net revenue (completed rentals)">
+    <ChartCard title={t("charts.topEquipment")} subtitle={t("charts.topSubtitle")}>
       {items.length === 0 ? (
-        <p className="py-8 text-center text-sm text-stone-500">
-          Complete rentals to see performance rankings.
-        </p>
+        <p className="py-8 text-center text-sm text-stone-500">{t("charts.completeToRank")}</p>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full min-w-[480px] text-sm">
             <thead>
               <tr className="border-b border-stone-200 text-left text-xs font-semibold uppercase tracking-wide text-stone-500">
-                <th className="pb-3 pr-4">Equipment</th>
-                <th className="pb-3 pr-4 text-right">Bookings</th>
-                <th className="pb-3 pr-4 text-right">Gross</th>
-                <th className="pb-3 text-right">Net</th>
+                <th className="pb-3 pe-4">{t("dashboardPage.tableEquipment")}</th>
+                <th className="pb-3 pe-4 text-end">{t("charts.tableBookingsCol")}</th>
+                <th className="pb-3 pe-4 text-end">{t("charts.tableGross")}</th>
+                <th className="pb-3 text-end">{t("charts.tableNet")}</th>
               </tr>
             </thead>
             <tbody>

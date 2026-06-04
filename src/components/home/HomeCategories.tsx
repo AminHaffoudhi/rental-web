@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { SectionHeading, SectionReveal } from "@/components/home/SectionReveal";
 import { CategoryIcon } from "@/components/equipment/CategoryIcon";
 import { ALL_CATEGORY_FILTER } from "@/config/categories";
@@ -35,13 +36,16 @@ function categoryHref(cat: CategoryFilterItem): string {
 }
 
 function CategoryCard({ cat }: { cat: CategoryFilterItem }) {
+  const { t } = useTranslation();
   const iconUrl = "iconUrl" in cat ? cat.iconUrl : undefined;
+  const label =
+    cat.value === ALL_CATEGORY_FILTER.value ? t("home.categoriesAll") : cat.label;
   const description =
     "description" in cat && cat.description
       ? cat.description
       : cat.value === ALL_CATEGORY_FILTER.value
-        ? "Browse everything in our catalog"
-        : "Explore listings in this category";
+        ? t("home.categoriesBrowseAll")
+        : t("home.categoriesExplore");
 
   return (
     <Link
@@ -70,12 +74,12 @@ function CategoryCard({ cat }: { cat: CategoryFilterItem }) {
           />
         )}
       </span>
-      <h3 className="font-display text-lg font-semibold text-stone-900">{cat.label}</h3>
+      <h3 className="font-display text-lg font-semibold text-stone-900">{label}</h3>
       <p className="mt-2 line-clamp-2 flex-1 text-sm leading-relaxed text-stone-500">
         {description}
       </p>
       <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-brand-600 opacity-0 transition-opacity group-hover:opacity-100 sm:opacity-100">
-        Explore
+        {t("common.explore")}
         <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
       </span>
     </Link>
@@ -83,6 +87,7 @@ function CategoryCard({ cat }: { cat: CategoryFilterItem }) {
 }
 
 export function HomeCategories({ categories }: { categories: CategoryFilterItem[] }) {
+  const { t } = useTranslation();
   const items = [
     ...categories.filter((c) => c.value !== ALL_CATEGORY_FILTER.value),
     ALL_CATEGORY_FILTER,
@@ -92,9 +97,9 @@ export function HomeCategories({ categories }: { categories: CategoryFilterItem[
     <section className="border-y border-stone-200 bg-gradient-to-b from-brand-50/50 to-canvas-card py-14 sm:py-16 md:py-20 lg:py-24 dark:from-brand-500/10 dark:to-canvas">
       <SectionReveal className="container">
         <SectionHeading
-          eyebrow="Categories"
-          title="Browse by category"
-          subtitle="Find exactly what you need across our growing catalog"
+          eyebrow={t("home.categoriesEyebrow")}
+          title={t("home.categoriesTitle")}
+          subtitle={t("home.categoriesSubtitle")}
         />
 
         <div className="mt-10 md:hidden">
@@ -133,7 +138,7 @@ export function HomeCategories({ categories }: { categories: CategoryFilterItem[
             to="/search"
             className="btn btn-secondary inline-flex gap-2"
           >
-            View all categories
+            {t("home.categoriesExploreAll")}
             <ArrowRight className="h-4 w-4" />
           </Link>
         </div>

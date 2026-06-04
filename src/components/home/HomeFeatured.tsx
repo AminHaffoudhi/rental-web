@@ -1,5 +1,6 @@
 import { ArrowRight, PackageSearch } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { SectionReveal } from "@/components/home/SectionReveal";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { EquipmentGrid } from "@/components/equipment/EquipmentGrid";
@@ -18,6 +19,7 @@ export function HomeFeatured({
   error,
   onRetry,
 }: HomeFeaturedProps) {
+  const { t } = useTranslation();
   const showEmpty = !isLoading && (error || equipment.length === 0);
 
   return (
@@ -26,21 +28,21 @@ export function HomeFeatured({
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between sm:gap-6">
           <div className="max-w-xl">
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-600">
-              Fresh picks
+              {t("home.featuredEyebrow")}
             </p>
             <h2 className="mt-2 font-display text-2xl font-semibold tracking-tight text-stone-900 sm:text-3xl lg:text-4xl">
-              Recently listed
+              {t("home.featuredRecentTitle")}
             </h2>
             <p className="mt-2 text-sm text-stone-500 sm:text-base">
-              New gear added by owners across Tunisia
+              {t("home.featuredRecentSubtitle")}
             </p>
           </div>
           <Link
             to="/search"
-            className="inline-flex w-fit items-center gap-2 rounded-full border border-stone-200 bg-canvas-card px-4 py-2.5 text-sm font-semibold text-brand-600 shadow-elevated transition-colors hover:border-brand-200 hover:bg-brand-50"
+            className="inline-flex w-fit items-center gap-2 rounded-full border border-stone-200 bg-canvas-card px-4 py-2.5 text-sm font-semibold text-brand-600 shadow-elevated transition-colors hover:border-brand-200 hover:bg-brand-50 rtl:flex-row-reverse"
           >
-            View all listings
-            <ArrowRight className="h-4 w-4" />
+            {t("home.featuredViewAll")}
+            <ArrowRight className="h-4 w-4 rtl:rotate-180" />
           </Link>
         </div>
 
@@ -48,14 +50,10 @@ export function HomeFeatured({
           {showEmpty ? (
             <EmptyState
               icon={PackageSearch}
-              title={error ? "Couldn't load listings" : "No listings yet"}
-              subtitle={
-                error
-                  ? error.message
-                  : "Check back soon — new gear is added every day."
-              }
+              title={error ? t("home.featuredLoadError") : t("home.featuredEmpty")}
+              subtitle={error ? error.message : t("home.featuredEmptyHint")}
               action={
-                error ? { label: "Try again", onClick: onRetry } : undefined
+                error ? { label: t("common.retry"), onClick: onRetry } : undefined
               }
             />
           ) : (

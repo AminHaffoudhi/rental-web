@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { PLATFORM_FEE_PERCENT } from "@/config/constants";
 import type { Equipment } from "@/types/equipment";
@@ -57,6 +58,7 @@ export function BookingForm({
   onSubmit,
   isSubmitting = false,
 }: BookingFormProps) {
+  const { t } = useTranslation();
   const user = useAuthStore((s) => s.user);
   const [startStr, setStartStr] = useState("");
   const [endStr, setEndStr] = useState("");
@@ -78,13 +80,13 @@ export function BookingForm({
     if (!user) return;
     setDateError(null);
     if (!startStr || !endStr) {
-      setDateError("Select check-in and check-out dates.");
+      setDateError(t("bookings.datesRequired"));
       return;
     }
     const start = startOfDay(new Date(startStr + "T12:00:00"));
     const end = startOfDay(new Date(endStr + "T12:00:00"));
     if (end <= start) {
-      setDateError("Check-out must be after check-in.");
+      setDateError(t("bookings.checkoutAfterCheckin"));
       return;
     }
     await onSubmit({
@@ -107,7 +109,7 @@ export function BookingForm({
           <p className="font-display text-3xl font-semibold text-stone-900">
             {Math.round(equipment.dailyRate)}{" "}
             <span className="text-lg font-normal text-stone-500">TND</span>
-            <span className="text-base font-normal text-stone-500">/day</span>
+            <span className="text-base font-normal text-stone-500">/{t("equipment.perDay")}</span>
           </p>
         </div>
         {avgRating !== null ? (
@@ -127,15 +129,15 @@ export function BookingForm({
             <span className="text-stone-400">({reviewCount})</span>
           </div>
         ) : (
-          <span className="text-sm text-stone-400">New listing</span>
+          <span className="text-sm text-stone-400">{t("bookings.newListingBadge")}</span>
         )}
       </div>
 
       <div className="mt-6 space-y-3">
-        <label className="block text-sm font-medium text-stone-700">Select rental dates</label>
+        <label className="block text-sm font-medium text-stone-700">{t("bookings.selectDates")}</label>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <span className="mb-1 block text-xs text-stone-500">Check-in</span>
+            <span className="mb-1 block text-xs text-stone-500">{t("bookings.checkIn")}</span>
             <input
               type="date"
               min={minDate}
@@ -148,7 +150,7 @@ export function BookingForm({
             />
           </div>
           <div>
-            <span className="mb-1 block text-xs text-stone-500">Check-out</span>
+            <span className="mb-1 block text-xs text-stone-500">{t("bookings.checkOut")}</span>
             <input
               type="date"
               min={startStr || minDate}
@@ -176,37 +178,40 @@ export function BookingForm({
             <div className="mt-6 space-y-3 border-t border-stone-200 pt-6 text-sm">
               <div className="flex justify-between text-stone-600">
                 <span>
-                  {totals.days} days × {Math.round(equipment.dailyRate)} TND
+                  {t("bookings.daysTimesRate", {
+                    days: totals.days,
+                    rate: Math.round(equipment.dailyRate),
+                  })}
                 </span>
                 <span className="font-medium text-stone-900">
                   {formatCurrency(totals.rentTotal)}
                 </span>
               </div>
               <div className="flex justify-between text-stone-600">
-                <span>Delivery fee</span>
+                <span>{t("equipment.deliveryFee")}</span>
                 <span className="font-medium text-stone-900">
                   {formatCurrency(totals.deliveryFee)}
                 </span>
               </div>
               <div className="flex justify-between text-stone-600">
-                <span>Platform fee ({PLATFORM_FEE_PERCENT}%)</span>
+                <span>{t("bookings.platformFeeLabel", { percent: PLATFORM_FEE_PERCENT })}</span>
                 <span className="font-medium text-stone-900">
                   {formatCurrency(totals.platformFee)}
                 </span>
               </div>
               <div className="my-3 h-px bg-stone-100" />
               <div className="flex justify-between font-semibold text-stone-900">
-                <span>Total</span>
+                <span>{t("bookings.total")}</span>
                 <span>{formatCurrency(totals.rentalSubtotal)}</span>
               </div>
               <div className="rounded-lg bg-brand-50/80 px-3 py-2 text-xs text-stone-600">
                 <div className="flex justify-between">
-                  <span>Deposit (refundable)</span>
+                  <span>{t("bookings.depositRefundable")}</span>
                   <span className="font-semibold text-stone-800">
                     {formatCurrency(totals.deposit)}
                   </span>
                 </div>
-                <p className="mt-1 text-stone-500">Returned after inspection</p>
+                <p className="mt-1 text-stone-500">{t("bookings.depositReturnedHint")}</p>
               </div>
             </div>
           </motion.div>
@@ -215,14 +220,14 @@ export function BookingForm({
 
       <div className="mt-6">
         <label htmlFor="booking-notes" className="mb-2 block text-sm font-medium text-stone-700">
-          Notes for the owner
+          {t("bookings.notesForOwner")}
         </label>
         <textarea
           id="booking-notes"
           rows={3}
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
-          placeholder="Any special requirements or questions for the owner?"
+          placeholder={t("bookings.notesPlaceholder")}
           className="input min-h-[88px] resize-y text-sm"
         />
       </div>
@@ -233,7 +238,7 @@ export function BookingForm({
           state={{ from: { pathname: `/equipment/${equipment.id}` } }}
           className="btn btn-primary btn-lg mt-6 block w-full text-center"
         >
-          Login to Book
+          {t("bookings.loginToBook")}
         </Link>
       ) : (
         <button
@@ -241,22 +246,26 @@ export function BookingForm({
           disabled={unavailable || !totals || isSubmitting}
           className="btn btn-primary btn-lg mt-6 w-full disabled:opacity-50"
         >
-          {unavailable ? "Currently Unavailable" : isSubmitting ? "Sending…" : "Request Booking"}
+          {unavailable
+            ? t("equipment.unavailable")
+            : isSubmitting
+              ? t("bookings.sending")
+              : t("bookings.requestBooking")}
         </button>
       )}
 
       <p className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-center text-xs text-stone-500">
         <span className="inline-flex items-center gap-1.5">
           <Shield className="h-3.5 w-3.5 shrink-0 text-stone-400" aria-hidden />
-          Secure payment
+          {t("bookings.securePayment")}
         </span>
         <span className="inline-flex items-center gap-1.5">
           <RotateCcw className="h-3.5 w-3.5 shrink-0 text-stone-400" aria-hidden />
-          Free cancellation
+          {t("bookings.freeCancellation")}
         </span>
         <span className="inline-flex items-center gap-1.5">
           <Headphones className="h-3.5 w-3.5 shrink-0 text-stone-400" aria-hidden />
-          24/7 support
+          {t("footer.support247")}
         </span>
       </p>
     </form>

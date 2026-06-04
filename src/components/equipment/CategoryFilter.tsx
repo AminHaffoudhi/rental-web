@@ -1,4 +1,5 @@
 import { Search } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { CategoryIcon } from "@/components/equipment/CategoryIcon";
 import { ALL_CATEGORY_FILTER, buildCategoryFilters } from "@/config/categories";
 import { useCategories } from "@/hooks/useCategories";
@@ -11,8 +12,11 @@ interface CategoryFilterProps {
 }
 
 export function CategoryFilter({ selected = null, onSelect }: CategoryFilterProps) {
+  const { t } = useTranslation();
   const { categories, isLoading } = useCategories();
-  const filters = buildCategoryFilters(categories);
+  const filters = buildCategoryFilters(categories).map((c) =>
+    c.value === ALL_CATEGORY_FILTER.value ? { ...c, label: t("search.allEquipment") } : c
+  );
 
   if (isLoading && categories.length === 0) {
     return (

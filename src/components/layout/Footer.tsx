@@ -1,6 +1,7 @@
 import type { SVGProps } from "react";
-import { Heart } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { LanguageSwitcher } from "@/components/shared/LanguageSwitcher";
 import { PlatformLogo } from "@/components/brand/PlatformLogo";
 import { PLATFORM_NAME } from "@/config/brand";
 
@@ -28,38 +29,39 @@ function IconLinkedIn(props: SVGProps<SVGSVGElement>) {
   );
 }
 
-const platformLinks = [
-  { label: "Browse Equipment", to: "/search" },
-  { label: "List Your Equipment", to: "/register" },
-  { label: "How It Works", to: "/search" },
-  { label: "Pricing", to: "/search" },
-];
+const platformLinkKeys = [
+  { key: "footer.browseEquipment", to: "/search" },
+  { key: "footer.listYourEquipment", to: "/register" },
+  { key: "nav.howItWorks", to: "/search" },
+  { key: "footer.pricing", to: "/search" },
+] as const;
 
-const supportLinks = [
-  { label: "Help Center", to: "/search" },
-  { label: "Contact Us", to: "/contact" },
-  { label: "Safety Guide", to: "/search" },
-  { label: "Report an Issue", to: "/contact?type=report" },
-];
+const supportLinkKeys = [
+  { key: "footer.helpCenter", to: "/search" },
+  { key: "footer.contactUs", to: "/contact" },
+  { key: "footer.safetyGuide", to: "/search" },
+  { key: "footer.reportIssue", to: "/contact?type=report" },
+] as const;
 
-const legalLinks = [
-  { label: "Terms of Service", to: "/terms" },
-  { label: "Privacy Policy", to: "/privacy" },
-  { label: "Cookie Policy", to: "/cookies" },
-];
+const legalLinkKeys = [
+  { key: "footer.terms", to: "/terms" },
+  { key: "footer.privacy", to: "/privacy" },
+  { key: "footer.cookies", to: "/cookies" },
+] as const;
 
 export function Footer() {
+  const { t } = useTranslation();
+  const year = new Date().getFullYear();
+
   return (
     <footer className="bg-stone-inv text-[var(--surface-inverse-fg)]">
       <div className="container section-sm">
         <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
           <div className="space-y-4">
             <PlatformLogo size="lg" linkTo="/" className="brightness-0 invert" />
-            <p className="text-sm font-medium text-stone-300">
-              The trusted marketplace for equipment rental
-            </p>
+            <p className="text-sm font-medium text-stone-300">{t("footer.tagline")}</p>
             <p className="max-w-xs text-sm leading-relaxed text-[var(--surface-inverse-muted)]/80">
-              Connect with local equipment owners. Rent what you need, when you need it.
+              {t("footer.description")}
             </p>
             <div className="flex gap-3 pt-2">
               <a
@@ -94,13 +96,13 @@ export function Footer() {
 
           <div>
             <p className="mb-4 font-display text-sm font-semibold uppercase tracking-wide text-[var(--surface-inverse-muted)]">
-              Platform
+              {t("footer.platform")}
             </p>
             <ul className="space-y-3 text-sm">
-              {platformLinks.map((l) => (
-                <li key={l.label}>
+              {platformLinkKeys.map((l) => (
+                <li key={l.key}>
                   <Link className="text-[var(--surface-inverse-muted)] transition-colors hover:text-white" to={l.to}>
-                    {l.label}
+                    {t(l.key)}
                   </Link>
                 </li>
               ))}
@@ -109,13 +111,13 @@ export function Footer() {
 
           <div>
             <p className="mb-4 font-display text-sm font-semibold uppercase tracking-wide text-[var(--surface-inverse-muted)]">
-              Support
+              {t("footer.support")}
             </p>
             <ul className="space-y-3 text-sm">
-              {supportLinks.map((l) => (
-                <li key={l.label}>
+              {supportLinkKeys.map((l) => (
+                <li key={l.key}>
                   <Link className="text-[var(--surface-inverse-muted)] transition-colors hover:text-white" to={l.to}>
-                    {l.label}
+                    {t(l.key)}
                   </Link>
                 </li>
               ))}
@@ -124,42 +126,45 @@ export function Footer() {
 
           <div className="space-y-4">
             <p className="mb-4 font-display text-sm font-semibold uppercase tracking-wide text-[var(--surface-inverse-muted)]">
-              Legal
+              {t("footer.legal")}
             </p>
             <ul className="space-y-3 text-sm">
-              {legalLinks.map((l) => (
-                <li key={l.label}>
+              {legalLinkKeys.map((l) => (
+                <li key={l.key}>
                   <Link
                     className="text-[var(--surface-inverse-muted)] transition-colors hover:text-white"
                     to={l.to}
                   >
-                    {l.label}
+                    {t(l.key)}
                   </Link>
                 </li>
               ))}
             </ul>
-            <p className="pt-4 text-xs text-[var(--surface-inverse-muted)]/70">© 2026 {PLATFORM_NAME}. All rights reserved.</p>
+            <p className="pt-4 text-xs text-[var(--surface-inverse-muted)]/70">
+              {t("footer.rights", { year, name: PLATFORM_NAME })}
+            </p>
           </div>
         </div>
 
         <div className="divider my-10 bg-[var(--surface-inverse-border)]" />
 
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-          <p className="flex items-center justify-center gap-1.5 text-center text-sm text-[var(--surface-inverse-muted)] lg:justify-start">
-            Made with
-            <Heart className="inline h-4 w-4 fill-red-400/80 text-red-400/80" aria-hidden />
-            for equipment owners and renters
+          <p className="text-center text-sm text-[var(--surface-inverse-muted)] lg:text-start">
+            {t("footer.madeWith")}
           </p>
-          <div className="flex flex-wrap justify-center gap-2 lg:justify-end">
+          <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center lg:justify-end">
+            <LanguageSwitcher className="[&_button]:border-white/20 [&_button]:bg-white/10 [&_button]:text-white" />
+          <div className="flex flex-wrap justify-center gap-2">
             <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-[var(--surface-inverse-fg)]">
-              Secure Payments
+              {t("footer.securePayments")}
             </span>
             <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-[var(--surface-inverse-fg)]">
-              Verified Users
+              {t("footer.verifiedUsers")}
             </span>
             <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-[var(--surface-inverse-fg)]">
-              24/7 Support
+              {t("footer.support247")}
             </span>
+          </div>
           </div>
         </div>
       </div>

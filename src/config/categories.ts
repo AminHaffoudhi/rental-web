@@ -45,3 +45,23 @@ export function findCategoryById(
   if (!id) return undefined;
   return categories.find((c) => c.id === id);
 }
+
+/** Normalize a category slug from URL query params (API-driven slugs only). */
+export function normalizeCategorySlug(raw: string | null | undefined): string | null {
+  if (!raw?.trim()) return null;
+  const slug = raw.trim().toLowerCase();
+  if (/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) return slug;
+  return null;
+}
+
+export function resolveCategorySlug(
+  categories: EquipmentCategory[],
+  raw: string | null | undefined
+): string | null {
+  const normalized = normalizeCategorySlug(raw);
+  if (!normalized) return null;
+  const match = categories.find(
+    (c) => c.isActive !== false && (c.slug === normalized || c.id === normalized)
+  );
+  return match?.slug ?? null;
+}

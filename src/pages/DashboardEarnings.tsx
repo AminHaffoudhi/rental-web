@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Wallet } from "lucide-react";
 import { BookingsPageHeader } from "@/components/booking/BookingsPageHeader";
 import { EmptyState } from "@/components/shared/EmptyState";
@@ -9,6 +10,7 @@ import { formatDateRange } from "@/utils/dates";
 type SortKey = "equipment" | "renter" | "period" | "gross" | "fee" | "net" | "status" | "date";
 
 export function DashboardEarnings() {
+  const { t } = useTranslation();
   const { bookings, isLoading } = useMyBookings();
   const [sortKey, setSortKey] = useState<SortKey>("date");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
@@ -80,24 +82,24 @@ export function DashboardEarnings() {
   return (
     <div className="space-y-8">
       <BookingsPageHeader
-        eyebrow="Owner dashboard"
-        title="Earnings"
-        description="Track gross revenue, platform fees, and net payouts from completed rentals."
+        eyebrow={t("bookings.ownerDashboardEyebrow")}
+        title={t("dashboardPage.earningsTitle")}
+        description={t("dashboardPage.earningsDesc")}
         stats={[
           {
-            label: "Total earned",
+            label: t("dashboardPage.totalEarned"),
             value: isLoading ? "—" : formatCurrency(totalAll),
             icon: Wallet,
             tone: "brand",
           },
           {
-            label: "This month",
+            label: t("dashboardPage.thisMonth"),
             value: isLoading ? "—" : formatCurrency(totalMonth),
             icon: Wallet,
             tone: "green",
           },
           {
-            label: "Pending payout",
+            label: t("dashboardPage.pendingPayout"),
             value: isLoading ? "—" : formatCurrency(pendingPayout),
             icon: Wallet,
             tone: "amber",
@@ -109,8 +111,8 @@ export function DashboardEarnings() {
         <div className="rounded-2xl border border-dashed border-stone-200 bg-canvas-card py-16 shadow-elevated">
           <EmptyState
             icon={Wallet}
-            title="No earnings yet"
-            subtitle="Completed rentals will show up here with net amounts after fees."
+            title={t("dashboardPage.noEarningsYet")}
+            subtitle={t("dashboardPage.noEarningsHint")}
           />
         </div>
       ) : (
@@ -121,14 +123,14 @@ export function DashboardEarnings() {
                 <tr className="border-b border-stone-200 bg-stone-100/80 text-left dark:bg-stone-800/50">
                   {(
                     [
-                      ["equipment", "Equipment"],
-                      ["renter", "Renter"],
-                      ["period", "Rental period"],
-                      ["gross", "Gross"],
-                      ["fee", "Platform fee"],
-                      ["net", "Net"],
-                      ["status", "Status"],
-                      ["date", "Date"],
+                      ["equipment", t("dashboardPage.tableEquipment")],
+                      ["renter", t("dashboardPage.tableRenter")],
+                      ["period", t("dashboardPage.tableRentalPeriod")],
+                      ["gross", t("dashboardPage.tableGross")],
+                      ["fee", t("dashboardPage.tablePlatformFee")],
+                      ["net", t("dashboardPage.tableNet")],
+                      ["status", t("dashboardPage.tableStatus")],
+                      ["date", t("dashboardPage.tableDate")],
                     ] as const
                   ).map(([key, label]) => (
                     <th key={key} className="px-4 py-3">

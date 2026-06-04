@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { PLATFORM_NAME } from "@/config/brand";
 import { ExternalLink } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -37,12 +38,15 @@ const publicSchema = z.object({
 type PersonalValues = z.infer<typeof personalSchema>;
 type PublicValues = z.infer<typeof publicSchema>;
 
-const roleLabel: Record<string, string> = {
-  RENTER: "Renter",
-  OWNER: "Owner",
-  BOTH: "Renter & owner",
-  ADMIN: "Admin",
-};
+function roleLabelKey(role: string): string {
+  const map: Record<string, string> = {
+    RENTER: "profile.roleRenter",
+    OWNER: "profile.roleOwner",
+    BOTH: "profile.roleBoth",
+    ADMIN: "profile.roleAdmin",
+  };
+  return map[role] ?? role;
+}
 
 function PersonalInfoForm({
   user,
@@ -51,6 +55,7 @@ function PersonalInfoForm({
   user: NonNullable<ReturnType<typeof useAuthStore.getState>["user"]>;
   onUpdated: (u: typeof user) => void;
 }) {
+  const { t } = useTranslation();
   const form = useForm<PersonalValues>({
     resolver: zodResolver(personalSchema),
     values: {
@@ -66,9 +71,9 @@ function PersonalInfoForm({
         phone: values.phone || undefined,
       });
       onUpdated(updated);
-      toast.success("Profile saved");
+      toast.success(t("profile.saveSuccess"));
     } catch {
-      toast.error("Could not update profile");
+      toast.error(t("profile.updateError"));
     }
   }
 
@@ -83,11 +88,9 @@ function PersonalInfoForm({
             onUpdated(updated);
           }}
         />
-        <div className="text-center sm:text-left">
+        <div className="text-center sm:text-start">
           <h3 className="font-semibold text-stone-900 dark:text-stone-100">{user.name}</h3>
-          <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
-            Tap the photo or camera to change your picture.
-          </p>
+          <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">{t("profile.photoHint")}</p>
         </div>
       </div>
 
@@ -98,7 +101,7 @@ function PersonalInfoForm({
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Name</FormLabel>
+                <FormLabel>{t("auth.name")}</FormLabel>
                 <FormControl>
                   <input className="input" {...field} />
                 </FormControl>
@@ -111,7 +114,7 @@ function PersonalInfoForm({
             name="phone"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Phone</FormLabel>
+                <FormLabel>{t("auth.phone")}</FormLabel>
                 <FormControl>
                   <input className="input" {...field} />
                 </FormControl>
@@ -120,7 +123,7 @@ function PersonalInfoForm({
             )}
           />
           <div className="space-y-2">
-            <Label htmlFor="profile-email">Email</Label>
+            <Label htmlFor="profile-email">{t("auth.email")}</Label>
             <Input
               id="profile-email"
               value={user.email}
@@ -130,13 +133,13 @@ function PersonalInfoForm({
             />
           </div>
           <div className="rounded-lg border border-stone-200 bg-stone-100/80 px-4 py-3 text-sm dark:border-stone-700 dark:bg-stone-800/40">
-            <span className="text-stone-500">Role: </span>
+            <span className="text-stone-500">{t("profile.role")}: </span>
             <span className="font-medium text-stone-800 dark:text-stone-200">
-              {roleLabel[user.role] ?? user.role}
+              {t(roleLabelKey(user.role))}
             </span>
           </div>
           <button type="submit" className="btn btn-primary">
-            Save changes
+            {t("profile.saveChanges")}
           </button>
         </form>
       </Form>
@@ -145,6 +148,7 @@ function PersonalInfoForm({
 }
 
 export function Profile() {
+  const { t } = useTranslation();
   const user = useAuthStore((s) => s.user);
   const setUser = useAuthStore((s) => s.setUser);
 
@@ -165,9 +169,9 @@ export function Profile() {
         location: values.location?.trim() || undefined,
       });
       setUser(updated);
-      toast.success("Public page updated");
+      toast.success(t("profile.publicUpdated"));
     } catch {
-      toast.error("Could not update public page");
+      toast.error(t("profile.publicUpdateError"));
     }
   }
 
@@ -182,11 +186,10 @@ export function Profile() {
       <div className="mx-auto max-w-3xl">
         <div>
           <h1 className="font-display text-3xl font-semibold text-stone-900 dark:text-stone-100">
-            Account settings
+            {t("profile.accountSettings")}
           </h1>
           <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
-            Update your name, contact details, and profile photo. Renters don&apos;t need identity
-            verification or a public host page.
+            {t("profile.renterSubtitle")}
           </p>
         </div>
         <div className="mt-8 rounded-2xl border border-stone-200 bg-canvas-card p-6 shadow-sm dark:border-stone-800 sm:p-8">
@@ -201,17 +204,17 @@ export function Profile() {
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="font-display text-3xl font-semibold text-stone-900 dark:text-stone-100">
-            Profile
+            {t("profile.title")}
           </h1>
           <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
-            Manage your account and how others see you on {PLATFORM_NAME}.
+            {t("profile.ownerSubtitle", { name: PLATFORM_NAME })}
           </p>
         </div>
         <Link
           to={`/users/${user.id}`}
-          className="inline-flex items-center gap-2 text-sm font-semibold text-brand-600 hover:text-brand-700"
+          className="inline-flex items-center gap-2 text-sm font-semibold text-brand-600 hover:text-brand-700 rtl:flex-row-reverse"
         >
-          View public page
+          {t("profile.viewPublicPage")}
           <ExternalLink className="h-4 w-4" aria-hidden />
         </Link>
       </div>
@@ -219,13 +222,13 @@ export function Profile() {
       <Tabs defaultValue="personal" className="mt-8">
         <TabsList className="grid w-full grid-cols-3 rounded-xl border border-stone-200 bg-stone-100 p-1 dark:border-stone-700 dark:bg-stone-800/60">
           <TabsTrigger value="personal" className="rounded-lg text-xs sm:text-sm">
-            Personal
+            {t("profile.personal")}
           </TabsTrigger>
           <TabsTrigger value="public" className="rounded-lg text-xs sm:text-sm">
-            Public page
+            {t("profile.publicPage")}
           </TabsTrigger>
           <TabsTrigger value="kyc" className="rounded-lg text-xs sm:text-sm">
-            KYC
+            {t("profile.kyc")}
           </TabsTrigger>
         </TabsList>
 
@@ -236,11 +239,9 @@ export function Profile() {
         <TabsContent value="public" className="mt-8 space-y-8">
           <div>
             <h3 className="font-display text-lg font-semibold text-stone-900 dark:text-stone-100">
-              Cover image
+              {t("profile.coverImage")}
             </h3>
-            <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
-              Wide banner shown at the top of your public profile. Recommended 1200×400px or larger.
-            </p>
+            <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">{t("profile.coverHint")}</p>
             <div className="mt-4">
               <CoverUploader
                 currentUrl={user.coverImage}
@@ -260,17 +261,17 @@ export function Profile() {
                 name="bio"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Bio</FormLabel>
+                    <FormLabel>{t("profile.bio")}</FormLabel>
                     <FormControl>
                       <Textarea
                         rows={5}
-                        placeholder="Tell renters about your experience, equipment, and service area…"
+                        placeholder={t("profile.bioPlaceholder")}
                         className="resize-y"
                         {...field}
                       />
                     </FormControl>
                     <p className="text-xs text-stone-400">
-                      {(field.value?.length ?? 0)}/600 characters
+                      {t("profile.charactersCount", { count: field.value?.length ?? 0 })}
                     </p>
                     <FormMessage />
                   </FormItem>
@@ -281,16 +282,20 @@ export function Profile() {
                 name="location"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Location</FormLabel>
+                    <FormLabel>{t("profile.location")}</FormLabel>
                     <FormControl>
-                      <input className="input" placeholder="e.g. Tunis, Sfax" {...field} />
+                      <input
+                        className="input"
+                        placeholder={t("profile.locationPlaceholder")}
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
               <button type="submit" className="btn btn-primary">
-                Save public page
+                {t("profile.savePublicPage")}
               </button>
             </form>
           </Form>

@@ -9,10 +9,13 @@ import { useClickOutside } from "@/hooks/useClickOutside";
 import { useAuth } from "@/hooks/useAuth";
 import { useAuthStore } from "@/store/authStore";
 import { PlatformLogo } from "@/components/brand/PlatformLogo";
+import { LanguageSwitcher } from "@/components/shared/LanguageSwitcher";
 import { isOwnerRole } from "@/lib/roles";
 import { cn } from "@/utils/cn";
+import { useTranslation } from "react-i18next";
 
 export function Navbar() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const hideNavSearch = location.pathname === "/search";
@@ -95,7 +98,7 @@ export function Navbar() {
           >
             <div className="relative w-full">
               <Search
-                className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400"
+                className="pointer-events-none absolute top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400 ltr:left-4 rtl:right-4"
                 aria-hidden
               />
               <input
@@ -103,25 +106,26 @@ export function Navbar() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={onSearchKeyDown}
-                placeholder="Search equipment, tools, gear..."
+                placeholder={t("nav.searchEquipmentPlaceholder")}
                 className={cn(
-                  "input w-full rounded-full border-stone-200 bg-stone-100 py-2.5 pl-11 pr-4 transition-all duration-300",
+                  "input w-full rounded-full border-stone-200 bg-stone-100 py-2.5 transition-all duration-300 ltr:pl-11 ltr:pr-4 rtl:pr-11 rtl:pl-4",
                   "focus:border-brand-500 focus:bg-canvas-card focus:shadow-elevated"
                 )}
-                aria-label="Search equipment"
+                aria-label={t("common.search")}
               />
             </div>
           </div>
 
           <div className="ml-auto flex items-center gap-1 md:gap-2">
+            <LanguageSwitcher compact className="hidden sm:flex" />
             <ThemeToggle className="hidden sm:flex" />
             {!isAuthenticated ? (
               <div className="hidden items-center gap-2 md:flex">
                 <Link to="/login" className="btn btn-ghost btn-sm">
-                  Login
+                  {t("nav.signIn")}
                 </Link>
                 <Link to="/register" className="btn btn-primary btn-sm">
-                  List your equipment
+                  {t("nav.listEquipmentCta")}
                 </Link>
               </div>
             ) : (
@@ -160,7 +164,7 @@ export function Navbar() {
                             onClick={() => setUserMenuOpen(false)}
                           >
                             <LayoutDashboard className="h-4 w-4 shrink-0 text-stone-400" />
-                            {isOwner ? "Owner dashboard" : "My account"}
+                            {isOwner ? t("nav.ownerDashboard") : t("nav.myAccount")}
                           </Link>
                           <Link
                             to="/bookings"
@@ -168,7 +172,7 @@ export function Navbar() {
                             onClick={() => setUserMenuOpen(false)}
                           >
                             <CalendarCheck className="h-4 w-4 shrink-0 text-stone-400" />
-                            My Bookings
+                            {t("nav.myBookings")}
                           </Link>
                         </div>
                         <div className="mx-3 h-px bg-stone-100" />
@@ -179,7 +183,7 @@ export function Navbar() {
                             onClick={() => setUserMenuOpen(false)}
                           >
                             <Settings className="h-4 w-4 shrink-0 text-stone-400" />
-                            {isOwner ? "Profile & settings" : "Account settings"}
+                            {isOwner ? t("nav.profileSettings") : t("nav.accountSettings")}
                           </Link>
                           <button
                             type="button"
@@ -187,7 +191,7 @@ export function Navbar() {
                             onClick={handleLogout}
                           >
                             <LogOut className="h-4 w-4 shrink-0" />
-                            Logout
+                            {t("nav.signOut")}
                           </button>
                         </div>
                       </motion.div>
@@ -201,7 +205,7 @@ export function Navbar() {
               type="button"
               className="flex h-10 w-10 items-center justify-center rounded-full text-stone-700 md:hidden"
               onClick={() => setMobileOpen(true)}
-              aria-label="Open menu"
+              aria-label={t("nav.openMenu")}
             >
               <Menu className="h-6 w-6" />
             </button>
@@ -227,27 +231,28 @@ export function Navbar() {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between border-b border-stone-200 px-4 py-4">
-                <span className="font-display text-lg font-semibold text-brand-600">Menu</span>
+                <span className="font-display text-lg font-semibold text-brand-600">{t("nav.menu")}</span>
                 <button
                   type="button"
                   className="rounded-full p-2 text-stone-600 hover:bg-stone-100"
                   onClick={() => setMobileOpen(false)}
-                  aria-label="Close menu"
+                  aria-label={t("nav.closeMenu")}
                 >
                   <X className="h-5 w-5" />
                 </button>
               </div>
               <div className="space-y-4 px-4 py-6">
+                <LanguageSwitcher className="w-full justify-center" />
                 <ThemeToggle variant="pill" className="w-full justify-center" />
                 <div className="relative">
-                  <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400" />
+                  <Search className="pointer-events-none absolute top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400 ltr:left-4 rtl:right-4" />
                   <input
                     type="search"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     onKeyDown={onSearchKeyDown}
-                    placeholder="Search equipment, tools, gear..."
-                    className="input w-full rounded-full border-stone-200 bg-stone-100 py-3 pl-11 pr-4 focus:border-brand-500 focus:bg-canvas-card focus:shadow-elevated"
+                    placeholder={t("nav.searchEquipmentPlaceholder")}
+                    className="input w-full rounded-full border-stone-200 bg-stone-100 py-3 ltr:pl-11 ltr:pr-4 rtl:pr-11 rtl:pl-4 focus:border-brand-500 focus:bg-canvas-card focus:shadow-elevated"
                   />
                 </div>
 
@@ -258,39 +263,39 @@ export function Navbar() {
                       className="btn btn-secondary w-full justify-center"
                       onClick={() => setMobileOpen(false)}
                     >
-                      Login
+                      {t("nav.signIn")}
                     </Link>
                     <Link
                       to="/register"
                       className="btn btn-primary w-full justify-center"
                       onClick={() => setMobileOpen(false)}
                     >
-                      List your equipment
+                      {t("nav.listEquipmentCta")}
                     </Link>
                   </div>
                 ) : (
                   <div className="flex flex-col gap-2 border-t border-stone-200 pt-4">
-                    <p className="text-xs font-medium uppercase tracking-wide text-stone-400">Account</p>
+                    <p className="text-xs font-medium uppercase tracking-wide text-stone-400">{t("nav.account")}</p>
                     <Link
                       to="/dashboard"
                       className="rounded-lg px-3 py-2 text-stone-800 hover:bg-stone-100 dark:text-stone-200 dark:hover:bg-stone-800"
                       onClick={() => setMobileOpen(false)}
                     >
-                      {isOwner ? "Owner dashboard" : "My account"}
+                      {isOwner ? t("nav.ownerDashboard") : t("nav.myAccount")}
                     </Link>
                     <Link
                       to="/bookings"
                       className="rounded-lg px-3 py-2 text-stone-800 hover:bg-stone-100"
                       onClick={() => setMobileOpen(false)}
                     >
-                      My Bookings
+                      {t("nav.myBookings")}
                     </Link>
                     <Link
                       to="/profile"
                       className="rounded-lg px-3 py-2 text-stone-800 hover:bg-stone-100 dark:text-stone-200 dark:hover:bg-stone-800"
                       onClick={() => setMobileOpen(false)}
                     >
-                      {isOwner ? "Profile & settings" : "Account settings"}
+                      {isOwner ? t("nav.profileSettings") : t("nav.accountSettings")}
                     </Link>
                     <button
                       type="button"
@@ -300,7 +305,7 @@ export function Navbar() {
                         setMobileOpen(false);
                       }}
                     >
-                      Logout
+                      {t("nav.signOut")}
                     </button>
                   </div>
                 )}

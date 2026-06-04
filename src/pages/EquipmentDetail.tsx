@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { BookingForm } from "@/components/booking/BookingForm";
 import { EquipmentDetailGallery } from "@/components/equipment/EquipmentDetailGallery";
 import { EmptyState } from "@/components/shared/EmptyState";
@@ -57,13 +58,14 @@ function DetailSkeleton() {
 }
 
 function DescriptionBlock({ text }: { text: string }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const long = text.length > 280;
   const shown = long && !open ? `${text.slice(0, 280)}…` : text;
 
   return (
     <section className="overflow-hidden rounded-2xl border border-stone-200 bg-canvas-card p-6 shadow-sm">
-      <h3 className="font-display text-xl font-semibold text-stone-900">About this equipment</h3>
+      <h3 className="font-display text-xl font-semibold text-stone-900">{t("equipment.aboutTitle")}</h3>
       <p className="mt-4 max-w-full whitespace-pre-wrap leading-relaxed text-stone-600 [overflow-wrap:anywhere]">
         {shown}
       </p>
@@ -73,7 +75,7 @@ function DescriptionBlock({ text }: { text: string }) {
           onClick={() => setOpen((o) => !o)}
           className="mt-3 text-sm font-semibold text-brand-600 hover:underline"
         >
-          {open ? "Show less" : "Read full description"}
+          {open ? t("equipment.showLess") : t("equipment.readMore")}
         </button>
       ) : null}
     </section>
@@ -81,6 +83,7 @@ function DescriptionBlock({ text }: { text: string }) {
 }
 
 function PricingCard({ equipment }: { equipment: Equipment }) {
+  const { t } = useTranslation();
   const rows: {
     icon: typeof Coins;
     label: string;
@@ -90,40 +93,42 @@ function PricingCard({ equipment }: { equipment: Equipment }) {
   }[] = [
     {
       icon: Coins,
-      label: "Daily rate",
-      value: `${formatCurrency(equipment.dailyRate)} / day`,
+      label: t("equipment.dailyRate"),
+      value: `${formatCurrency(equipment.dailyRate)}${t("equipment.perDaySuffix")}`,
       highlight: true,
     },
     ...(equipment.weeklyRate != null
       ? [
           {
             icon: CalendarDays,
-            label: "Weekly rate",
-            value: `${formatCurrency(equipment.weeklyRate)} / week`,
+            label: t("equipment.weeklyRate"),
+            value: `${formatCurrency(equipment.weeklyRate)}${t("equipment.perWeekSuffix")}`,
           },
         ]
       : []),
     {
       icon: Shield,
-      label: "Security deposit",
+      label: t("equipment.securityDeposit"),
       value: formatCurrency(equipment.depositAmount),
-      sub: "Refunded after return",
+      sub: t("equipment.depositRefunded"),
     },
     {
       icon: Truck,
-      label: "Delivery fee",
+      label: t("equipment.deliveryFee"),
       value: formatCurrency(equipment.deliveryFee),
-      sub: equipment.deliveryFee > 0 ? "One-way delivery" : "Free delivery",
+      sub: equipment.deliveryFee > 0 ? t("equipment.deliveryOneWay") : t("equipment.freeDelivery"),
     },
   ];
 
   return (
     <div className="overflow-hidden rounded-2xl border border-brand-100 bg-gradient-to-br from-brand-50 to-canvas-card shadow-sm">
       <div className="border-b border-brand-100/80 px-5 py-4">
-        <p className="text-xs font-semibold uppercase tracking-widest text-brand-700">Pricing</p>
+        <p className="text-xs font-semibold uppercase tracking-widest text-brand-700">
+          {t("equipment.pricingLabel")}
+        </p>
         <p className="mt-1 font-display text-3xl font-semibold text-stone-900">
           {formatCurrency(equipment.dailyRate)}
-          <span className="text-lg font-normal text-stone-500"> / day</span>
+          <span className="text-lg font-normal text-stone-500">{t("equipment.perDaySuffix")}</span>
         </p>
       </div>
       <dl className="divide-y divide-brand-100/60 px-5">
@@ -157,7 +162,8 @@ function PricingCard({ equipment }: { equipment: Equipment }) {
 }
 
 function EquipmentHeader({ equipment }: { equipment: Equipment }) {
-  const cat = equipment.category?.name ?? "Equipment";
+  const { t } = useTranslation();
+  const cat = equipment.category?.name ?? t("equipment.defaultCategory");
   const listed = format(parseISO(equipment.createdAt), "MMMM yyyy");
   const { count: reviewCount, average: avg } = equipmentReviewStats(equipment);
 
@@ -166,7 +172,7 @@ function EquipmentHeader({ equipment }: { equipment: Equipment }) {
       <div className="flex flex-wrap items-center gap-2">
         <span className="badge badge-brand">{cat}</span>
         <span className={cn("badge", equipment.isAvailable ? "badge-green" : "badge-red")}>
-          {equipment.isAvailable ? "Available now" : "Currently unavailable"}
+          {equipment.isAvailable ? t("equipment.availableNow") : t("equipment.unavailable")}
         </span>
       </div>
       <h1 className="mt-3 break-words font-display text-3xl font-semibold tracking-tight text-stone-900 md:text-4xl">
@@ -179,17 +185,21 @@ function EquipmentHeader({ equipment }: { equipment: Equipment }) {
         </span>
         <span className="inline-flex items-center gap-1.5">
           <CalendarDays className="h-4 w-4 shrink-0" aria-hidden />
-          Listed {listed}
+          {t("equipment.listedDate", { date: listed })}
         </span>
         <span className="inline-flex items-center gap-1.5">
           <Star className="h-4 w-4 shrink-0 fill-amber-400 text-amber-400" aria-hidden />
           {avg !== null ? (
             <>
               <span className="font-medium text-stone-700">{avg.toFixed(1)}</span>
-              <span>({reviewCount} reviews)</span>
+              <span>
+                {reviewCount === 1
+                  ? t("equipment.reviewCountParen", { count: reviewCount })
+                  : t("equipment.reviewsCountParen", { count: reviewCount })}
+              </span>
             </>
           ) : (
-            "No reviews yet"
+            t("equipment.noReviews")
           )}
         </span>
       </div>
@@ -198,18 +208,19 @@ function EquipmentHeader({ equipment }: { equipment: Equipment }) {
 }
 
 function OwnerCard({ equipment }: { equipment: Equipment }) {
+  const { t } = useTranslation();
   const owner = equipment.owner;
   const { count: reviewCount, average: avg } = equipmentReviewStats(equipment);
   const since = owner.createdAt
     ? format(parseISO(owner.createdAt), "MMMM yyyy")
-    : "recently";
+    : null;
   const isVerified = owner.kycStatus === "APPROVED";
 
   return (
     <section className="overflow-hidden rounded-2xl border border-stone-200 bg-canvas-card shadow-sm">
       <div className="p-6">
         <h3 className="text-xs font-semibold uppercase tracking-widest text-stone-400">
-          Hosted by
+          {t("equipment.hostedBy")}
         </h3>
         <div className="mt-4 flex gap-4 sm:gap-5">
           <div className="shrink-0 rounded-2xl bg-gradient-to-br from-stone-50 to-brand-50/40 p-1 ring-1 ring-stone-100">
@@ -227,25 +238,31 @@ function OwnerCard({ equipment }: { equipment: Equipment }) {
               {isVerified ? (
                 <span
                   className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold leading-none text-emerald-800 shadow-sm"
-                  title={`Identity verified on ${PLATFORM_NAME}`}
+                  title={t("equipment.identityVerifiedTooltip", { name: PLATFORM_NAME })}
                 >
                   <BadgeCheck className="h-3.5 w-3.5 shrink-0 text-emerald-600" strokeWidth={2.5} />
-                  Verified owner
+                  {t("equipment.verifiedOwner")}
                 </span>
               ) : null}
             </div>
-            <p className="text-sm text-stone-500">Member since {since}</p>
+            <p className="text-sm text-stone-500">
+              {since
+                ? t("equipment.memberSince", { date: since })
+                : t("equipment.memberSinceRecent")}
+            </p>
             <div className="flex flex-wrap items-center gap-2 text-sm">
               {avg !== null ? (
                 <span className="inline-flex items-center gap-1.5 rounded-lg bg-amber-50 px-2.5 py-1 text-amber-900">
                   <Star className="h-3.5 w-3.5 fill-amber-500 text-amber-500" aria-hidden />
                   <span className="font-semibold tabular-nums">{avg.toFixed(1)}</span>
                   <span className="text-amber-800/80">
-                    · {reviewCount} {reviewCount === 1 ? "review" : "reviews"} on this listing
+                    {reviewCount === 1
+                      ? t("equipment.reviewOnListing", { count: reviewCount })
+                      : t("equipment.reviewsOnListing", { count: reviewCount })}
                   </span>
                 </span>
               ) : (
-                <span className="text-stone-500">No reviews yet</span>
+                <span className="text-stone-500">{t("equipment.noReviews")}</span>
               )}
             </div>
           </div>
@@ -257,9 +274,9 @@ function OwnerCard({ equipment }: { equipment: Equipment }) {
           to={`/users/${owner.id}`}
           className="group flex w-full items-center justify-center gap-2 rounded-xl border border-stone-200 bg-canvas-card px-4 py-3 text-sm font-semibold text-stone-800 shadow-sm transition-all hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700 hover:shadow-md"
         >
-          View profile
+          {t("equipment.viewProfile")}
           <ChevronRight
-            className="h-4 w-4 text-stone-400 transition-transform group-hover:translate-x-0.5 group-hover:text-brand-600"
+            className="h-4 w-4 text-stone-400 transition-transform group-hover:translate-x-0.5 group-hover:text-brand-600 rtl:rotate-180 rtl:group-hover:-translate-x-0.5"
             aria-hidden
           />
         </Link>
@@ -269,6 +286,7 @@ function OwnerCard({ equipment }: { equipment: Equipment }) {
 }
 
 function OwnerApprovalBanner({ equipment }: { equipment: Equipment }) {
+  const { t } = useTranslation();
   if (equipment.approvalStatus === "APPROVED") return null;
 
   const pending = equipment.approvalStatus === "PENDING";
@@ -289,14 +307,14 @@ function OwnerApprovalBanner({ equipment }: { equipment: Equipment }) {
       )}
       <div>
         <p className="font-semibold">
-          {pending ? "Pending admin review" : "Listing was rejected"}
+          {pending ? t("equipment.pendingReview") : t("equipment.rejected")}
         </p>
         <p className="mt-1 text-[13px] opacity-90">
           {pending
-            ? "Renters cannot find this until an admin approves it. You'll get a notification when it's ready."
+            ? t("equipment.pendingHint")
             : equipment.rejectionNote
               ? equipment.rejectionNote
-              : "Update your listing and save to resubmit for review."}
+              : t("equipment.rejectedHint")}
         </p>
       </div>
     </div>
@@ -304,28 +322,25 @@ function OwnerApprovalBanner({ equipment }: { equipment: Equipment }) {
 }
 
 function OwnerManagePanel({ equipment }: { equipment: Equipment }) {
-  const approved = equipment.approvalStatus === "APPROVED";
+  const { t } = useTranslation();
   const pending = equipment.approvalStatus === "PENDING";
   const rejected = equipment.approvalStatus === "REJECTED";
 
   return (
     <div className="overflow-hidden rounded-2xl border border-stone-200 bg-canvas-card shadow-lg">
       <div className="bg-stone-inv px-5 py-4 text-white">
-        <p className="text-xs font-semibold uppercase tracking-widest text-stone-400">Your listing</p>
-        <p className="mt-1 font-display text-lg font-semibold">Manage from dashboard</p>
+        <p className="text-xs font-semibold uppercase tracking-widest text-stone-400">
+          {t("equipment.yourListingLabel")}
+        </p>
+        <p className="mt-1 font-display text-lg font-semibold">{t("equipment.manageFromDashboard")}</p>
       </div>
       <div className="space-y-4 p-5 text-sm text-stone-600">
         {pending ? (
-          <p>Submitted for review. You can preview it here; it won&apos;t appear in search until approved.</p>
+          <p>{t("equipment.managePendingBody")}</p>
         ) : rejected ? (
-          <p>
-            Edit this listing from <strong className="text-stone-800">My Listings</strong> and save to
-            resubmit for review.
-          </p>
+          <p>{t("equipment.manageRejectedBody")}</p>
         ) : (
-          <p>
-            Toggle visibility or delete from <strong className="text-stone-800">My Listings</strong>.
-          </p>
+          <p>{t("equipment.manageApprovedBody")}</p>
         )}
         <div
           className={cn(
@@ -340,19 +355,19 @@ function OwnerManagePanel({ equipment }: { equipment: Equipment }) {
           )}
         >
           {pending
-            ? "Pending review"
+            ? t("equipment.statusPending")
             : rejected
-              ? "Rejected — edit to resubmit"
+              ? t("equipment.statusRejected")
               : equipment.isAvailable
-                ? "Live in search"
-                : "Approved — hidden from search"}
+                ? t("equipment.statusLive")
+                : t("equipment.statusHidden")}
         </div>
         <Link
           to="/dashboard/listings"
           className="btn btn-primary flex w-full items-center justify-center gap-2"
         >
           <LayoutDashboard className="h-4 w-4" aria-hidden />
-          Go to My Listings
+          {t("equipment.goToMyListings")}
         </Link>
       </div>
     </div>
@@ -370,6 +385,7 @@ function ReviewsSection({
   onReviewSubmitted?: () => void;
   highlightedReviewId?: string | null;
 }) {
+  const { t } = useTranslation();
   const { count: reviewCount, average: avg, approvedReviews } = equipmentReviewStats(equipment);
   const displayReviews = equipment.reviews ?? [];
 
@@ -384,7 +400,7 @@ function ReviewsSection({
 
   return (
     <section className="rounded-2xl border border-stone-200 bg-canvas-card p-6 shadow-sm">
-      <h3 className="font-display text-xl font-semibold text-stone-900">Reviews</h3>
+      <h3 className="font-display text-xl font-semibold text-stone-900">{t("equipment.reviews")}</h3>
       {reviewCount > 0 && avg !== null ? (
         <div className="mt-6 flex flex-wrap items-end gap-8 border-b border-stone-200 pb-8">
           <div>
@@ -400,7 +416,9 @@ function ReviewsSection({
                 />
               ))}
             </div>
-            <p className="mt-1 text-sm text-stone-500">{reviewCount} published reviews</p>
+            <p className="mt-1 text-sm text-stone-500">
+              {t("equipment.publishedReviews", { count: reviewCount })}
+            </p>
           </div>
           <div className="min-w-[200px] flex-1 space-y-1.5">
             {[5, 4, 3, 2, 1].map((star) => {
@@ -423,8 +441,8 @@ function ReviewsSection({
           <ReviewForm
             variant="equipment"
             equipmentId={equipment.id}
-            title="Review this listing"
-            description="Rate the equipment. Your review appears after admin approval."
+            title={t("equipment.reviewTitle")}
+            description={t("equipment.reviewSubtitle")}
             onSuccess={onReviewSubmitted}
           />
         </div>
@@ -446,8 +464,8 @@ function ReviewsSection({
         ) : (
           <EmptyState
             icon={MessageSquare}
-            title="No reviews yet"
-            subtitle="Be the first to review this listing."
+            title={t("equipment.noReviews")}
+            subtitle={t("equipment.firstReview")}
           />
         )}
       </div>
@@ -456,6 +474,7 @@ function ReviewsSection({
 }
 
 export function EquipmentDetail() {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const user = useAuthStore((s) => s.user);
   const { equipment, isLoading, error, refetch } = useEquipmentDetail(id);
@@ -463,7 +482,7 @@ export function EquipmentDetail() {
   const [submitting, setSubmitting] = useState(false);
 
   const isOwner = Boolean(user && equipment && user.id === equipment.owner.id);
-  const catSlug = equipment?.category?.name ?? "Equipment";
+  const catSlug = equipment?.category?.name ?? t("equipment.defaultCategory");
   const catFilterSlug = equipment?.category?.slug;
 
   async function handleBook(data: { startDate: Date; endDate: Date; notes?: string }) {
@@ -471,7 +490,7 @@ export function EquipmentDetail() {
     setSubmitting(true);
     try {
       await bookingService.createBooking({ equipmentId: equipment.id, ...data });
-      toast.success("Booking requested!");
+      toast.success(t("equipment.bookingRequested"));
     } catch (e) {
       toast.error(getApiErrorDetail(e).message);
     } finally {
@@ -488,12 +507,12 @@ export function EquipmentDetail() {
   if (!equipment) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center bg-canvas px-4 text-center">
-        <p className="font-display text-xl font-semibold text-stone-900">Listing not found</p>
+        <p className="font-display text-xl font-semibold text-stone-900">{t("equipment.listingNotFound")}</p>
         <p className="mt-2 text-sm text-stone-500">
-          {error?.message ?? "This equipment may have been removed."}
+          {error?.message ?? t("equipment.notFound")}
         </p>
         <Link to="/search" className="btn btn-primary mt-6">
-          Browse equipment
+          {t("bookings.browseCta")}
         </Link>
       </div>
     );
@@ -505,7 +524,7 @@ export function EquipmentDetail() {
         <nav className="container flex flex-wrap items-center gap-1 py-3 text-sm text-stone-500">
           <Link to="/" className="inline-flex items-center gap-1 hover:text-brand-600">
             <Home className="h-4 w-4" aria-hidden />
-            Home
+            {t("common.home")}
           </Link>
           <ChevronRight className="h-4 w-4 opacity-40" aria-hidden />
           <Link
@@ -534,13 +553,15 @@ export function EquipmentDetail() {
             </div>
             <DescriptionBlock text={equipment.description} />
             <section className="overflow-hidden rounded-2xl border border-stone-200 bg-canvas-card p-6 shadow-sm">
-              <h3 className="font-display text-xl font-semibold text-stone-900">What&apos;s included</h3>
+              <h3 className="font-display text-xl font-semibold text-stone-900">
+                {t("equipment.whatsIncluded")}
+              </h3>
               <ul className="mt-4 grid gap-3 sm:grid-cols-2">
                 {[
-                  "Equipment as listed & inspected",
-                  "Delivery & pickup coordination",
-                  "Usage instructions from the owner",
-                  "Deposit refunded after return",
+                  t("equipment.included1"),
+                  t("equipment.included2"),
+                  t("equipment.included3"),
+                  t("equipment.included4"),
                 ].map((line) => (
                   <li key={line} className="flex items-start gap-2.5 text-sm text-stone-600">
                     <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-50">
@@ -586,16 +607,18 @@ export function EquipmentDetail() {
       </div>
 
       {!isOwner && equipment.approvalStatus === "APPROVED" && equipment.isAvailable ? (
-        <div className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-between gap-4 border-t border-stone-200 bg-canvas-card/95 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-8px_32px_rgba(0,0,0,0.08)] backdrop-blur-sm lg:hidden">
+        <div className="fixed bottom-0 start-0 end-0 z-40 flex items-center justify-between gap-4 border-t border-stone-200 bg-canvas-card/95 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-8px_32px_rgba(0,0,0,0.08)] backdrop-blur-sm lg:hidden">
           <div>
-            <p className="text-[11px] font-medium uppercase tracking-wide text-stone-400">From</p>
+            <p className="text-[11px] font-medium uppercase tracking-wide text-stone-400">
+              {t("equipment.from")}
+            </p>
             <p className="font-display text-xl font-semibold text-stone-900">
-              {Math.round(equipment.dailyRate)} TND
-              <span className="text-sm font-normal text-stone-500">/day</span>
+              {Math.round(equipment.dailyRate)} {t("common.tnd")}
+              <span className="text-sm font-normal text-stone-500">{t("equipment.perDaySuffix")}</span>
             </p>
           </div>
           <button type="button" className="btn btn-primary shrink-0" onClick={scrollToBook}>
-            Book now →
+            {t("equipment.bookNowCta")}
           </button>
         </div>
       ) : null}

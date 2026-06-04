@@ -11,8 +11,9 @@ import {
   Shield,
   Truck,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { z } from "zod";
 import {
@@ -45,6 +46,7 @@ const perks = [
 ] as const;
 
 export function Login() {
+  const { t } = useTranslation();
   const { login } = useAuth();
   const clearAuth = useAuthStore((s) => s.clearAuth);
   const navigate = useNavigate();
@@ -77,6 +79,8 @@ export function Login() {
       }
       if (code === "ACCOUNT_BLOCKED") {
         clearAuth();
+        setApiError(t("auth.blockedAccount"));
+        return;
       }
       setApiError(message);
     } finally {
@@ -167,7 +171,7 @@ export function Login() {
             <div className="rounded-2xl border border-stone-200 bg-canvas-card p-6 shadow-elevated sm:p-8 sm:rounded-3xl">
               <div className="mb-8">
                 <h2 className="font-display text-2xl font-semibold tracking-tight text-stone-900 sm:text-3xl">
-                  Sign in
+                  {t("auth.welcomeBack")}
                 </h2>
                 <p className="mt-2 text-sm text-stone-500 sm:text-base">
                   New here?{" "}
@@ -215,7 +219,7 @@ export function Login() {
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-stone-700">Email</FormLabel>
+                        <FormLabel className="text-stone-700">{t("auth.email")}</FormLabel>
                         <FormControl>
                           <div className="relative">
                             <Mail
@@ -242,12 +246,12 @@ export function Login() {
                     render={({ field }) => (
                       <FormItem>
                         <div className="flex items-center justify-between gap-2">
-                          <FormLabel className="text-stone-700">Password</FormLabel>
+                          <FormLabel className="text-stone-700">{t("auth.password")}</FormLabel>
                           <span
                             className="cursor-not-allowed text-xs font-medium text-stone-400"
                             title="Coming soon"
                           >
-                            Forgot password?
+                            {t("auth.forgotPassword")}
                           </span>
                         </div>
                         <FormControl>
@@ -294,7 +298,7 @@ export function Login() {
                       <span className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
                     ) : (
                       <>
-                        Sign in
+                        {t("auth.signInButton")}
                         <ArrowRight className="h-4 w-4" />
                       </>
                     )}

@@ -12,6 +12,7 @@ import {
   Wrench,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { SearchBar } from "@/components/shared/SearchBar";
 import { cn } from "@/utils/cn";
 
@@ -54,13 +55,14 @@ const showcaseItems = [
   },
 ] as const;
 
-const trustPills = [
-  { icon: BadgeCheck, label: "Verified owners" },
-  { icon: Shield, label: "Secure deposits" },
-  { icon: Truck, label: "Delivery included" },
+const trustPillKeys = [
+  { icon: BadgeCheck, key: "home.trustVerified" },
+  { icon: Shield, key: "home.trustSecure" },
+  { icon: Truck, key: "home.trustDelivery" },
 ] as const;
 
 export function HomeHero() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   return (
@@ -96,7 +98,7 @@ export function HomeHero() {
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-400 opacity-60" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-brand-500" />
               </span>
-              Tunisia&apos;s equipment rental marketplace
+              {t("footer.tagline")}
             </motion.span>
 
             <motion.h1
@@ -105,11 +107,7 @@ export function HomeHero() {
               transition={{ duration: 0.5, delay: 0.06 }}
               className="mt-5 font-display text-[1.85rem] font-semibold leading-[1.12] tracking-tight text-stone-900 min-[400px]:text-[2.1rem] sm:mt-6 sm:text-4xl md:text-5xl lg:text-[3.25rem]"
             >
-              Rent any{" "}
-              <span className="bg-gradient-to-r from-brand-600 via-brand-500 to-brand-400 bg-clip-text text-transparent">
-                equipment
-              </span>
-              , anywhere.
+              {t("home.heroTitle")}
             </motion.h1>
 
             <motion.p
@@ -118,8 +116,7 @@ export function HomeHero() {
               transition={{ duration: 0.5, delay: 0.12 }}
               className="mt-4 max-w-lg text-base leading-relaxed text-stone-600 sm:mt-5 sm:text-lg"
             >
-              Connect with trusted local owners. Book construction gear, sports equipment,
-              and event supplies — by the day, with secure payments.
+              {t("home.heroSubtitle")}
             </motion.p>
 
             <motion.div
@@ -131,7 +128,7 @@ export function HomeHero() {
               <SearchBar
                 showButton
                 instant={false}
-                placeholder="Search drills, tents, tools, gear…"
+                placeholder={t("nav.searchEquipmentPlaceholder")}
                 onSearch={(q) =>
                   navigate(q ? `/search?q=${encodeURIComponent(q)}` : "/search")
                 }
@@ -160,14 +157,14 @@ export function HomeHero() {
                 to="/search"
                 className="btn btn-primary btn-lg w-full justify-center shadow-warm min-[400px]:w-auto"
               >
-                Browse equipment
+                {t("home.heroCta")}
                 <ArrowRight className="h-4 w-4" aria-hidden />
               </Link>
               <Link
                 to="/equipment/new"
                 className="btn btn-secondary btn-lg w-full justify-center min-[400px]:w-auto"
               >
-                List your gear
+                {t("home.heroListCta")}
               </Link>
             </motion.div>
 
@@ -177,15 +174,15 @@ export function HomeHero() {
               transition={{ duration: 0.5, delay: 0.32 }}
               className="mt-8 grid gap-3 sm:grid-cols-3 sm:gap-4"
             >
-              {trustPills.map(({ icon: Icon, label }) => (
+              {trustPillKeys.map(({ icon: Icon, key }) => (
                 <li
-                  key={label}
+                  key={key}
                   className="flex items-center gap-2.5 rounded-xl border border-stone-200 bg-stone-100/80 px-3 py-2.5 text-sm text-stone-700"
                 >
                   <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-canvas-card shadow-elevated ring-1 ring-stone-200">
                     <Icon className="h-4 w-4 text-brand-600" strokeWidth={2} />
                   </span>
-                  <span className="font-medium">{label}</span>
+                  <span className="font-medium">{t(key)}</span>
                 </li>
               ))}
             </motion.ul>

@@ -1,4 +1,5 @@
 import { useEffect, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import {
   CalendarCheck,
@@ -43,11 +44,11 @@ const RENTER_UPCOMING = [
   "ACTIVE",
 ];
 
-function greetingForNow(): string {
+function greetingForNow(t: (key: string) => string): string {
   const h = new Date().getHours();
-  if (h < 12) return "Good morning";
-  if (h < 18) return "Good afternoon";
-  return "Good evening";
+  if (h < 12) return t("dashboardPage.goodMorning");
+  if (h < 18) return t("dashboardPage.goodAfternoon");
+  return t("dashboardPage.goodEvening");
 }
 
 function StatCard({
@@ -91,6 +92,7 @@ function StatCard({
 }
 
 export function Dashboard() {
+  const { t } = useTranslation();
   const user = useAuthStore((s) => s.user);
   const setUser = useAuthStore((s) => s.setUser);
   const { data: dashboard, isLoading: dashLoading, canFetch } = useOwnerDashboard();
@@ -131,7 +133,7 @@ export function Dashboard() {
   }, [bookings?.asRenter]);
 
   const loading = dashLoading || bookingsLoading;
-  const greet = greetingForNow();
+  const greet = greetingForNow(t);
   const s = dashboard?.summary;
   const isOwner = isOwnerRole(user?.role);
 
@@ -144,11 +146,11 @@ export function Dashboard() {
               <ShieldAlert size={20} className="text-yellow-600" aria-hidden />
             </div>
             <div>
-              <p className="text-sm font-semibold text-yellow-900">Identity verification required</p>
+              <p className="text-sm font-semibold text-yellow-900">{t("dashboardPage.kycRequired")}</p>
               <p className="mt-0.5 text-xs text-yellow-700">
                 {user.kycStatus === "SUBMITTED"
-                  ? "Your document is under review. You'll be notified within 24–48 hours."
-                  : "Upload your ID to start listing equipment and earning."}
+                  ? t("dashboardPage.kycSubmitted")
+                  : t("dashboardPage.kycUpload")}
               </p>
             </div>
           </div>
@@ -157,7 +159,7 @@ export function Dashboard() {
               to="/profile"
               className="btn btn-sm shrink-0 bg-yellow-500 text-white hover:bg-yellow-600"
             >
-              Verify Now →
+              {t("dashboardPage.verifyNow")} →
             </Link>
           ) : null}
         </div>
@@ -170,9 +172,7 @@ export function Dashboard() {
           <span aria-hidden>👋</span>
         </h2>
         <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
-          {canFetch
-            ? "Here's how your listings and earnings are performing."
-            : "Track your rentals, payments, and booking status in one place."}
+          {canFetch ? t("dashboardPage.ownerSubtitle") : t("dashboardPage.renterSubtitle")}
         </p>
       </div>
 
@@ -180,11 +180,11 @@ export function Dashboard() {
         <>
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
             <StatCard
-              label="Net earnings (all time)"
+              label={t("dashboardPage.netEarnings")}
               value={loading || !s ? "—" : formatCurrency(s.totalEarningsNet)}
               subValue={
                 <span className="text-xs font-medium text-stone-400">
-                  Gross {loading || !s ? "—" : formatCurrency(s.totalEarningsGross)}
+                  {t("dashboardPage.gross")} {loading || !s ? "—" : formatCurrency(s.totalEarningsGross)}
                 </span>
               }
               icon={Wallet}
@@ -193,7 +193,7 @@ export function Dashboard() {
               href="/dashboard/earnings"
             />
             <StatCard
-              label="This month (net)"
+              label={t("dashboardPage.thisMonthNet")}
               value={loading || !s ? "—" : formatCurrency(s.earningsThisMonthNet)}
               subValue={
                 !loading && s ? <MonthChangeBadge pct={s.monthOverMonthChangePct} /> : null
@@ -204,7 +204,7 @@ export function Dashboard() {
               href="/dashboard/earnings"
             />
             <StatCard
-              label="Active rentals"
+              label={t("dashboardPage.activeRentals")}
               value={loading || !s ? "—" : String(s.activeRentals)}
               icon={Package}
               iconBg="bg-blue-50"
@@ -212,7 +212,7 @@ export function Dashboard() {
               href="/dashboard/bookings"
             />
             <StatCard
-              label="Pending requests"
+              label={t("dashboardPage.pendingRequests")}
               value={loading || !s ? "—" : String(s.pendingRequests)}
               icon={Clock}
               iconBg="bg-yellow-50"
@@ -223,11 +223,11 @@ export function Dashboard() {
 
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
             <StatCard
-              label="My listings"
+              label={t("dashboardPage.myListings")}
               value={loading || !s ? "—" : String(s.totalListings)}
               subValue={
                 <span className="text-xs font-medium text-green-600">
-                  {loading || !s ? "" : `${s.liveListings} live`}
+                  {loading || !s ? "" : t("dashboardPage.liveCount", { count: s.liveListings })}
                 </span>
               }
               icon={Tag}
@@ -236,14 +236,14 @@ export function Dashboard() {
               href="/dashboard/listings"
             />
             <StatCard
-              label="Completed rentals"
+              label={t("dashboardPage.completedRentals")}
               value={loading || !s ? "—" : String(s.completedBookings)}
               icon={Package}
               iconBg="bg-stone-100"
               iconColor="text-stone-600"
             />
             <StatCard
-              label="Pending payout"
+              label={t("dashboardPage.pendingPayout")}
               value={loading || !s ? "—" : formatCurrency(s.pendingPayout)}
               icon={Wallet}
               iconBg="bg-violet-50"
@@ -251,11 +251,11 @@ export function Dashboard() {
               href="/dashboard/earnings"
             />
             <StatCard
-              label="Average rating"
+              label={t("dashboardPage.avgRating")}
               value={loading || !s ? "—" : s.avgRating !== null ? s.avgRating.toFixed(1) : "—"}
               subValue={
                 <span className="text-xs font-medium text-stone-400">
-                  {loading || !s ? "" : `${s.totalReviews} reviews`}
+                  {loading || !s ? "" : t("dashboardPage.reviewsCount", { count: s.totalReviews })}
                 </span>
               }
               icon={Star}
@@ -295,7 +295,7 @@ export function Dashboard() {
         <>
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
             <StatCard
-              label="Active rentals"
+              label={t("dashboardPage.activeRentals")}
               value={loading ? "—" : String(renterStats.active)}
               icon={Package}
               iconBg="bg-blue-50 dark:bg-blue-500/15"
@@ -303,7 +303,7 @@ export function Dashboard() {
               href="/bookings"
             />
             <StatCard
-              label="Upcoming"
+              label={t("dashboardPage.upcoming")}
               value={loading ? "—" : String(renterStats.upcoming)}
               icon={CalendarCheck}
               iconBg="bg-brand-50 dark:bg-brand-500/15"
@@ -311,7 +311,7 @@ export function Dashboard() {
               href="/bookings"
             />
             <StatCard
-              label="Awaiting action"
+              label={t("dashboardPage.awaitingAction")}
               value={loading ? "—" : String(renterStats.pending)}
               icon={Clock}
               iconBg="bg-yellow-50 dark:bg-yellow-500/15"
@@ -319,7 +319,7 @@ export function Dashboard() {
               href="/bookings"
             />
             <StatCard
-              label="Completed"
+              label={t("dashboardPage.completed")}
               value={loading ? "—" : String(renterStats.completed)}
               icon={CheckCircle2}
               iconBg="bg-emerald-50 dark:bg-emerald-500/15"
@@ -330,7 +330,7 @@ export function Dashboard() {
 
           {!loading && renterStats.totalSpent > 0 ? (
             <p className="text-sm text-stone-500 dark:text-stone-400">
-              Total spent on confirmed rentals:{" "}
+              {t("dashboardPage.totalSpent")}{" "}
               <span className="font-semibold text-stone-800 dark:text-stone-200">
                 {formatCurrency(renterStats.totalSpent)}
               </span>
@@ -340,23 +340,23 @@ export function Dashboard() {
           <div className="flex flex-wrap gap-3">
             <Link to="/search" className="btn btn-primary">
               <Search className="h-4 w-4" aria-hidden />
-              Browse equipment
+              {t("dashboardPage.browseEquipment")}
             </Link>
             <Link to="/bookings" className="btn btn-secondary">
-              View all bookings
+              {t("dashboardPage.viewAllBookings")}
             </Link>
           </div>
 
           <div className="overflow-hidden rounded-2xl border border-stone-200 bg-canvas-card shadow-sm dark:border-stone-800">
             <div className="flex items-center justify-between border-b border-stone-200 px-4 py-4 sm:px-6 dark:border-stone-800">
               <h3 className="font-display text-lg text-stone-900 dark:text-stone-100">
-                Recent rentals
+                {t("dashboardPage.recentRentals")}
               </h3>
               <Link
                 to="/bookings"
                 className="text-sm font-medium text-brand-500 hover:text-brand-600"
               >
-                View all →
+                {t("dashboardPage.viewAll")} →
               </Link>
             </div>
             <div className="p-4 sm:p-6">
@@ -364,12 +364,12 @@ export function Dashboard() {
                 <div className="py-12 sm:py-16">
                   <EmptyState
                     icon={CalendarX}
-                    title="No rentals yet"
-                    subtitle="Find equipment on the marketplace and send your first booking request."
+                    title={t("dashboardPage.noRentalsYet")}
+                    subtitle={t("dashboardPage.noRentalsHint")}
                   />
                   <div className="mt-6 flex justify-center">
                     <Link to="/search" className="btn btn-primary">
-                      Browse equipment
+                      {t("dashboardPage.browseEquipment")}
                     </Link>
                   </div>
                 </div>
@@ -378,10 +378,10 @@ export function Dashboard() {
                   <table className="w-full min-w-[560px] text-sm">
                     <thead>
                       <tr className="border-b border-stone-200 bg-stone-100/80 text-left text-xs font-semibold uppercase tracking-wide text-stone-500 dark:border-stone-800 dark:bg-stone-800/50">
-                        <th className="px-3 py-3 sm:px-4">Equipment</th>
-                        <th className="px-3 py-3 sm:px-4">Dates</th>
-                        <th className="px-3 py-3 sm:px-4">Status</th>
-                        <th className="px-3 py-3 text-right sm:px-4">Amount</th>
+                        <th className="px-3 py-3 sm:px-4">{t("dashboardPage.tableEquipment")}</th>
+                        <th className="px-3 py-3 sm:px-4">{t("dashboardPage.tableDates")}</th>
+                        <th className="px-3 py-3 sm:px-4">{t("dashboardPage.tableStatus")}</th>
+                        <th className="px-3 py-3 text-end sm:px-4">{t("dashboardPage.tableAmount")}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -427,14 +427,13 @@ export function Dashboard() {
 
           <div className="rounded-2xl border border-stone-200 bg-gradient-to-br from-stone-50 to-brand-50/40 p-5 sm:p-6 dark:border-stone-800 dark:from-stone-900 dark:to-brand-500/10">
             <h3 className="font-display text-lg font-semibold text-stone-900 dark:text-stone-100">
-              Want to list your equipment?
+              {t("dashboardPage.listEquipmentTitle")}
             </h3>
             <p className="mt-1 max-w-lg text-sm text-stone-600 dark:text-stone-400">
-              Owners get a public profile, listings, earnings dashboard, and identity verification.
-              Contact us if you&apos;d like to upgrade your account to list gear.
+              {t("dashboardPage.listEquipmentBody")}
             </p>
             <Link to="/contact" className="btn btn-secondary btn-sm mt-4">
-              Contact support
+              {t("dashboardPage.contactSupport")}
             </Link>
           </div>
         </>
@@ -443,10 +442,10 @@ export function Dashboard() {
       {isOwner ? (
         <div className="flex flex-wrap gap-3">
           <Link to="/equipment/new" className="btn btn-primary">
-            Add New Listing
+            {t("dashboardPage.addListing")}
           </Link>
           <Link to="/dashboard/bookings" className="btn btn-secondary">
-            View Booking Requests
+            {t("dashboardPage.viewBookingRequests")}
           </Link>
         </div>
       ) : null}
@@ -455,13 +454,13 @@ export function Dashboard() {
         <div className="overflow-hidden rounded-2xl border border-stone-200 bg-canvas-card shadow-sm dark:border-stone-800">
           <div className="flex items-center justify-between border-b border-stone-200 px-6 py-4 dark:border-stone-800">
             <h3 className="font-display text-lg text-stone-900 dark:text-stone-100">
-              Recent booking requests
+              {t("dashboardPage.recentRequests")}
             </h3>
             <Link
               to="/dashboard/bookings"
               className="text-sm font-medium text-brand-500 hover:text-brand-600"
             >
-              View all →
+              {t("dashboardPage.viewAll")} →
             </Link>
           </div>
           <div className="p-6">
@@ -469,8 +468,8 @@ export function Dashboard() {
               <div className="py-16">
                 <EmptyState
                   icon={CalendarX}
-                  title="No bookings yet"
-                  subtitle="Requests from renters will appear here."
+                  title={t("dashboardPage.noBookingsYet")}
+                  subtitle={t("dashboardPage.noBookingsHint")}
                 />
               </div>
             ) : (
@@ -478,11 +477,11 @@ export function Dashboard() {
                 <table className="w-full min-w-[640px] text-sm">
                   <thead>
                     <tr className="border-b border-stone-200 bg-stone-100/80 text-left text-xs font-semibold uppercase tracking-wide text-stone-500 dark:border-stone-800 dark:bg-stone-800/50">
-                      <th className="px-4 py-3">Equipment</th>
-                      <th className="px-4 py-3">Renter</th>
-                      <th className="px-4 py-3">Dates</th>
-                      <th className="px-4 py-3">Status</th>
-                      <th className="px-4 py-3 text-right">Amount</th>
+                      <th className="px-4 py-3">{t("dashboardPage.tableEquipment")}</th>
+                      <th className="px-4 py-3">{t("dashboardPage.tableRenter")}</th>
+                      <th className="px-4 py-3">{t("dashboardPage.tableDates")}</th>
+                      <th className="px-4 py-3">{t("dashboardPage.tableStatus")}</th>
+                      <th className="px-4 py-3 text-end">{t("dashboardPage.tableAmount")}</th>
                     </tr>
                   </thead>
                   <tbody>

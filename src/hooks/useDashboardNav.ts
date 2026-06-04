@@ -1,5 +1,6 @@
 import { CalendarCheck, LayoutDashboard, Package, Settings, User, Wallet } from "lucide-react";
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { useAuthStore } from "@/store/authStore";
 import { isOwnerRole } from "@/lib/roles";
 
@@ -11,6 +12,7 @@ export type DashboardNavItem = {
 };
 
 export function useDashboardNav() {
+  const { t, i18n } = useTranslation();
   const role = useAuthStore((s) => s.user?.role);
   const isOwner = isOwnerRole(role);
 
@@ -20,33 +22,37 @@ export function useDashboardNav() {
         isOwner: true as const,
         sections: [
           {
-            section: "OVERVIEW",
+            section: t("dashboard.sectionOverview"),
             links: [
-              { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, end: true },
-              { to: "/dashboard/listings", label: "My Listings", icon: Package },
-              { to: "/dashboard/bookings", label: "Booking Requests", icon: CalendarCheck },
-              { to: "/dashboard/earnings", label: "Earnings", icon: Wallet },
+              { to: "/dashboard", label: t("dashboard.overview"), icon: LayoutDashboard, end: true },
+              { to: "/dashboard/listings", label: t("dashboard.myListings"), icon: Package },
+              {
+                to: "/dashboard/bookings",
+                label: t("dashboard.bookingRequests"),
+                icon: CalendarCheck,
+              },
+              { to: "/dashboard/earnings", label: t("dashboard.earnings"), icon: Wallet },
             ] as DashboardNavItem[],
           },
           {
-            section: "ACCOUNT",
-            links: [{ to: "/profile", label: "My Profile", icon: User }],
+            section: t("dashboard.sectionAccount"),
+            links: [{ to: "/profile", label: t("dashboard.myProfile"), icon: User }],
           },
         ],
         mobileLinks: [
-          { to: "/dashboard", label: "Home", icon: LayoutDashboard, end: true },
-          { to: "/dashboard/listings", label: "Listings", icon: Package },
-          { to: "/dashboard/bookings", label: "Requests", icon: CalendarCheck },
-          { to: "/dashboard/earnings", label: "Earnings", icon: Wallet },
-          { to: "/profile", label: "Profile", icon: User },
+          { to: "/dashboard", label: t("dashboard.home"), icon: LayoutDashboard, end: true },
+          { to: "/dashboard/listings", label: t("dashboard.listings"), icon: Package },
+          { to: "/dashboard/bookings", label: t("dashboard.requests"), icon: CalendarCheck },
+          { to: "/dashboard/earnings", label: t("dashboard.earnings"), icon: Wallet },
+          { to: "/profile", label: t("dashboard.myProfile"), icon: User },
         ] as DashboardNavItem[],
         breadcrumbs: {
-          "/dashboard": "Overview",
-          "/dashboard/listings": "My Listings",
-          "/dashboard/bookings": "Booking Requests",
-          "/dashboard/earnings": "Earnings",
-          "/profile": "My Profile",
-          "/equipment/new": "New Listing",
+          "/dashboard": t("dashboard.overview"),
+          "/dashboard/listings": t("dashboard.myListings"),
+          "/dashboard/bookings": t("dashboard.bookingRequests"),
+          "/dashboard/earnings": t("dashboard.earnings"),
+          "/profile": t("dashboard.myProfile"),
+          "/equipment/new": t("dashboard.newListing"),
         } as Record<string, string>,
       };
     }
@@ -55,26 +61,26 @@ export function useDashboardNav() {
       isOwner: false as const,
       sections: [
         {
-          section: "MY RENTALS",
+          section: t("dashboard.sectionRentals"),
           links: [
-            { to: "/dashboard", label: "Overview", icon: LayoutDashboard, end: true },
-            { to: "/bookings", label: "My Bookings", icon: CalendarCheck },
+            { to: "/dashboard", label: t("dashboard.renterOverview"), icon: LayoutDashboard, end: true },
+            { to: "/bookings", label: t("nav.myBookings"), icon: CalendarCheck },
           ] as DashboardNavItem[],
         },
         {
-          section: "ACCOUNT",
-          links: [{ to: "/profile", label: "Account settings", icon: Settings }],
+          section: t("dashboard.sectionAccount"),
+          links: [{ to: "/profile", label: t("nav.accountSettings"), icon: Settings }],
         },
       ],
       mobileLinks: [
-        { to: "/dashboard", label: "Overview", icon: LayoutDashboard, end: true },
-        { to: "/bookings", label: "Bookings", icon: CalendarCheck },
-        { to: "/profile", label: "Settings", icon: Settings },
+        { to: "/dashboard", label: t("dashboard.renterOverview"), icon: LayoutDashboard, end: true },
+        { to: "/bookings", label: t("dashboard.bookings"), icon: CalendarCheck },
+        { to: "/profile", label: t("dashboard.settings"), icon: Settings },
       ] as DashboardNavItem[],
       breadcrumbs: {
-        "/dashboard": "Overview",
-        "/profile": "Account settings",
+        "/dashboard": t("dashboard.renterOverview"),
+        "/profile": t("nav.accountSettings"),
       } as Record<string, string>,
     };
-  }, [isOwner]);
+  }, [isOwner, t, i18n.language]);
 }

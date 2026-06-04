@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { CalendarDays, Inbox, Search, Tag } from "lucide-react";
 import { BookingsPageHeader } from "@/components/booking/BookingsPageHeader";
@@ -22,6 +23,7 @@ function countActive(list: Booking[]) {
 }
 
 export function Bookings() {
+  const { t } = useTranslation();
   const { bookings, isLoading, error, refetch } = useMyBookings();
   const role = useAuthStore((s) => s.user?.role);
   const isOwner = isOwnerRole(role);
@@ -43,37 +45,35 @@ export function Bookings() {
     <div className="min-h-screen bg-canvas">
       <div className="container max-w-4xl pb-20 pt-8 sm:pt-10 md:pb-16">
         <BookingsPageHeader
-          eyebrow="Reservations"
-          title="My Bookings"
+          eyebrow={t("bookings.eyebrow")}
+          title={t("bookings.title")}
           description={
-            isOwner
-              ? "Track rentals you've made and manage requests for your equipment."
-              : "Track equipment you've rented and follow each booking from request to return."
+            isOwner ? t("bookings.subtitleOwner") : t("bookings.subtitleRenter")
           }
           stats={
             stats
               ? isOwner
                 ? [
                     {
-                      label: "I'm renting",
+                      label: t("bookings.imRenting"),
                       value: stats.renting,
                       icon: CalendarDays,
                       tone: "blue" as const,
                     },
                     {
-                      label: "Active rentals",
+                      label: t("bookings.statActiveRentals"),
                       value: stats.rentingActive,
                       icon: Inbox,
                       tone: "green" as const,
                     },
                     {
-                      label: "My equipment",
+                      label: t("bookings.statMyEquipment"),
                       value: stats.owner,
                       icon: Tag,
                       tone: "brand" as const,
                     },
                     {
-                      label: "Pending requests",
+                      label: t("bookings.statPendingRequests"),
                       value: stats.ownerPending,
                       icon: CalendarDays,
                       tone: "amber" as const,
@@ -81,13 +81,13 @@ export function Bookings() {
                   ]
                 : [
                     {
-                      label: "Total bookings",
+                      label: t("bookings.statTotalBookings"),
                       value: stats.renting,
                       icon: CalendarDays,
                       tone: "blue" as const,
                     },
                     {
-                      label: "Active now",
+                      label: t("bookings.statActiveNow"),
                       value: stats.rentingActive,
                       icon: Inbox,
                       tone: "green" as const,
@@ -103,12 +103,12 @@ export function Bookings() {
               tabs={[
                 {
                   id: "renter",
-                  label: "I'm renting",
+                  label: t("bookings.imRenting"),
                   count: bookings?.asRenter.length ?? 0,
                 },
                 {
                   id: "owner",
-                  label: "My equipment",
+                  label: t("bookings.statMyEquipment"),
                   count: bookings?.asOwner.length ?? 0,
                 },
               ]}
@@ -127,7 +127,7 @@ export function Bookings() {
             </div>
           ) : error || !bookings ? (
             <div className="rounded-2xl border border-red-200 bg-red-500/10 px-6 py-12 text-center text-red-700 dark:border-red-500/30 dark:text-red-300">
-              {error?.message ?? "Could not load bookings"}
+              {error?.message ?? t("bookings.loadError")}
             </div>
           ) : list.length > 0 ? (
             <div className="space-y-4">
@@ -144,11 +144,9 @@ export function Bookings() {
             <div className="rounded-2xl border border-dashed border-stone-200 bg-canvas-card px-4 py-4 shadow-elevated">
               <EmptyState
                 icon={CalendarDays}
-                title={tab === "renter" ? "No rentals yet" : "No incoming bookings"}
+                title={tab === "renter" ? t("bookings.noRentalsTitle") : t("bookings.noIncomingTitle")}
                 subtitle={
-                  tab === "renter"
-                    ? "Browse listings and send your first booking request."
-                    : "List equipment to start receiving booking requests."
+                  tab === "renter" ? t("bookings.noRentalsHint") : t("bookings.noIncomingHint")
                 }
               />
               <div className="flex justify-center pb-8">
@@ -159,12 +157,12 @@ export function Bookings() {
                   {tab === "renter" ? (
                     <>
                       <Search className="h-4 w-4" />
-                      Browse equipment
+                      {t("bookings.browseCta")}
                     </>
                   ) : (
                     <>
                       <Tag className="h-4 w-4" />
-                      Add listing
+                      {t("bookings.listCta")}
                     </>
                   )}
                 </Link>

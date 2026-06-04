@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -14,14 +15,8 @@ import * as userService from "@/services/user.service";
 import { useAuthStore } from "@/store/authStore";
 import toast from "react-hot-toast";
 
-function hoursAgo(iso: string): string {
-  const h = Math.floor((Date.now() - new Date(iso).getTime()) / 3600000);
-  if (h <= 0) return "just now";
-  if (h === 1) return "1 hour ago";
-  return `${h} hours ago`;
-}
-
 export function KycUploadForm() {
+  const { t } = useTranslation();
   const user = useAuthStore((s) => s.user);
   const setUser = useAuthStore((s) => s.setUser);
   const [docType, setDocType] = useState<KycDocumentType>("national_id");
@@ -29,6 +24,13 @@ export function KycUploadForm() {
   const [docKeys, setDocKeys] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [kyc, setKyc] = useState<Awaited<ReturnType<typeof kycService.getKycStatus>> | null>(null);
+
+  function hoursAgoLabel(iso: string): string {
+    const h = Math.floor((Date.now() - new Date(iso).getTime()) / 3600000);
+    if (h <= 0) return t("kyc.justNow");
+    if (h === 1) return t("kyc.oneHourAgo");
+    return t("kyc.hoursAgo", { count: h });
+  }
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -56,15 +58,11 @@ export function KycUploadForm() {
   }, [user, refresh]);
 
   if (!user || user.role === "RENTER") {
-    return (
-      <p className="text-sm text-stone-600">
-        Identity verification is only required if you list equipment as an owner.
-      </p>
-    );
+    return <p className="text-sm text-stone-600">{t("kyc.renterOnly")}</p>;
   }
 
   if (loading || kyc === null) {
-    return <p className="text-sm text-stone-500">Loading verification status…</p>;
+    return <p className="text-sm text-stone-500">{t("kyc.loadingStatus")}</p>;
   }
 
   const status = kyc.kycStatus ?? user.kycStatus;
@@ -76,19 +74,19 @@ export function KycUploadForm() {
 
   async function onSubmit() {
     if (!previewUrl) {
-      toast.error("Upload a document first");
+      toast.error(t("kyc.uploadFirst"));
       return;
     }
     try {
       await userService.uploadKycDocument(previewUrl, docType);
-      toast.success("Submitted for review");
+      toast.success(t("kyc.submitted"));
       setDocUrls([]);
       setDocKeys([]);
       const me = await userService.refreshProfile();
       setUser(me);
       await refresh();
     } catch {
-      toast.error("Could not submit");
+      toast.error(t("kyc.submitError"));
     }
   }
 
@@ -96,19 +94,19 @@ export function KycUploadForm() {
     return (
       <div className="space-y-4">
         <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6">
-          <p className="font-semibold text-amber-900">Under review</p>
+          <p className="font-semibold text-amber-900">{t("kyc.underReview")}</p>
           <p className="mt-1 text-sm text-amber-800">
-            Submitted {hoursAgo(doc.submittedAt)}. You will be notified within 24–48 hours.
+            {t("kyc.submittedAgo", { ago: hoursAgoLabel(doc.submittedAt) })}
           </p>
         </div>
         {doc.documentUrl ? (
           <a href={doc.documentUrl} target="_blank" rel="noreferrer" className="block">
             {doc.documentUrl.toLowerCase().includes(".pdf") ? (
-              <p className="text-sm font-medium text-brand-600 underline">View submitted PDF</p>
+              <p className="text-sm font-medium text-brand-600 underline">{t("kyc.viewPdf")}</p>
             ) : (
               <img
                 src={doc.documentUrl}
-                alt="Submitted document"
+                alt={t("kyc.submittedDocAlt")}
                 className="max-h-48 rounded-xl border object-contain"
               />
             )}
@@ -121,10 +119,12 @@ export function KycUploadForm() {
   if (status === "APPROVED") {
     return (
       <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6">
-        <p className="font-semibold text-emerald-900">Verified — you can list equipment</p>
+        <p className="font-semibold text-emerald-900">{t("kyc.verifiedCanList")}</p>
         {doc?.reviewedAt ? (
           <p className="mt-1 text-sm text-emerald-800">
-            Approved on {new Date(doc.reviewedAt).toLocaleDateString()}
+            {t("kyc.approvedOn", {
+              date: new Date(doc.reviewedAt).toLocaleDateString(),
+            })}
           </p>
         ) : null}
       </div>
@@ -133,20 +133,17 @@ export function KycUploadForm() {
 
   const uploadBlock = (
     <div className="space-y-4">
-      <p className="text-xs text-stone-500">
-        Accepted: JPG, PNG, WebP, PDF · up to 20MB. Must show full name and photo clearly (for ID
-        cards).
-      </p>
+      <p className="text-xs text-stone-500">{t("kyc.acceptedFormats")}</p>
       <div className="space-y-2">
-        <p className="text-sm font-medium text-stone-800">Document type</p>
+        <p className="text-sm font-medium text-stone-800">{t("kyc.documentType")}</p>
         <Select value={docType} onValueChange={(v) => setDocType(v as KycDocumentType)}>
           <SelectTrigger className="input h-11 rounded-xl">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="national_id">National ID</SelectItem>
-            <SelectItem value="passport">Passport</SelectItem>
-            <SelectItem value="driving_license">Driving license</SelectItem>
+            <SelectItem value="national_id">{t("kyc.nationalId")}</SelectItem>
+            <SelectItem value="passport">{t("kyc.passport")}</SelectItem>
+            <SelectItem value="driving_license">{t("kyc.drivingLicense")}</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -154,8 +151,8 @@ export function KycUploadForm() {
         folder="kyc"
         maxFiles={1}
         accept="image/*,application/pdf"
-        label="Upload identity document"
-        hint="National ID, passport, or driving license"
+        label={t("kyc.uploadLabel")}
+        hint={t("kyc.uploadHint")}
         valueUrls={docUrls}
         valueKeys={docKeys}
         onChange={(urls, keys) => {
@@ -171,14 +168,14 @@ export function KycUploadForm() {
             rel="noreferrer"
             className="inline-block text-sm font-medium text-brand-600 underline"
           >
-            Preview PDF
+            {t("kyc.previewPdf")}
           </a>
         ) : (
           <img src={previewUrl} alt="" className="max-h-40 rounded-lg border object-contain" />
         )
       ) : null}
       <Button type="button" className="min-h-[44px]" disabled={!previewUrl} onClick={() => void onSubmit()}>
-        Submit for review
+        {t("kyc.submitForReview")}
       </Button>
     </div>
   );
@@ -187,9 +184,9 @@ export function KycUploadForm() {
     return (
       <div className="space-y-6">
         <div className="rounded-2xl border border-red-200 bg-red-50 p-6">
-          <p className="font-semibold text-red-900">Verification issue</p>
+          <p className="font-semibold text-red-900">{t("kyc.verificationIssue")}</p>
           <p className="mt-2 text-sm text-red-800">
-            <span className="font-medium">Reason:</span> {doc.adminNote}
+            <span className="font-medium">{t("kyc.reason")}</span> {doc.adminNote}
           </p>
         </div>
         <div className="space-y-4 rounded-xl border border-stone-200 p-4">{uploadBlock}</div>
@@ -200,16 +197,13 @@ export function KycUploadForm() {
   return (
     <div className="space-y-4 rounded-xl border border-stone-200 p-6">
       <div>
-        <p className="font-display text-lg font-semibold text-stone-900">Identity verification</p>
-        <p className="mt-2 text-sm text-stone-600">
-          Owners must verify their identity before listing equipment. Upload a clear photo or PDF of
-          your government-issued ID.
-        </p>
+        <p className="font-display text-lg font-semibold text-stone-900">{t("kyc.title")}</p>
+        <p className="mt-2 text-sm text-stone-600">{t("kyc.body")}</p>
       </div>
       {uploadBlock}
-      {kyc.canList === false && user.role !== "RENTER" ? (
+      {kyc.canList === false ? (
         <p className="text-xs text-stone-500">
-          Listing is disabled until an admin approves your document ({status}).
+          {t("kyc.listingDisabled", { status })}
         </p>
       ) : null}
     </div>

@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 import { useForm, type FieldErrors, type Resolver } from "react-hook-form";
 import { z } from "zod";
 import { ImageUploader } from "@/components/shared/ImageUploader";
@@ -200,9 +201,11 @@ function NumberField({
 export function EquipmentForm({
   defaultValues,
   onSubmit,
-  submitLabel = "Save listing",
+  submitLabel,
 }: EquipmentFormProps) {
+  const { t } = useTranslation();
   const { categories, isLoading: categoriesLoading } = useCategories();
+  const resolvedSubmitLabel = submitLabel ?? t("listing.saveListing");
   const form = useForm<FormValues>({
     resolver: zodResolver(schema) as Resolver<FormValues>,
     mode: "onTouched",
@@ -257,8 +260,8 @@ export function EquipmentForm({
         noValidate
       >
         <FormSection
-          title="Basics"
-          description="What are you renting? A clear title and description help renters decide."
+          title={t("listing.sectionBasics")}
+          description={t("listing.sectionBasicsDesc")}
           icon={FileText}
           delay={0}
         >
@@ -267,18 +270,18 @@ export function EquipmentForm({
             name="title"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Listing title</FormLabel>
+                <FormLabel>{t("listing.titleLabel")}</FormLabel>
                 <FormControl>
                   <input
                     className="input"
-                    placeholder="e.g. Professional concrete mixer"
+                    placeholder={t("listing.titlePlaceholder")}
                     maxLength={TITLE_MAX}
                     data-field="title"
                     {...field}
                   />
                 </FormControl>
                 <FormDescription className="text-stone-400">
-                  {field.value.length}/{TITLE_MAX} characters
+                  {t("listing.charactersCount", { current: field.value.length, max: TITLE_MAX })}
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -290,12 +293,12 @@ export function EquipmentForm({
             name="description"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Description</FormLabel>
+                <FormLabel>{t("listing.descriptionLabel")}</FormLabel>
                 <FormControl>
                   <textarea
                     rows={5}
                     className="input min-h-[120px] resize-y py-3"
-                    placeholder="Condition, what's included, pickup notes, rules…"
+                    placeholder={t("listing.descriptionPlaceholder")}
                     maxLength={DESCRIPTION_MAX}
                     data-field="description"
                     {...field}
@@ -307,7 +310,11 @@ export function EquipmentForm({
                     description.length > 0 && description.length < DESCRIPTION_MIN && "text-amber-600"
                   )}
                 >
-                  {description.length}/{DESCRIPTION_MAX} · at least {DESCRIPTION_MIN} characters
+                  {t("listing.charactersCount", {
+                    current: description.length,
+                    max: DESCRIPTION_MAX,
+                  })}{" "}
+                  · {t("listing.descriptionMin", { min: DESCRIPTION_MIN })}
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -319,7 +326,7 @@ export function EquipmentForm({
             name="categoryId"
             render={({ field }) => (
               <FormItem data-field="categoryId">
-                <FormLabel>Category</FormLabel>
+                <FormLabel>{t("listing.categoryLabel")}</FormLabel>
                 <FormControl>
                   {categoriesLoading && categories.length === 0 ? (
                     <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
@@ -331,9 +338,7 @@ export function EquipmentForm({
                       ))}
                     </div>
                   ) : categories.length === 0 ? (
-                    <p className="text-sm text-amber-700">
-                      No categories available yet. Ask an admin to add categories.
-                    </p>
+                    <p className="text-sm text-amber-700">{t("listing.noCategories")}</p>
                   ) : (
                     <motion.div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                       {categories.map((c) => {
@@ -384,8 +389,8 @@ export function EquipmentForm({
         </FormSection>
 
         <FormSection
-          title="Pricing"
-          description="Set your daily rate in Tunisian dinars (TND). Weekly rate is optional."
+          title={t("listing.sectionPricing")}
+          description={t("listing.sectionPricingDesc")}
           icon={Coins}
           delay={0.05}
         >
@@ -395,7 +400,7 @@ export function EquipmentForm({
               name="dailyRate"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Daily rate (TND) *</FormLabel>
+                  <FormLabel>{t("listing.dailyRateRequired")}</FormLabel>
                   <FormControl>
                     <NumberField
                       name="dailyRate"
@@ -414,7 +419,7 @@ export function EquipmentForm({
               name="weeklyRate"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Weekly rate (optional)</FormLabel>
+                  <FormLabel>{t("listing.weeklyRateLabel")}</FormLabel>
                   <FormControl>
                     <NumberField
                       name="weeklyRate"
@@ -425,7 +430,7 @@ export function EquipmentForm({
                     />
                   </FormControl>
                   <FormDescription className="text-stone-400">
-                    Offer a discount for 7-day rentals
+                    {t("listing.weeklyDiscountHint")}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -436,7 +441,7 @@ export function EquipmentForm({
               name="depositAmount"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Security deposit (TND)</FormLabel>
+                  <FormLabel>{t("listing.depositLabel")}</FormLabel>
                   <FormControl>
                     <NumberField
                       name="depositAmount"
@@ -447,7 +452,7 @@ export function EquipmentForm({
                     />
                   </FormControl>
                   <FormDescription className="text-stone-400">
-                    Held until the item is returned
+                    {t("listing.depositHeldHint")}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -458,7 +463,7 @@ export function EquipmentForm({
               name="deliveryFee"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Delivery fee (TND)</FormLabel>
+                  <FormLabel>{t("listing.deliveryFeeLabel")}</FormLabel>
                   <FormControl>
                     <NumberField
                       name="deliveryFee"
@@ -469,7 +474,7 @@ export function EquipmentForm({
                     />
                   </FormControl>
                   <FormDescription className="text-stone-400">
-                    One-way delivery charge, if applicable
+                    {t("listing.deliveryChargeHint")}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -479,8 +484,8 @@ export function EquipmentForm({
         </FormSection>
 
         <FormSection
-          title="Location"
-          description="Where can renters pick up the equipment?"
+          title={t("listing.sectionLocation")}
+          description={t("listing.sectionLocationDesc")}
           icon={MapPin}
           delay={0.1}
         >
@@ -489,11 +494,11 @@ export function EquipmentForm({
             name="location"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>City or area</FormLabel>
+                <FormLabel>{t("listing.locationCityLabel")}</FormLabel>
                 <FormControl>
                   <input
                     className="input"
-                    placeholder="e.g. Tunis, La Marsa"
+                    placeholder={t("listing.locationPlaceholderShort")}
                     data-field="location"
                     {...field}
                   />
@@ -505,8 +510,8 @@ export function EquipmentForm({
         </FormSection>
 
         <FormSection
-          title="Photos"
-          description="Good photos get more bookings. The first image is your cover."
+          title={t("listing.sectionPhotos")}
+          description={t("listing.sectionPhotosDesc")}
           icon={Camera}
           delay={0.15}
         >
@@ -515,14 +520,14 @@ export function EquipmentForm({
             name="images"
             render={({ field }) => (
               <FormItem data-field="images">
-                <FormLabel className="sr-only">Equipment photos</FormLabel>
+                <FormLabel className="sr-only">{t("listing.photosSrOnly")}</FormLabel>
                 <FormControl>
                   <ImageUploader
                     folder="equipment"
                     maxFiles={8}
                     accept="image/*"
-                    label="Upload equipment photos"
-                    hint="JPG, PNG, WebP · Max 10MB each · First photo is the cover"
+                    label={t("listing.uploadPhotos")}
+                    hint={t("listing.photosUploadHint")}
                     valueUrls={field.value ?? []}
                     valueKeys={form.watch("imageKeys") ?? []}
                     onChange={(urls, keys) => {
@@ -532,7 +537,7 @@ export function EquipmentForm({
                   />
                 </FormControl>
                 <FormDescription className="text-stone-400">
-                  {imageCount}/8 photos · at least 1 required
+                  {t("listing.photosCount", { count: imageCount })}
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -549,18 +554,16 @@ export function EquipmentForm({
             {isSubmitting ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-                Publishing…
+                {t("listing.publishing")}
               </>
             ) : (
               <>
                 <Sparkles className="h-4 w-4" aria-hidden />
-                {submitLabel}
+                {resolvedSubmitLabel}
               </>
             )}
           </button>
-          <p className="mt-2 text-xs text-stone-400">
-            You can edit your listing anytime from My Listings.
-          </p>
+          <p className="mt-2 text-xs text-stone-400">{t("listing.editAnytimeHint")}</p>
         </div>
       </form>
     </Form>

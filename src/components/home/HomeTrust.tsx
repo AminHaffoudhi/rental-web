@@ -1,34 +1,37 @@
 import { BadgeCheck, Quote, Shield, Star, Truck } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { SectionReveal } from "@/components/home/SectionReveal";
 import { cn } from "@/utils/cn";
 
-const features = [
-  {
-    icon: Shield,
-    title: "Secure deposits",
-    body: "Your deposit is held safely until the return is confirmed.",
-  },
-  {
-    icon: BadgeCheck,
-    title: "Verified owners",
-    body: "Every owner completes KYC before listing equipment.",
-  },
-  {
-    icon: Truck,
-    title: "Delivery included",
-    body: "Equipment delivered and picked up from your door.",
-  },
-] as const;
-
 export function HomeTrust() {
+  const { t } = useTranslation();
+
+  const features = [
+    {
+      icon: Shield,
+      title: t("home.trustFeatureSecureTitle"),
+      body: t("home.trustFeatureSecureBody"),
+    },
+    {
+      icon: BadgeCheck,
+      title: t("home.trustFeatureVerifiedTitle"),
+      body: t("home.trustFeatureVerifiedBody"),
+    },
+    {
+      icon: Truck,
+      title: t("home.trustFeatureDeliveryTitle"),
+      body: t("home.trustFeatureDeliveryBody"),
+    },
+  ] as const;
+
   return (
     <section className="py-14 sm:py-16 md:py-20 lg:py-24">
       <SectionReveal className="container">
         <div className="overflow-hidden rounded-3xl border border-stone-200 bg-canvas-card shadow-elevated">
           <div className="grid lg:grid-cols-[1.1fr_0.9fr]">
-            <div className="relative border-b border-stone-200 bg-gradient-to-br from-brand-50 via-canvas-card to-canvas-card p-8 sm:p-10 lg:border-b-0 lg:border-r">
+            <div className="relative border-b border-stone-200 bg-gradient-to-br from-brand-50 via-canvas-card to-canvas-card p-8 sm:p-10 lg:border-b-0 lg:border-r lg:border-stone-200 rtl:lg:border-l rtl:lg:border-r-0">
               <Quote
-                className="absolute right-6 top-6 h-16 w-16 text-brand-100 sm:h-20 sm:w-20"
+                className="absolute end-6 top-6 h-16 w-16 text-brand-100 sm:h-20 sm:w-20"
                 aria-hidden
               />
               <div className="relative">
@@ -38,16 +41,17 @@ export function HomeTrust() {
                   ))}
                 </div>
                 <blockquote className="font-display text-xl font-medium leading-snug text-stone-900 sm:text-2xl lg:text-[1.65rem] lg:leading-relaxed">
-                  I rented a concrete mixer for a weekend project. The process was seamless and
-                  the owner was incredibly helpful.
+                  {t("home.trustQuote")}
                 </blockquote>
                 <footer className="mt-6 flex items-center gap-3">
                   <div className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-500 font-semibold text-white">
                     AB
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-stone-900">Ahmed B.</p>
-                    <p className="text-sm text-stone-500">Tunis · Renter</p>
+                    <p className="text-sm font-semibold text-stone-900">
+                      {t("home.trustAuthorName")}
+                    </p>
+                    <p className="text-sm text-stone-500">{t("home.trustAuthorMeta")}</p>
                   </div>
                 </footer>
               </div>

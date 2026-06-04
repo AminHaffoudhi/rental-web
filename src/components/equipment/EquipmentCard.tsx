@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Heart, MapPin, Package, Star } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { UserAvatar } from "@/components/user/UserAvatar";
 import { CategoryIcon } from "@/components/equipment/CategoryIcon";
 import type { Equipment } from "@/types/equipment";
@@ -12,9 +13,10 @@ interface EquipmentCardProps {
 }
 
 export function EquipmentCard({ equipment }: EquipmentCardProps) {
+  const { t } = useTranslation();
   const img = equipment.images[0];
   const cat = equipment.category;
-  const catLabel = cat?.name ?? "Equipment";
+  const catLabel = cat?.name ?? t("equipment.defaultCategory");
 
   const { count: reviewCount, average: avgRating } = equipmentReviewStats(equipment);
   const roundedRating = avgRating !== null ? Math.round(avgRating * 10) / 10 : null;
@@ -33,8 +35,8 @@ export function EquipmentCard({ equipment }: EquipmentCardProps) {
     >
       <button
         type="button"
-        className="absolute right-2 top-2 z-20 flex h-8 w-8 items-center justify-center rounded-full bg-canvas-card/95 text-stone-400 shadow-elevated ring-1 ring-stone-200 transition-colors hover:text-red-500"
-        aria-label={favorited ? "Remove from favorites" : "Add to favorites"}
+        className="absolute end-2 top-2 z-20 flex h-8 w-8 items-center justify-center rounded-full bg-canvas-card/95 text-stone-400 shadow-elevated ring-1 ring-stone-200 transition-colors hover:text-red-500"
+        aria-label={favorited ? t("equipment.removeFavorite") : t("equipment.addFavorite")}
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -65,7 +67,7 @@ export function EquipmentCard({ equipment }: EquipmentCardProps) {
               />
             </div>
           )}
-          <span className="badge badge-brand absolute left-2 top-2 z-10 shadow-sm">{catLabel}</span>
+          <span className="badge badge-brand absolute start-2 top-2 z-10 shadow-sm">{catLabel}</span>
         </div>
 
         <div className="p-4">
@@ -101,11 +103,13 @@ export function EquipmentCard({ equipment }: EquipmentCardProps) {
                     </span>
                   </div>
                   <span className="text-[11px] text-stone-400">
-                    ({reviewCount} {reviewCount === 1 ? "review" : "reviews"})
+                    {reviewCount === 1
+                      ? t("equipment.reviewCountParen", { count: reviewCount })
+                      : t("equipment.reviewsCountParen", { count: reviewCount })}
                   </span>
                 </>
               ) : (
-                <span className="text-[12px] font-medium text-stone-400">New</span>
+                <span className="text-[12px] font-medium text-stone-400">{t("equipment.new")}</span>
               )}
             </div>
           </div>
@@ -114,7 +118,8 @@ export function EquipmentCard({ equipment }: EquipmentCardProps) {
 
           <div className="flex items-center justify-between gap-3">
             <p className="price-tag text-xl leading-none">
-              {daily} TND<span>/day</span>
+              {daily} {t("common.tnd")}
+              <span>{t("equipment.perDaySuffix")}</span>
             </p>
             <span
               className={cn(
@@ -123,7 +128,7 @@ export function EquipmentCard({ equipment }: EquipmentCardProps) {
                 "group-hover/card:pointer-events-auto group-hover/card:opacity-100"
               )}
             >
-              Book Now
+              {t("equipment.bookNow")}
             </span>
           </div>
         </div>

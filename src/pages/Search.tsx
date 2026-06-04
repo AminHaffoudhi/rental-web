@@ -7,6 +7,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
 import { CategoryFilter } from "@/components/equipment/CategoryFilter";
 import { EquipmentGrid } from "@/components/equipment/EquipmentGrid";
@@ -17,36 +18,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { resolveCategorySlug } from "@/config/categories";
+import { useCategories } from "@/hooks/useCategories";
 import { useEquipmentList } from "@/hooks/useEquipment";
 import { useDebounce } from "@/hooks/useDebounce";
 import type { EquipmentSort } from "@/services/equipment.service";
 import { cn } from "@/utils/cn";
 
 const PAGE_SIZE = 12;
-
-const SORT_OPTIONS: { value: EquipmentSort; label: string }[] = [
-  { value: "recent", label: "Most Recent" },
-  { value: "price_asc", label: "Price: Low to High" },
-  { value: "price_desc", label: "Price: High to Low" },
-  { value: "rating", label: "Top Rated" },
-];
-
-const LEGACY_CATEGORY_SLUGS: Record<string, string> = {
-  CONSTRUCTION: "construction",
-  SPORTS: "sports",
-  EVENTS: "events",
-  TOOLS: "tools",
-  OTHER: "other",
-};
-
-function parseCategorySlug(raw: string | null): string | null {
-  if (!raw?.trim()) return null;
-  const upper = raw.trim().toUpperCase();
-  if (LEGACY_CATEGORY_SLUGS[upper]) return LEGACY_CATEGORY_SLUGS[upper];
-  const slug = raw.trim().toLowerCase();
-  if (/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) return slug;
-  return null;
-}
 
 function parseSort(raw: string | null): EquipmentSort {
   if (raw === "price_asc" || raw === "price_desc" || raw === "rating") return raw;
@@ -63,12 +42,24 @@ function visiblePages(current: number, total: number): number[] {
 }
 
 export function Search() {
+  const { t } = useTranslation();
+  const { categories } = useCategories();
+
+  const sortOptions: { value: EquipmentSort; label: string }[] = useMemo(
+    () => [
+      { value: "recent", label: t("search.sortRecent") },
+      { value: "price_asc", label: t("search.sortPriceAsc") },
+      { value: "price_desc", label: t("search.sortPriceDesc") },
+      { value: "rating", label: t("search.sortRating") },
+    ],
+    [t]
+  );
   const [params, setParams] = useSearchParams();
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   const filters = useMemo(() => {
     const q = params.get("q")?.trim() || undefined;
-    const category = parseCategorySlug(params.get("category"));
+    const category = resolveCategorySlug(categories, params.get("category"));
     const minRaw = params.get("minPrice");
     const maxRaw = params.get("maxPrice");
     const minPrice =
@@ -96,7 +87,7 @@ export function Search() {
       pageSize: PAGE_SIZE,
       ...(availableOnly === false ? { availableOnly: false } : {}),
     };
-  }, [params]);
+  }, [params, categories]);
 
   const { equipment, total, isLoading } = useEquipmentList(filters);
 
@@ -134,7 +125,7 @@ export function Search() {
     });
   }, [debouncedQ, patchParams, params]);
 
-  const selectedCategory = parseCategorySlug(params.get("category"));
+  const selectedCategory = resolveCategorySlug(categories, params.get("category"));
 
   const sortValue = parseSort(params.get("sort"));
   const page = Math.max(1, parseInt(params.get("page") ?? "1", 10) || 1);
@@ -192,7 +183,7 @@ export function Search() {
         <div className="container py-6">
           <div className="relative mb-5">
             <SearchIcon
-              className="pointer-events-none absolute left-4 top-1/2 z-[1] h-5 w-5 -translate-y-1/2 text-stone-400"
+              className="pointer-events-none absolute start-4 top-1/2 z-[1] h-5 w-5 -translate-y-1/2 text-stone-400"
               aria-hidden
             />
             <input
@@ -208,9 +199,9 @@ export function Search() {
                   });
                 }
               }}
-              placeholder="Search equipment, tools, gear..."
-              className="input input-lg w-full rounded-full border-stone-200 py-3 pl-12 pr-4 shadow-sm transition-all focus:border-brand-500 focus:shadow-elevated"
-              aria-label="Search listings"
+              placeholder={t("nav.searchEquipmentPlaceholder")}
+              className="input input-lg w-full rounded-full border-stone-200 py-3 ps-12 pe-4 shadow-sm transition-all focus:border-brand-500 focus:shadow-elevated"
+              aria-label={t("search.searchListingsLabel")}
             />
           </div>
           <CategoryFilter
@@ -243,10 +234,10 @@ export function Search() {
               />
               <div className="mt-6 flex flex-col gap-2">
                 <button type="button" className="btn btn-primary w-full" onClick={applySidebar}>
-                  Apply Filters
+                  {t("search.applyFilters")}
                 </button>
                 <button type="button" className="btn btn-ghost w-full text-stone-500" onClick={resetSidebar}>
-                  Reset
+                  {t("search.reset")}
                 </button>
               </div>
             </div>
@@ -258,12 +249,13 @@ export function Search() {
               <p className="text-sm text-stone-500">
                 {qDisplay ? (
                   <>
-                    Showing results for <strong className="text-stone-800">&apos;{qDisplay}&apos;</strong>
+                    {t("search.resultsForQuery")}{" "}
+                    <strong className="text-stone-800">&apos;{qDisplay}&apos;</strong>
                   </>
                 ) : (
-                  <>
-                    <span className="font-medium text-stone-700">{total}</span> listings found
-                  </>
+                  <span className="font-medium text-stone-700">
+                    {t("search.listingsFound", { count: total })}
+                  </span>
                 )}
               </p>
               <div className="flex flex-wrap items-center gap-3">
@@ -273,7 +265,7 @@ export function Search() {
                   onClick={() => setMobileFiltersOpen(true)}
                 >
                   <SlidersHorizontal className="h-4 w-4" />
-                  Filters
+                  {t("search.filters")}
                 </button>
                 <Select
                   value={sortValue}
@@ -285,10 +277,10 @@ export function Search() {
                   }
                 >
                   <SelectTrigger className="input h-10 w-full min-w-[200px] rounded-xl border-stone-200 bg-canvas-card sm:w-[220px]">
-                    <SelectValue placeholder="Sort" />
+                    <SelectValue placeholder={t("search.sortLabel")} />
                   </SelectTrigger>
                   <SelectContent>
-                    {SORT_OPTIONS.map((o) => (
+                    {sortOptions.map((o) => (
                       <SelectItem key={o.value} value={o.value}>
                         {o.label}
                       </SelectItem>
@@ -303,7 +295,7 @@ export function Search() {
             {totalPages > 1 ? (
               <div className="mt-10 flex flex-col items-center gap-4">
                 <p className="text-sm text-stone-500">
-                  Page {page} of {totalPages}
+                  {t("search.pageOf", { current: page, total: totalPages })}
                 </p>
                 <div className="flex flex-wrap items-center justify-center gap-2">
                   <button
@@ -312,8 +304,8 @@ export function Search() {
                     disabled={page <= 1}
                     onClick={() => patchParams({ page: String(Math.max(1, page - 1)) })}
                   >
-                    <ChevronLeft className="h-4 w-4" />
-                    Previous
+                    <ChevronLeft className="h-4 w-4 rtl:rotate-180" />
+                    {t("search.previous")}
                   </button>
                   <div className="flex flex-wrap justify-center gap-1">
                     {visiblePages(page, totalPages).map((p) => (
@@ -340,8 +332,8 @@ export function Search() {
                       patchParams({ page: String(Math.min(totalPages, page + 1)) })
                     }
                   >
-                    Next
-                    <ChevronRight className="h-4 w-4" />
+                    {t("search.next")}
+                    <ChevronRight className="h-4 w-4 rtl:rotate-180" />
                   </button>
                 </div>
               </div>
@@ -364,11 +356,11 @@ export function Search() {
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ type: "spring", damping: 32, stiffness: 380 }}
-              className="absolute bottom-0 left-0 right-0 max-h-[85vh] overflow-y-auto rounded-t-2xl bg-canvas-card px-4 pb-8 pt-2 shadow-xl"
+              className="absolute bottom-0 start-0 end-0 max-h-[85vh] overflow-y-auto rounded-t-2xl bg-canvas-card px-4 pb-8 pt-2 shadow-xl"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-stone-200" aria-hidden />
-              <p className="mb-4 font-display text-lg font-semibold text-stone-900">Filters</p>
+              <p className="mb-4 font-display text-lg font-semibold text-stone-900">{t("search.filters")}</p>
               <FilterFields
                 draftMin={draftMin}
                 setDraftMin={setDraftMin}
@@ -381,14 +373,14 @@ export function Search() {
                 presetPrice={presetPrice}
               />
               <button type="button" className="btn btn-primary mt-6 w-full" onClick={applySidebar}>
-                Apply Filters
+                {t("search.applyFilters")}
               </button>
               <button
                 type="button"
                 className="btn btn-ghost mt-2 w-full text-stone-500"
                 onClick={resetSidebar}
               >
-                Reset
+                {t("search.reset")}
               </button>
             </motion.div>
           </motion.div>
@@ -419,28 +411,30 @@ function FilterFields({
   setDraftAvailOnly: (v: boolean) => void;
   presetPrice: (min: string, max: string) => void;
 }) {
+  const { t } = useTranslation();
+
   return (
     <div className="space-y-8">
       <div>
-        <p className="mb-3 font-display text-sm font-semibold text-stone-900">Daily Rate</p>
+        <p className="mb-3 font-display text-sm font-semibold text-stone-900">{t("search.dailyRate")}</p>
         <div className="flex gap-2">
           <input
             type="number"
             inputMode="numeric"
-            placeholder="0 TND"
+            placeholder={t("search.minRatePlaceholder")}
             value={draftMin}
             onChange={(e) => setDraftMin(e.target.value)}
             className="input min-w-0 flex-1"
-            aria-label="Minimum daily rate"
+            aria-label={t("search.minRate")}
           />
           <input
             type="number"
             inputMode="numeric"
-            placeholder="500 TND"
+            placeholder={t("search.maxRatePlaceholder")}
             value={draftMax}
             onChange={(e) => setDraftMax(e.target.value)}
             className="input min-w-0 flex-1"
-            aria-label="Maximum daily rate"
+            aria-label={t("search.maxRate")}
           />
         </div>
         <div className="mt-3 flex flex-wrap gap-2">
@@ -449,44 +443,44 @@ function FilterFields({
             className="rounded-full border border-stone-200 bg-stone-100 px-3 py-1.5 text-xs font-medium text-stone-600 transition-colors hover:border-brand-200 hover:bg-brand-50 dark:bg-stone-800 dark:text-stone-400 dark:hover:bg-brand-500/15"
             onClick={() => presetPrice("", "50")}
           >
-            Under 50
+            {t("search.priceUnder50")}
           </button>
           <button
             type="button"
             className="rounded-full border border-stone-200 bg-stone-100 px-3 py-1.5 text-xs font-medium text-stone-600 transition-colors hover:border-brand-200 hover:bg-brand-50 dark:bg-stone-800 dark:text-stone-400 dark:hover:bg-brand-500/15"
             onClick={() => presetPrice("50", "150")}
           >
-            50–150
+            {t("search.price50to150")}
           </button>
           <button
             type="button"
             className="rounded-full border border-stone-200 bg-stone-100 px-3 py-1.5 text-xs font-medium text-stone-600 transition-colors hover:border-brand-200 hover:bg-brand-50 dark:bg-stone-800 dark:text-stone-400 dark:hover:bg-brand-500/15"
             onClick={() => presetPrice("150", "")}
           >
-            150+
+            {t("search.priceOver150")}
           </button>
         </div>
       </div>
 
       <div>
-        <p className="mb-3 font-display text-sm font-semibold text-stone-900">Location</p>
+        <p className="mb-3 font-display text-sm font-semibold text-stone-900">{t("search.location")}</p>
         <div className="relative">
-          <MapPin className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400" />
+          <MapPin className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400" />
           <input
             type="text"
-            placeholder="City or region..."
+            placeholder={t("search.locationPlaceholder")}
             value={draftLoc}
             onChange={(e) => setDraftLoc(e.target.value)}
-            className="input pl-10"
-            aria-label="Location"
+            className="input ps-10"
+            aria-label={t("search.location")}
           />
         </div>
       </div>
 
       <div>
-        <p className="mb-3 font-display text-sm font-semibold text-stone-900">Available now</p>
+        <p className="mb-3 font-display text-sm font-semibold text-stone-900">{t("search.availableNow")}</p>
         <label className="flex cursor-pointer items-center justify-between gap-4">
-          <span className="text-sm text-stone-600">Show only available equipment</span>
+          <span className="text-sm text-stone-600">{t("search.availableOnlyHint")}</span>
           <button
             type="button"
             role="switch"
@@ -500,7 +494,7 @@ function FilterFields({
             <span
               className={cn(
                 "absolute top-0.5 h-6 w-6 rounded-full bg-white shadow transition-transform duration-200",
-                draftAvailOnly ? "translate-x-[26px]" : "translate-x-0.5"
+                draftAvailOnly ? "translate-x-[26px] rtl:-translate-x-[26px]" : "translate-x-0.5 rtl:-translate-x-0.5"
               )}
             />
           </button>

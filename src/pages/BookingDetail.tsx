@@ -1,4 +1,6 @@
 import { useEffect, type ReactNode } from "react";
+import { useTranslation } from "react-i18next";
+import type { TFunction } from "i18next";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import {
@@ -32,7 +34,10 @@ function shortRef(id: string) {
   return id.slice(0, 8).toUpperCase();
 }
 
-function statusBanner(status: TB): {
+function statusBanner(
+  status: TB,
+  t: TFunction
+): {
   wrap: string;
   icon: ReactNode;
   title: string;
@@ -44,32 +49,32 @@ function statusBanner(status: TB): {
         wrap:
           "border-brand-200 bg-brand-50 text-brand-950 dark:border-brand-500/30 dark:bg-brand-500/10 dark:text-brand-100",
         icon: <Clock className="h-6 w-6 text-brand-600 dark:text-brand-400" />,
-        title: "Request pending",
-        subtitle: "The owner will approve or decline shortly.",
+        title: t("bookings.bannerPendingTitle"),
+        subtitle: t("bookings.bannerPendingSubtitle"),
       };
     case "CONFIRMED":
       return {
         wrap:
           "border-blue-200 bg-blue-50 text-blue-950 dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-100",
         icon: <CheckCircle2 className="h-6 w-6 text-blue-600 dark:text-blue-400" />,
-        title: "Confirmed",
-        subtitle: "Complete payment to lock in your rental.",
+        title: t("bookings.bannerConfirmedTitle"),
+        subtitle: t("bookings.bannerConfirmedSubtitle"),
       };
     case "PAYMENT_PENDING":
       return {
         wrap:
           "border-amber-200 bg-amber-50 text-amber-950 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-100",
         icon: <Clock className="h-6 w-6 text-amber-600 dark:text-amber-400" />,
-        title: "Pay to start",
-        subtitle: "Use the button below — your rental begins right after payment.",
+        title: t("bookings.bannerPaymentTitle"),
+        subtitle: t("bookings.bannerPaymentSubtitle"),
       };
     case "PAID":
       return {
         wrap:
           "border-emerald-200 bg-emerald-50 text-emerald-950 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-100",
         icon: <CheckCircle2 className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />,
-        title: "Paid",
-        subtitle: "Owner can start the rental, or it may already be active.",
+        title: t("bookings.bannerPaidTitle"),
+        subtitle: t("bookings.bannerPaidSubtitle"),
       };
     case "PICKUP_SCHEDULED":
     case "IN_TRANSIT":
@@ -78,8 +83,8 @@ function statusBanner(status: TB): {
         wrap:
           "border-green-200 bg-green-50 text-green-950 dark:border-green-500/30 dark:bg-green-500/10 dark:text-green-100",
         icon: <CheckCircle2 className="h-6 w-6 text-green-600 dark:text-green-400" />,
-        title: "Rental active",
-        subtitle: "Coordinate pickup with the owner. Tap Complete rental when finished.",
+        title: t("bookings.bannerActiveTitle"),
+        subtitle: t("bookings.bannerActiveSubtitle"),
       };
     case "RETURN_SCHEDULED":
     case "RETURNING":
@@ -88,56 +93,56 @@ function statusBanner(status: TB): {
         wrap:
           "border-green-200 bg-green-50 text-green-950 dark:border-green-500/30 dark:bg-green-500/10 dark:text-green-100",
         icon: <CheckCircle2 className="h-6 w-6 text-green-600 dark:text-green-400" />,
-        title: "Rental active",
-        subtitle: "Tap Complete rental when the equipment is returned.",
+        title: t("bookings.bannerActiveTitle"),
+        subtitle: t("bookings.bannerActiveReturnSubtitle"),
       };
     case "COMPLETED":
       return {
         wrap:
           "border-green-200 bg-green-50 text-green-950 dark:border-green-500/30 dark:bg-green-500/10 dark:text-green-100",
         icon: <CheckCircle2 className="h-6 w-6 text-green-700 dark:text-green-400" />,
-        title: "Completed",
-        subtitle: "This rental is closed — thank you for using the platform.",
+        title: t("bookings.bannerCompletedTitle"),
+        subtitle: t("bookings.bannerCompletedSubtitle"),
       };
     case "DISPUTED":
       return {
         wrap:
           "border-red-200 bg-red-50 text-red-950 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-100",
         icon: <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />,
-        title: "Dispute open",
-        subtitle: "Our team may reach out for more information.",
+        title: t("bookings.bannerDisputedTitle"),
+        subtitle: t("bookings.bannerDisputedSubtitle"),
       };
     case "REJECTED":
       return {
         wrap:
           "border-rose-200 bg-rose-50 text-rose-950 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-100",
         icon: <AlertTriangle className="h-6 w-6 text-rose-600 dark:text-rose-400" />,
-        title: "Request declined",
-        subtitle: "This booking did not go ahead.",
+        title: t("bookings.bannerRejectedTitle"),
+        subtitle: t("bookings.bannerRejectedSubtitle"),
       };
     case "CANCELLED":
       return {
         wrap:
           "border-stone-200 bg-stone-100 text-stone-800 dark:border-stone-600 dark:bg-stone-800/50 dark:text-stone-200",
         icon: <AlertTriangle className="h-6 w-6 text-stone-600 dark:text-stone-400" />,
-        title: "Cancelled",
-        subtitle: "This booking was cancelled.",
+        title: t("bookings.bannerCancelledTitle"),
+        subtitle: t("bookings.bannerCancelledSubtitle"),
       };
     case "REFUNDED":
       return {
         wrap:
           "border-zinc-200 bg-zinc-50 text-zinc-900 dark:border-zinc-500/30 dark:bg-zinc-500/10 dark:text-zinc-100",
         icon: <CheckCircle2 className="h-6 w-6 text-zinc-600 dark:text-zinc-400" />,
-        title: "Refunded",
-        subtitle: "Funds have been returned according to policy.",
+        title: t("bookings.bannerRefundedTitle"),
+        subtitle: t("bookings.bannerRefundedSubtitle"),
       };
     default:
       return {
         wrap:
           "border-stone-200 bg-stone-50 text-stone-900 dark:border-stone-600 dark:bg-stone-800/50 dark:text-stone-100",
         icon: <Clock className="h-6 w-6 text-stone-600 dark:text-stone-400" />,
-        title: "Booking",
-        subtitle: "Track progress below.",
+        title: t("bookings.bannerDefaultTitle"),
+        subtitle: t("bookings.bannerDefaultSubtitle"),
       };
   }
 }
@@ -153,6 +158,7 @@ function BookingReviewSection({
   equipmentId: string;
   onReviewSubmitted?: () => void;
 }) {
+  const { t } = useTranslation();
   return (
     <div id="review" className="scroll-mt-24 space-y-6">
       <ReviewForm
@@ -160,15 +166,15 @@ function BookingReviewSection({
         bookingId={bookingId}
         revieweeId={ownerId}
         equipmentId={equipmentId}
-        title="Review the owner"
-        description="Share feedback about the host. Visible after admin approval."
+        title={t("bookings.reviewOwnerTitle")}
+        description={t("bookings.reviewOwnerDesc")}
         onSuccess={onReviewSubmitted}
       />
       <ReviewForm
         variant="equipment"
         equipmentId={equipmentId}
-        title="Review the equipment"
-        description="Rate the listing and equipment condition."
+        title={t("bookings.reviewEquipmentTitle")}
+        description={t("bookings.reviewEquipmentDesc")}
         onSuccess={onReviewSubmitted}
       />
     </div>
@@ -176,6 +182,7 @@ function BookingReviewSection({
 }
 
 export function BookingDetail() {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
   const user = useAuthStore((s) => s.user);
@@ -198,7 +205,7 @@ export function BookingDetail() {
       void (async () => {
         try {
           await paymentService.verifyCheckoutReturn(id);
-          toast.success("Payment received — your rental is now active!");
+          toast.success(t("bookings.paymentSuccess"));
         } catch (e) {
           toast.error(getApiErrorDetail(e).message);
         } finally {
@@ -209,7 +216,7 @@ export function BookingDetail() {
     }
 
     if (payment === "cancelled") {
-      toast("Payment cancelled. You can try again when ready.");
+      toast(t("bookings.paymentCancelled"));
     }
   }, [searchParams, refetch, setSearchParams, id]);
 
@@ -236,7 +243,7 @@ export function BookingDetail() {
 
   if (!id) {
     return (
-      <div className="container py-16 text-center text-stone-500">Missing booking id.</div>
+      <div className="container py-16 text-center text-stone-500">{t("bookings.missingBookingId")}</div>
     );
   }
 
@@ -262,7 +269,7 @@ export function BookingDetail() {
   const isOwner = user?.id === booking.owner.id;
   const days = getDaysBetween(booking.startDate, booking.endDate);
   const rentExclusive = booking.totalPrice - booking.platformFee - booking.deliveryFee;
-  const banner = statusBanner(booking.status);
+  const banner = statusBanner(booking.status, t);
   const grandTotal = booking.totalPrice + booking.depositAmount;
 
   const sectionClass =
@@ -277,11 +284,11 @@ export function BookingDetail() {
             className="inline-flex items-center gap-1 transition-colors hover:text-brand-600"
           >
             <Home className="h-4 w-4" />
-            Home
+            {t("common.home")}
           </Link>
-          <ChevronRight className="h-4 w-4 opacity-50" />
+          <ChevronRight className="h-4 w-4 opacity-50 rtl:rotate-180" />
           <Link to="/bookings" className="transition-colors hover:text-brand-600">
-            My Bookings
+            {t("bookings.title")}
           </Link>
           <ChevronRight className="h-4 w-4 opacity-50" />
           <span className="font-mono font-medium text-stone-600">#{shortRef(booking.id)}</span>
@@ -344,7 +351,7 @@ export function BookingDetail() {
                     <span className="inline-flex items-center gap-2 text-stone-600">
                       <UserAvatar user={booking.owner} size="sm" />
                       <span>
-                        Owner:{" "}
+                        {t("bookings.ownerLabel")}{" "}
                         <Link
                           to={`/users/${booking.owner.id}`}
                           className="font-medium text-stone-900 hover:text-brand-600"
@@ -356,7 +363,7 @@ export function BookingDetail() {
                     <span className="inline-flex items-center gap-2 text-stone-600">
                       <UserAvatar user={booking.renter} size="sm" />
                       <span>
-                        Renter:{" "}
+                        {t("bookings.renterLabel")}{" "}
                         <Link
                           to={`/users/${booking.renter.id}`}
                           className="font-medium text-stone-900 hover:text-brand-600"
@@ -371,65 +378,69 @@ export function BookingDetail() {
             </section>
 
             <section className={sectionClass}>
-              <h3 className="font-display text-lg font-semibold text-stone-900">Rental period</h3>
+              <h3 className="font-display text-lg font-semibold text-stone-900">
+                {t("bookings.rentalPeriod")}
+              </h3>
               <div className="mt-4 flex flex-col gap-4 rounded-xl border border-stone-200 bg-stone-100/60 p-4 dark:border-stone-600 dark:bg-stone-800/40 sm:flex-row sm:flex-wrap sm:items-center">
                 <div>
                   <p className="text-xs font-medium uppercase tracking-wide text-stone-500">
-                    Start
+                    {t("bookings.start")}
                   </p>
                   <p className="font-medium text-stone-900">{formatDate(booking.startDate)}</p>
                 </div>
                 <ArrowRight className="hidden h-5 w-5 text-stone-300 sm:block" />
                 <div>
-                  <p className="text-xs font-medium uppercase tracking-wide text-stone-500">End</p>
+                  <p className="text-xs font-medium uppercase tracking-wide text-stone-500">
+                    {t("bookings.end")}
+                  </p>
                   <p className="font-medium text-stone-900">{formatDate(booking.endDate)}</p>
                 </div>
                 <div className="flex items-center gap-2 rounded-full border border-stone-200 bg-canvas-card px-3 py-1.5 text-sm text-stone-600 shadow-elevated sm:ml-auto">
                   <CalendarDays className="h-4 w-4 text-brand-500" />
                   {formatDateRange(booking.startDate, booking.endDate)}
                   <span className="text-stone-400">·</span>
-                  {days} day{days === 1 ? "" : "s"}
+                  {days === 1 ? t("bookings.dayCount", { count: days }) : t("bookings.daysCount", { count: days })}
                 </div>
               </div>
             </section>
 
             <section className={sectionClass}>
-              <h3 className="font-display text-lg font-semibold text-stone-900">Price breakdown</h3>
+              <h3 className="font-display text-lg font-semibold text-stone-900">
+                {t("bookings.priceBreakdown")}
+              </h3>
               <div className="mt-4 space-y-3 text-sm">
                 <div className="flex justify-between text-stone-600">
-                  <span>
-                    {days} days · rent subtotal
-                  </span>
+                  <span>{t("bookings.daysRentSubtotal", { days })}</span>
                   <span className="font-semibold text-stone-900">{formatCurrency(rentExclusive)}</span>
                 </div>
                 <div className="flex justify-between text-stone-600">
-                  <span>Delivery fee</span>
+                  <span>{t("equipment.deliveryFee")}</span>
                   <span className="font-semibold text-stone-900">
                     {formatCurrency(booking.deliveryFee)}
                   </span>
                 </div>
                 <div className="flex justify-between text-stone-600">
-                  <span>Platform fee ({PLATFORM_FEE_PERCENT}%)</span>
+                  <span>{t("bookings.platformFee", { percent: PLATFORM_FEE_PERCENT })}</span>
                   <span className="font-semibold text-stone-900">
                     {formatCurrency(booking.platformFee)}
                   </span>
                 </div>
                 <div className="my-3 h-px bg-stone-200 dark:bg-stone-700" />
                 <div className="flex justify-between font-semibold text-stone-900">
-                  <span>Rental total</span>
+                  <span>{t("bookings.rentalTotalLabel")}</span>
                   <span>{formatCurrency(booking.totalPrice)}</span>
                 </div>
                 <div className="rounded-lg border border-brand-200/60 bg-brand-50/80 px-3 py-2 text-xs text-stone-600 dark:border-brand-500/25 dark:bg-brand-500/10 dark:text-stone-400">
                   <div className="flex justify-between">
-                    <span>Deposit (refundable)</span>
+                    <span>{t("bookings.depositRefundable")}</span>
                     <span className="font-semibold text-stone-800 dark:text-stone-200">
                       {formatCurrency(booking.depositAmount)}
                     </span>
                   </div>
-                  <p className="mt-1 text-stone-500">Returned after inspection</p>
+                  <p className="mt-1 text-stone-500">{t("bookings.depositReturnedHint")}</p>
                 </div>
                 <div className="flex justify-between border-t border-stone-200 pt-3 text-base font-semibold text-stone-900 dark:border-stone-700">
-                  <span>Amount due (rent + deposit)</span>
+                  <span>{t("bookings.amountDue")}</span>
                   <span>{formatCurrency(grandTotal)}</span>
                 </div>
               </div>
@@ -437,7 +448,7 @@ export function BookingDetail() {
 
             {booking.notes ? (
               <section className={sectionClass}>
-                <h3 className="font-display text-lg font-semibold text-stone-900">Notes</h3>
+                <h3 className="font-display text-lg font-semibold text-stone-900">{t("bookings.notes")}</h3>
                 <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-stone-600">
                   {booking.notes}
                 </p>
@@ -460,7 +471,7 @@ export function BookingDetail() {
 
           <div className="space-y-6 lg:sticky lg:top-24 lg:self-start lg:space-y-8">
             <section className={sectionClass}>
-              <h3 className="font-display text-lg font-semibold text-stone-900">Progress</h3>
+              <h3 className="font-display text-lg font-semibold text-stone-900">{t("bookings.progress")}</h3>
               <div className="mt-6">
                 <BookingTimeline status={booking.status} />
               </div>
@@ -470,40 +481,44 @@ export function BookingDetail() {
             booking.status !== "REJECTED" &&
             booking.status !== "CANCELLED" ? (
               <section className="rounded-2xl border border-stone-200 bg-stone-100/60 p-5 text-sm text-stone-600 dark:border-stone-600 dark:bg-stone-800/40 dark:text-stone-400">
-                <p className="font-medium text-stone-800 dark:text-stone-200">Pickup & return</p>
+                <p className="font-medium text-stone-800 dark:text-stone-200">
+                  {t("bookings.pickupReturnTitle")}
+                </p>
                 <p className="mt-1">
-                  Arrange handoff directly with {isOwner ? "the renter" : "the owner"} at{" "}
-                  <span className="font-medium text-stone-900">{booking.equipment.location}</span>.
-                  No separate delivery scheduling — one payment starts the rental, one button
-                  completes it.
+                  {t("bookings.pickupReturnBody", {
+                    party: isOwner ? t("bookings.partyRenter") : t("bookings.partyOwner"),
+                    location: booking.equipment.location,
+                  })}
                 </p>
               </section>
             ) : null}
 
             <section className={sectionClass}>
-              <h3 className="font-display text-lg font-semibold text-stone-900">Payment</h3>
+              <h3 className="font-display text-lg font-semibold text-stone-900">
+                {t("bookings.paymentTitle")}
+              </h3>
               <div className="mt-4 space-y-3 text-sm">
                 {booking.payment ? (
                   <>
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                      <span className="text-stone-600">Status</span>
+                      <span className="text-stone-600">{t("bookings.paymentStatus")}</span>
                       <span className="badge badge-stone">{booking.payment.status}</span>
                     </div>
                     <div className="flex justify-between text-stone-600">
-                      <span>Amount</span>
+                      <span>{t("bookings.paymentAmount")}</span>
                       <span className="font-semibold text-stone-900">
                         {formatCurrency(booking.payment.amount)}
                       </span>
                     </div>
                   </>
                 ) : (
-                  <p className="text-stone-500">No payment record linked.</p>
+                  <p className="text-stone-500">{t("bookings.noPaymentRecord")}</p>
                 )}
               </div>
             </section>
 
             <section className={cn(sectionClass, "hidden lg:block")}>
-              <h3 className="font-display text-lg font-semibold text-stone-900">Actions</h3>
+              <h3 className="font-display text-lg font-semibold text-stone-900">{t("bookings.actions")}</h3>
               <div className="mt-4">
                 <BookingActions booking={booking} onUpdated={() => refetch()} />
               </div>
@@ -512,7 +527,7 @@ export function BookingDetail() {
         </div>
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-stone-200 bg-canvas-card/95 px-4 py-3 shadow-elevated backdrop-blur-md lg:hidden safe-bottom">
+      <div className="fixed bottom-0 start-0 end-0 z-40 border-t border-stone-200 bg-canvas-card/95 px-4 py-3 shadow-elevated backdrop-blur-md lg:hidden safe-bottom">
         <BookingActions booking={booking} onUpdated={() => refetch()} />
       </div>
     </div>

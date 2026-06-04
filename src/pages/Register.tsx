@@ -2,6 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
 import { AlertCircle, Check, Eye, EyeOff } from "lucide-react";
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import { z } from "zod";
@@ -27,30 +28,43 @@ import { PlatformLogo } from "@/components/brand/PlatformLogo";
 import { PLATFORM_NAME } from "@/config/brand";
 import { cn } from "@/utils/cn";
 
-const schema = z
-  .object({
-    name: z.string().min(1, "Name is required"),
-    email: z.string().email("Enter a valid email"),
-    phone: z
-      .string()
-      .trim()
-      .min(8, "Enter a valid phone number")
-      .max(30, "Phone number is too long"),
-    password: z.string().min(8, "At least 8 characters"),
-    confirm: z.string().min(8),
-    role: z.enum(["RENTER", "OWNER", "BOTH"]),
-    acceptTerms: z.boolean().refine((v) => v === true, {
-      message: "You must accept the terms",
-    }),
-  })
-  .refine((data) => data.password === data.confirm, {
-    message: "Passwords must match",
-    path: ["confirm"],
-  });
+type FormValues = {
+  name: string;
+  email: string;
+  phone: string;
+  password: string;
+  confirm: string;
+  role: "RENTER" | "OWNER" | "BOTH";
+  acceptTerms: boolean;
+};
 
-type FormValues = z.infer<typeof schema>;
+function createRegisterSchema(t: (key: string) => string) {
+  return z
+    .object({
+      name: z.string().min(1, t("auth.nameRequired")),
+      email: z.string().email(t("auth.invalidEmail")),
+      phone: z
+        .string()
+        .trim()
+        .min(8, t("auth.phoneRequired"))
+        .max(30, t("auth.phoneTooLong")),
+      password: z.string().min(8, t("auth.passwordMin")),
+      confirm: z.string().min(8),
+      role: z.enum(["RENTER", "OWNER", "BOTH"]),
+      acceptTerms: z.boolean().refine((v) => v === true, {
+        message: t("auth.termsRequired"),
+      }),
+    })
+    .refine((data) => data.password === data.confirm, {
+      message: t("auth.passwordMatch"),
+      path: ["confirm"],
+    });
+}
 
-function passwordStrength(pw: string): { level: number; label: string } {
+function passwordStrength(
+  pw: string,
+  labels: [string, string, string, string]
+): { level: number; label: string } {
   let score = 0;
   if (pw.length >= 8) score++;
   if (pw.length >= 12) score++;
@@ -58,12 +72,23 @@ function passwordStrength(pw: string): { level: number; label: string } {
   if (/\d/.test(pw)) score++;
   if (/[^A-Za-z0-9]/.test(pw)) score++;
   const level = Math.min(4, Math.floor(score * 0.8));
-  const labels = ["Weak", "Fair", "Good", "Strong"];
   return { level: Math.max(1, level), label: labels[Math.min(3, Math.max(0, level - 1))] };
 }
 
 export function Register() {
+  const { t } = useTranslation();
   const { register: registerUser } = useAuth();
+  const schema = useMemo(() => createRegisterSchema(t), [t]);
+  const strengthLabels = useMemo(
+    () =>
+      [
+        t("auth.passwordStrengthWeak"),
+        t("auth.passwordStrengthFair"),
+        t("auth.passwordStrengthGood"),
+        t("auth.passwordStrengthStrong"),
+      ] as [string, string, string, string],
+    [t]
+  );
   const [showPw, setShowPw] = useState(false);
   const [showPw2, setShowPw2] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
@@ -85,7 +110,7 @@ export function Register() {
   });
 
   const pw = form.watch("password");
-  const strength = useMemo(() => passwordStrength(pw || ""), [pw]);
+  const strength = useMemo(() => passwordStrength(pw || "", strengthLabels), [pw, strengthLabels]);
 
   async function onSubmit(values: FormValues) {
     setApiError(null);
@@ -118,21 +143,19 @@ export function Register() {
         />
         <div className="relative z-[1]">
           <PlatformLogo size="2xl" linkTo="/" className="brightness-0 invert" />
-          <p className="mt-6 max-w-sm text-lg text-white/90">
-            Rent anything from trusted local owners
-          </p>
+          <p className="mt-6 max-w-sm text-lg text-white/90">{t("auth.registerSidebar")}</p>
           <ul className="mt-10 space-y-3 text-white/80">
             <li className="flex items-center gap-2">
               <Check className="h-4 w-4 shrink-0 text-white" strokeWidth={2.5} aria-hidden />
-              Thousands of listings
+              {t("auth.registerBulletListings")}
             </li>
             <li className="flex items-center gap-2">
               <Check className="h-4 w-4 shrink-0 text-white" strokeWidth={2.5} aria-hidden />
-              Secure deposits
+              {t("auth.registerBulletDeposits")}
             </li>
             <li className="flex items-center gap-2">
               <Check className="h-4 w-4 shrink-0 text-white" strokeWidth={2.5} aria-hidden />
-              Delivery included
+              {t("auth.registerBulletDelivery")}
             </li>
           </ul>
         </div>
@@ -147,12 +170,12 @@ export function Register() {
           <div className="mb-8">
             <PlatformLogo size="md" className="mb-6 lg:hidden" />
             <h2 className="font-display text-3xl font-semibold text-stone-900">
-              Create your account
+              {t("auth.createAccountTitle")}
             </h2>
             <p className="mt-2 text-sm text-stone-500">
-              Already have an account?{" "}
+              {t("auth.loginPrompt")}{" "}
               <Link to="/login" className="font-semibold text-brand-600 hover:underline">
-                Login →
+                {t("auth.loginLink")} →
               </Link>
             </p>
           </div>
@@ -176,7 +199,7 @@ export function Register() {
                 render={({ field }) => (
                   <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
                     <FormItem>
-                      <FormLabel>Full name</FormLabel>
+                      <FormLabel>{t("auth.name")}</FormLabel>
                       <FormControl>
                         <input className="input" {...field} />
                       </FormControl>
@@ -196,7 +219,7 @@ export function Register() {
                     transition={{ delay: 0.05 }}
                   >
                     <FormItem>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel>{t("auth.email")}</FormLabel>
                       <FormControl>
                         <input type="email" autoComplete="email" className="input" {...field} />
                       </FormControl>
@@ -217,13 +240,13 @@ export function Register() {
                   >
                     <FormItem>
                       <FormLabel>
-                        Phone <span className="text-destructive">*</span>
+                        {t("auth.phone")} <span className="text-destructive">*</span>
                       </FormLabel>
                       <FormControl>
                         <input
                           type="tel"
                           autoComplete="tel"
-                          placeholder="+216 XX XXX XXX"
+                          placeholder={t("auth.phonePlaceholder")}
                           className="input"
                           {...field}
                         />
@@ -244,20 +267,20 @@ export function Register() {
                     transition={{ delay: 0.12 }}
                   >
                     <FormItem>
-                      <FormLabel>Password</FormLabel>
+                      <FormLabel>{t("auth.password")}</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <input
                             type={showPw ? "text" : "password"}
                             autoComplete="new-password"
-                            className="input pr-11"
+                            className="input pe-11"
                             {...field}
                           />
                           <button
                             type="button"
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700"
+                            className="absolute end-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700"
                             onClick={() => setShowPw((s) => !s)}
-                            aria-label={showPw ? "Hide password" : "Show password"}
+                            aria-label={showPw ? t("auth.hidePassword") : t("auth.showPassword")}
                           >
                             {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                           </button>
@@ -298,20 +321,20 @@ export function Register() {
                     transition={{ delay: 0.14 }}
                   >
                     <FormItem>
-                      <FormLabel>Confirm password</FormLabel>
+                      <FormLabel>{t("auth.confirmPassword")}</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <input
                             type={showPw2 ? "text" : "password"}
                             autoComplete="new-password"
-                            className="input pr-11"
+                            className="input pe-11"
                             {...field}
                           />
                           <button
                             type="button"
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700"
+                            className="absolute end-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700"
                             onClick={() => setShowPw2((s) => !s)}
-                            aria-label={showPw2 ? "Hide password" : "Show password"}
+                            aria-label={showPw2 ? t("auth.hidePassword") : t("auth.showPassword")}
                           >
                             {showPw2 ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                           </button>
@@ -333,17 +356,17 @@ export function Register() {
                     transition={{ delay: 0.16 }}
                   >
                     <FormItem>
-                      <FormLabel>How will you use {PLATFORM_NAME}?</FormLabel>
+                      <FormLabel>{t("auth.howUsePlatform", { name: PLATFORM_NAME })}</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger className="input h-11 rounded-xl border-stone-200">
-                            <SelectValue placeholder="Choose…" />
+                            <SelectValue placeholder={t("auth.chooseRole")} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="RENTER">I want to rent equipment</SelectItem>
-                          <SelectItem value="OWNER">I want to list my equipment</SelectItem>
-                          <SelectItem value="BOTH">Both — rent and list</SelectItem>
+                          <SelectItem value="RENTER">{t("auth.roleRenter")}</SelectItem>
+                          <SelectItem value="OWNER">{t("auth.roleOwner")}</SelectItem>
+                          <SelectItem value="BOTH">{t("auth.roleBoth")}</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -370,28 +393,28 @@ export function Register() {
                       </FormControl>
                       <div className="min-w-0 flex-1 space-y-2 leading-snug">
                         <FormLabel className="font-normal text-stone-700">
-                          I agree to the{" "}
+                          {t("auth.termsAgreePrefix")}{" "}
                           <Link
                             to="/terms"
                             className="font-semibold text-brand-600 hover:text-brand-700"
                             target="_blank"
                             rel="noopener noreferrer"
                           >
-                            Terms of Service
+                            {t("auth.termsOfService")}
                           </Link>{" "}
-                          and{" "}
+                          {t("auth.and")}{" "}
                           <Link
                             to="/privacy"
                             className="font-semibold text-brand-600 hover:text-brand-700"
                             target="_blank"
                             rel="noopener noreferrer"
                           >
-                            Privacy Policy
+                            {t("auth.privacyPolicy")}
                           </Link>
                         </FormLabel>
                         {!termsReviewed ? (
                           <p id="terms-hint" className="text-xs text-stone-500">
-                            Read and accept the Terms in our modal before checking this box.
+                            {t("auth.termsReadHint")}
                           </p>
                         ) : null}
                         <button
@@ -399,7 +422,7 @@ export function Register() {
                           onClick={() => setTermsModalOpen(true)}
                           className="text-xs font-semibold text-brand-600 hover:text-brand-700"
                         >
-                          {termsReviewed ? "Review Terms again" : "Read Terms of Service →"}
+                          {termsReviewed ? t("auth.reviewTermsAgain") : t("auth.readTermsCta")}
                         </button>
                         <FormMessage />
                       </div>
@@ -430,7 +453,7 @@ export function Register() {
                   {loading ? (
                     <span className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
                   ) : (
-                    "Create Account"
+                    t("auth.createAccountButton")
                   )}
                 </button>
               </motion.div>

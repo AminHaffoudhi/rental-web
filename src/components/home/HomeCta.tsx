@@ -1,9 +1,12 @@
 import { ArrowRight, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { SectionReveal } from "@/components/home/SectionReveal";
 import { PLATFORM_NAME } from "@/config/brand";
 
 export function HomeCta() {
+  const { t } = useTranslation();
+
   return (
     <section className="relative overflow-hidden border-t border-brand-600/20">
       <div
@@ -11,11 +14,11 @@ export function HomeCta() {
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute -left-20 top-0 h-64 w-64 rounded-full bg-white/10 blur-3xl"
+        className="pointer-events-none absolute -start-20 top-0 h-64 w-64 rounded-full bg-white/10 blur-3xl"
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute -right-16 bottom-0 h-72 w-72 rounded-full bg-brand-300/30 blur-3xl"
+        className="pointer-events-none absolute -end-16 bottom-0 h-72 w-72 rounded-full bg-brand-300/30 blur-3xl"
         aria-hidden
       />
       <div
@@ -31,33 +34,30 @@ export function HomeCta() {
       <SectionReveal className="container relative py-14 text-center sm:py-16 md:py-20 lg:py-24">
         <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-1.5 text-xs font-semibold text-white/95 backdrop-blur-sm sm:text-sm">
           <Sparkles className="h-4 w-4" aria-hidden />
-          Start earning today
+          {t("home.ctaBadge")}
         </span>
         <h2 className="mx-auto mt-5 max-w-2xl font-display text-2xl font-semibold text-white sm:text-3xl md:text-4xl">
-          Have equipment sitting idle?
+          {t("home.ctaHeading")}
         </h2>
         <p className="mx-auto mt-4 max-w-lg text-base leading-relaxed text-white/85 sm:text-lg">
-          List it on {PLATFORM_NAME} and earn from your tools, gear, and machinery — only when you
-          get booked.
+          {t("home.ctaBodyLong", { name: PLATFORM_NAME })}
         </p>
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
           <Link
             to="/equipment/new"
-            className="btn btn-xl inline-flex w-full max-w-xs justify-center gap-2 bg-white font-semibold text-brand-700 shadow-lg hover:bg-brand-50 sm:w-auto sm:max-w-none"
+            className="btn btn-xl inline-flex w-full max-w-xs justify-center gap-2 bg-white font-semibold text-brand-700 shadow-lg hover:bg-brand-50 sm:w-auto sm:max-w-none rtl:flex-row-reverse"
           >
-            Start listing
-            <ArrowRight className="h-4 w-4" />
+            {t("home.ctaList")}
+            <ArrowRight className="h-4 w-4 rtl:rotate-180" />
           </Link>
           <Link
             to="/search"
             className="btn btn-xl inline-flex w-full max-w-xs justify-center border-2 border-white/40 bg-transparent font-semibold text-white hover:bg-canvas-card/10 sm:w-auto sm:max-w-none"
           >
-            Browse marketplace
+            {t("home.ctaBrowse")}
           </Link>
         </div>
-        <p className="mt-6 text-sm text-white/75">
-          Free to list · No subscription · Pay only when you earn
-        </p>
+        <p className="mt-6 text-sm text-white/75">{t("home.ctaFinePrint")}</p>
       </SectionReveal>
     </section>
   );

@@ -1,14 +1,17 @@
 import { Star } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { SectionReveal } from "@/components/home/SectionReveal";
 
-const stats = [
-  { value: "2,400+", label: "Active listings" },
-  { value: "1,800+", label: "Verified owners" },
-  { value: "12,000+", label: "Completed rentals" },
-  { value: "4.9", label: "Average rating", showStar: true },
-] as const;
-
 export function HomeStats() {
+  const { t } = useTranslation();
+
+  const stats = [
+    { value: "2,400+", label: t("home.statActiveListings") },
+    { value: "1,800+", label: t("home.statVerifiedOwners") },
+    { value: "12,000+", label: t("home.statCompletedRentals") },
+    { value: "4.9", label: t("home.statAverageRating"), showStar: true },
+  ] as const;
+
   return (
     <SectionReveal>
       <div className="container -mt-2 pb-10 sm:-mt-4 sm:pb-12">
@@ -18,9 +21,9 @@ export function HomeStats() {
               <div
                 key={s.label}
                 className={`flex flex-col items-center px-4 py-7 text-center sm:px-6 sm:py-9 ${
-                  i % 2 === 0 ? "border-r border-stone-200" : ""
+                  i % 2 === 0 ? "border-r border-stone-200 rtl:border-l rtl:border-r-0" : ""
                 } ${i < 2 ? "border-b border-stone-200 sm:border-b-0" : ""} ${
-                  i > 0 && i < 4 ? "sm:border-l sm:border-stone-200" : ""
+                  i > 0 && i < 4 ? "sm:border-l sm:border-stone-200 rtl:sm:border-r rtl:sm:border-l-0" : ""
                 }`}
               >
                 {"showStar" in s && s.showStar ? (

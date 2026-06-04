@@ -7,6 +7,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { GalleryZoomHint, ImageLightbox } from "@/components/shared/ImageLightbox";
 import { Switch } from "@/components/ui/switch";
@@ -31,6 +32,7 @@ export function OwnerListingCard({
   onSetAvailability,
   onDelete,
 }: OwnerListingCardProps) {
+  const { t } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [available, setAvailable] = useState(item.isAvailable);
@@ -42,12 +44,12 @@ export function OwnerListingCard({
   const canToggleVisibility = isApproved;
 
   const statusBadge = isPending
-    ? { label: "Pending review", className: "bg-amber-500 text-white" }
+    ? { label: t("equipment.statusPending"), className: "bg-amber-500 text-white" }
     : isRejected
-      ? { label: "Rejected", className: "bg-red-600 text-white" }
+      ? { label: t("listing.statusRejectedShort"), className: "bg-red-600 text-white" }
       : available
-        ? { label: "Live", className: "bg-green-500 text-white" }
-        : { label: "Hidden", className: "bg-stone-700 text-white" };
+        ? { label: t("listing.statusLiveShort"), className: "bg-green-500 text-white" }
+        : { label: t("listing.statusHiddenShort"), className: "bg-stone-700 text-white" };
   const cover = item.images[0];
   const { count: reviewCount } = equipmentReviewStats(item);
   const photos = item.images.filter(Boolean);
@@ -92,7 +94,7 @@ export function OwnerListingCard({
               "relative block h-44 w-full overflow-hidden rounded-t-2xl bg-brand-50 md:h-full md:min-h-[188px] md:rounded-l-2xl md:rounded-tr-none",
               photos.length > 0 && "cursor-zoom-in"
             )}
-            aria-label={photos.length ? "View photos" : "No photos"}
+            aria-label={photos.length ? t("listing.viewPhotos") : t("listing.noPhotos")}
           >
             {cover ? (
               <img src={cover} alt="" className="h-full w-full object-cover" />
@@ -108,18 +110,18 @@ export function OwnerListingCard({
             )}
             <span
               className={cn(
-                "absolute left-3 top-3 rounded-full px-2.5 py-1 text-[11px] font-semibold shadow-sm",
+                "absolute start-3 top-3 rounded-full px-2.5 py-1 text-[11px] font-semibold shadow-sm",
                 statusBadge.className
               )}
             >
               {statusBadge.label}
             </span>
             {photos.length > 1 ? (
-              <span className="absolute bottom-3 right-3 rounded-full bg-black/50 px-2 py-0.5 text-[10px] font-medium text-white">
-                {photos.length} photos
+              <span className="absolute bottom-3 end-3 rounded-full bg-black/50 px-2 py-0.5 text-[10px] font-medium text-white">
+                {t("listing.photoCount", { count: photos.length })}
               </span>
             ) : null}
-            {photos.length > 0 ? <GalleryZoomHint className="bottom-3 left-3" /> : null}
+            {photos.length > 0 ? <GalleryZoomHint className="bottom-3 start-3" /> : null}
           </button>
         </div>
 
@@ -128,12 +130,14 @@ export function OwnerListingCard({
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
                 <span className={cn("badge text-[10px]", cat?.color ?? "badge-brand")}>
-                  {cat?.name ?? "Equipment"}
+                  {cat?.name ?? t("equipment.defaultCategory")}
                 </span>
                 <span className="text-[11px] text-stone-400">
                   {reviewCount > 0
-                    ? `${reviewCount} review${reviewCount !== 1 ? "s" : ""}`
-                    : "No reviews yet"}
+                    ? reviewCount === 1
+                      ? t("listing.reviewCountShort", { count: reviewCount })
+                      : t("listing.reviewsCountShort", { count: reviewCount })
+                    : t("equipment.noReviews")}
                 </span>
               </div>
               <Link
@@ -152,7 +156,7 @@ export function OwnerListingCard({
               <button
                 type="button"
                 className="flex h-9 w-9 items-center justify-center rounded-full text-stone-400 hover:bg-stone-100"
-                aria-label="More actions"
+                aria-label={t("listing.moreActions")}
                 onClick={() => setMenuOpen((o) => !o)}
               >
                 <MoreVertical className="h-4 w-4" />
@@ -162,17 +166,17 @@ export function OwnerListingCard({
                   <button
                     type="button"
                     className="fixed inset-0 z-10"
-                    aria-label="Close menu"
+                    aria-label={t("common.close")}
                     onClick={() => setMenuOpen(false)}
                   />
-                  <div className="absolute right-0 top-10 z-20 min-w-[140px] rounded-xl border border-stone-200 bg-canvas-card py-1 shadow-lg">
+                  <div className="absolute end-0 top-10 z-20 min-w-[140px] rounded-xl border border-stone-200 bg-canvas-card py-1 shadow-lg">
                     <Link
                       to={`/equipment/${item.id}`}
                       className="flex items-center gap-2 px-3 py-2 text-sm text-stone-700 hover:bg-stone-100"
                       onClick={() => setMenuOpen(false)}
                     >
                       <ExternalLink className="h-3.5 w-3.5" />
-                      View listing
+                      {t("listing.viewListing")}
                     </Link>
                     <button
                       type="button"
@@ -183,7 +187,7 @@ export function OwnerListingCard({
                       }}
                     >
                       <Trash2 className="h-3.5 w-3.5" />
-                      Delete
+                      {t("common.delete")}
                     </button>
                   </div>
                 </>
@@ -194,15 +198,15 @@ export function OwnerListingCard({
           <div className="mt-4 grid gap-4 border-t border-stone-200 pt-4 sm:grid-cols-[1fr_auto] sm:items-center">
             <div>
               <p className="text-[11px] font-medium uppercase tracking-wide text-stone-400">
-                Daily rate
+                {t("equipment.dailyRate")}
               </p>
               <p className="price-tag mt-0.5 text-2xl leading-none">
-                {Math.round(item.dailyRate)} TND
-                <span className="text-sm font-normal text-stone-500">/day</span>
+                {Math.round(item.dailyRate)} {t("common.tnd")}
+                <span className="text-sm font-normal text-stone-500">{t("equipment.perDaySuffix")}</span>
               </p>
               {item.weeklyRate != null ? (
                 <p className="mt-1 text-xs text-stone-500">
-                  {formatCurrency(item.weeklyRate)} / week
+                  {t("listing.perWeekPrice", { price: formatCurrency(item.weeklyRate) })}
                 </p>
               ) : null}
             </div>
@@ -216,17 +220,17 @@ export function OwnerListingCard({
               )}
             >
               <div className="min-w-0">
-                <p className="text-xs font-semibold text-stone-700">Visible in search</p>
+                <p className="text-xs font-semibold text-stone-700">{t("listing.visibleInSearch")}</p>
                 <p className="text-[11px] text-stone-500">
                   {isPending
-                    ? "Waiting for admin approval"
+                    ? t("listing.waitingApproval")
                     : isRejected
                       ? item.rejectionNote
                         ? item.rejectionNote
-                        : "Edit listing to resubmit for review"
+                        : t("listing.editToResubmit")
                       : available
-                        ? "Renters can find this"
-                        : "Approved — turn on to go live"}
+                        ? t("listing.rentersCanFind")
+                        : t("listing.turnOnToGoLive")}
                 </p>
               </div>
               <Switch
@@ -234,7 +238,7 @@ export function OwnerListingCard({
                 disabled={toggling || !canToggleVisibility}
                 onCheckedChange={(checked) => void handleAvailabilityChange(checked)}
                 className="shrink-0 data-[state=checked]:bg-green-500"
-                aria-label={available ? "Hide from search" : "Show in search"}
+                aria-label={available ? t("listing.hideFromSearch") : t("listing.showInSearch")}
               />
             </div>
           </div>
@@ -245,7 +249,7 @@ export function OwnerListingCard({
               className="btn btn-secondary btn-sm inline-flex items-center gap-1.5"
             >
               <ExternalLink className="h-3.5 w-3.5" />
-              View public page
+              {t("listing.viewPublicPage")}
             </Link>
             <button
               type="button"
@@ -253,7 +257,7 @@ export function OwnerListingCard({
               onClick={() => onDelete(item.id)}
             >
               <Trash2 className="h-3.5 w-3.5" />
-              Delete
+              {t("common.delete")}
             </button>
           </div>
         </div>

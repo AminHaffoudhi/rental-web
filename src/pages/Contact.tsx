@@ -1,9 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
 import { Clock, Mail, MessageSquare, Phone, Send } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import toast from "react-hot-toast";
 import {
@@ -31,19 +32,14 @@ const schema = z.object({
 type FormValues = z.infer<typeof schema>;
 
 export function Contact() {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const isReport = searchParams.get("type") === "report";
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
 
-  const pageTitle = isReport ? "Report an issue" : "Contact us";
-  const pageDescription = useMemo(
-    () =>
-      isReport
-        ? "Describe the problem (booking, payment, safety, or account). Our team will review it promptly."
-        : "Questions about bookings, listings, payments, or your account? Send us a message and we'll respond as soon as we can.",
-    [isReport]
-  );
+  const pageTitle = isReport ? t("contact.typeReport") : t("contact.title");
+  const pageDescription = t("contact.subtitle");
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -151,12 +147,7 @@ export function Contact() {
                 <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-green-500/15 text-green-600 dark:text-green-400">
                   <Send className="h-7 w-7" aria-hidden />
                 </div>
-                <h3 className="mt-4 font-display text-xl font-semibold text-stone-900">
-                  Message sent
-                </h3>
-                <p className="mt-2 text-sm text-stone-500">
-                  Thank you for contacting {PLATFORM_NAME}. We&apos;ve received your request.
-                </p>
+                <p className="mt-4 font-display text-xl font-semibold text-stone-900">{t("contact.success")}</p>
                 <button
                   type="button"
                   className="btn btn-secondary mt-6"
@@ -174,9 +165,9 @@ export function Contact() {
                       name="firstName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>First name</FormLabel>
+                          <FormLabel>{t("contact.name")}</FormLabel>
                           <FormControl>
-                            <input className="input" autoComplete="given-name" {...field} />
+                            <input className="input" autoComplete="name" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -187,7 +178,7 @@ export function Contact() {
                       name="lastName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Last name</FormLabel>
+                          <FormLabel>{t("auth.name")}</FormLabel>
                           <FormControl>
                             <input className="input" autoComplete="family-name" {...field} />
                           </FormControl>
@@ -202,7 +193,7 @@ export function Contact() {
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Email</FormLabel>
+                        <FormLabel>{t("contact.email")}</FormLabel>
                         <FormControl>
                           <input
                             type="email"
@@ -222,7 +213,8 @@ export function Contact() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>
-                          Phone <span className="font-normal text-stone-400">(optional)</span>
+                          {t("contact.phone")}{" "}
+                          <span className="font-normal text-stone-400">({t("common.optional")})</span>
                         </FormLabel>
                         <FormControl>
                           <input
@@ -244,10 +236,10 @@ export function Contact() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>
-                          Subject{" "}
-                          <span className="font-normal text-stone-400">
-                            ({isReport ? "recommended" : "optional"})
-                          </span>
+                          {t("contact.subject")}{" "}
+                          {!isReport ? (
+                            <span className="font-normal text-stone-400">({t("common.optional")})</span>
+                          ) : null}
                         </FormLabel>
                         <FormControl>
                           <input
@@ -268,7 +260,7 @@ export function Contact() {
                     name="message"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Message</FormLabel>
+                        <FormLabel>{t("contact.message")}</FormLabel>
                         <FormControl>
                           <textarea
                             rows={5}
@@ -292,7 +284,7 @@ export function Contact() {
                     ) : (
                       <>
                         <Send className="h-4 w-4" aria-hidden />
-                        Send message
+                        {t("contact.send")}
                       </>
                     )}
                   </button>

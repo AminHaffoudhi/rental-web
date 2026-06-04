@@ -1,33 +1,24 @@
 import { CalendarCheck, Search, Truck } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { SectionHeading, SectionReveal } from "@/components/home/SectionReveal";
 import { cn } from "@/utils/cn";
 
-const steps = [
-  {
-    icon: Search,
-    title: "Search & filter",
-    body: "Browse thousands of listings. Filter by category, location, and price.",
-  },
-  {
-    icon: CalendarCheck,
-    title: "Book & pay",
-    body: "Request a booking. Owner approves. Pay securely with deposit held.",
-  },
-  {
-    icon: Truck,
-    title: "Receive & return",
-    body: "We deliver to you. Use it. Return it. Deposit refunded.",
-  },
+const stepConfig = [
+  { icon: Search, titleKey: "home.howStep1Title", bodyKey: "home.howStep1Body" },
+  { icon: CalendarCheck, titleKey: "home.howStep2Title", bodyKey: "home.howStep2Body" },
+  { icon: Truck, titleKey: "home.howStep3Title", bodyKey: "home.howStep3Body" },
 ] as const;
 
 export function HomeHowItWorks() {
+  const { t } = useTranslation();
+
   return (
     <section className="py-14 sm:py-16 md:py-20 lg:py-24">
       <SectionReveal className="container">
         <SectionHeading
-          eyebrow="How it works"
-          title="Renting is simple"
-          subtitle="Three steps to get the equipment you need"
+          eyebrow={t("nav.howItWorks")}
+          title={t("home.howTitle")}
+          subtitle={t("home.howSubtitle")}
         />
 
         <div className="relative mx-auto mt-12 max-w-5xl lg:mt-16">
@@ -37,9 +28,9 @@ export function HomeHowItWorks() {
           />
 
           <ol className="flex flex-col gap-10 md:flex-row md:items-start md:justify-between md:gap-6 lg:gap-10">
-            {steps.map((step, index) => (
+            {stepConfig.map((step, index) => (
               <li
-                key={step.title}
+                key={step.titleKey}
                 className={cn(
                   "relative flex flex-1 flex-col md:items-center md:text-center",
                   "pl-14 md:pl-0"
@@ -62,13 +53,13 @@ export function HomeHowItWorks() {
                 </span>
 
                 <h3 className="font-display text-lg font-semibold text-stone-900 sm:text-xl">
-                  {step.title}
+                  {t(step.titleKey)}
                 </h3>
                 <p className="mt-2 max-w-xs text-sm leading-relaxed text-stone-500 md:mx-auto md:mt-3">
-                  {step.body}
+                  {t(step.bodyKey)}
                 </p>
 
-                {index < steps.length - 1 ? (
+                {index < stepConfig.length - 1 ? (
                   <div
                     className="absolute -bottom-5 left-6 hidden h-10 w-px bg-brand-200 md:hidden"
                     aria-hidden
@@ -82,10 +73,10 @@ export function HomeHowItWorks() {
             className="mt-10 hidden items-center justify-center gap-2 md:flex"
             aria-hidden
           >
-            {steps.map((_, i) => (
+            {stepConfig.map((_, i) => (
               <span key={i} className="flex items-center gap-2">
                 <span className="h-2 w-2 rounded-full bg-brand-400" />
-                {i < steps.length - 1 ? (
+                {i < stepConfig.length - 1 ? (
                   <span className="h-px w-12 bg-brand-200 lg:w-20" />
                 ) : null}
               </span>

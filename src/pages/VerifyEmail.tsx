@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { useTranslation } from "react-i18next";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { Loader2 } from "lucide-react";
@@ -8,6 +9,7 @@ import { getApiErrorDetail } from "@/services/api";
 import { useAuthStore } from "@/store/authStore";
 
 export function VerifyEmail() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const setAuth = useAuthStore((s) => s.setAuth);
@@ -91,7 +93,7 @@ export function VerifyEmail() {
   async function handleResend() {
     if (cooldown > 0 || submitting) return;
     if (!email) {
-      toast.error("Missing email address.");
+      toast.error(t("auth.verifyMissingEmail"));
       return;
     }
     setError(null);
@@ -118,17 +120,14 @@ export function VerifyEmail() {
           <div className="mb-6 flex justify-center">
             <PlatformLogo size="md" linkTo="/" />
           </div>
-          <h1 className="font-display text-xl font-semibold text-stone-900">Verify your email</h1>
-          <p className="mt-3 text-sm text-stone-600">
-            Register to receive a 6-digit code, or use Login if you need to reach the verification page with your
-            email.
-          </p>
+          <h1 className="font-display text-xl font-semibold text-stone-900">{t("auth.verifyTitle")}</h1>
+          <p className="mt-3 text-sm text-stone-600">{t("auth.verifyNoAccessBody")}</p>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
             <Link to="/register" className="btn btn-primary btn-sm text-center">
-              Register
+              {t("auth.createAccount")}
             </Link>
             <Link to="/login" className="btn btn-secondary btn-sm text-center">
-              Login
+              {t("nav.signIn")}
             </Link>
           </div>
         </div>
@@ -146,10 +145,10 @@ export function VerifyEmail() {
         <div className="mb-6 flex justify-center">
           <PlatformLogo size="md" linkTo="/" />
         </div>
-        <h1 className="font-display text-2xl font-semibold text-stone-900">Check your email</h1>
+        <h1 className="font-display text-2xl font-semibold text-stone-900">{t("auth.verifyCheckEmail")}</h1>
         <p className="mt-2 text-sm text-stone-600">
-          We sent a 6-digit code to{" "}
-          <span className="font-medium text-stone-800">{email || "your inbox"}</span>
+          {t("auth.verifyCodeSent")}{" "}
+          <span className="font-medium text-stone-800">{email || t("auth.verifyYourInbox")}</span>
         </p>
 
         <div className="mt-8 flex justify-center gap-2" onPaste={handlePaste}>
@@ -164,7 +163,7 @@ export function VerifyEmail() {
               autoComplete="one-time-code"
               maxLength={1}
               value={d}
-              aria-label={`Digit ${i + 1}`}
+              aria-label={t("auth.digitLabel", { n: i + 1 })}
               disabled={submitting}
               onChange={(e) => handleDigitInput(i, e.target.value.slice(-1))}
               onKeyDown={(e) => handleKeyDown(i, e)}
@@ -189,10 +188,10 @@ export function VerifyEmail() {
             {submitting ? (
               <span className="inline-flex items-center justify-center gap-2">
                 <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-                Verifying…
+                {t("auth.verifying")}
               </span>
             ) : (
-              "Verify"
+              t("auth.verify")
             )}
           </button>
           <button
@@ -201,14 +200,16 @@ export function VerifyEmail() {
             className="btn btn-ghost w-full text-sm"
             onClick={() => void handleResend()}
           >
-            {cooldown > 0 ? `Resend code (${cooldown}s)` : "Resend code"}
+            {cooldown > 0
+              ? t("auth.resendCodeCooldown", { seconds: cooldown })
+              : t("auth.verifyResend")}
           </button>
         </div>
 
         <p className="mt-6 text-center text-xs text-stone-500">
-          Wrong account?{" "}
+          {t("auth.wrongAccount")}{" "}
           <Link to="/login" className="font-medium text-brand-600 hover:underline">
-            Back to login
+            {t("auth.backToLogin")}
           </Link>
         </p>
       </div>

@@ -87,8 +87,9 @@ export default {
       },
       fontFamily: {
         display: ["Fraunces", "serif"],
-        body: ["Plus Jakarta Sans", "sans-serif"],
-        sans: ["Plus Jakarta Sans", "sans-serif"],
+        body: ["Plus Jakarta Sans", "Noto Sans Arabic", "sans-serif"],
+        sans: ["Plus Jakarta Sans", "Noto Sans Arabic", "sans-serif"],
+        arabic: ["Noto Sans Arabic", "sans-serif"],
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -137,5 +138,11 @@ export default {
       },
     },
   },
-  plugins: [tailwindcssAnimate],
+  plugins: [
+    tailwindcssAnimate,
+    function ({ addVariant }) {
+      addVariant("rtl", '[dir="rtl"] &');
+      addVariant("ltr", '[dir="ltr"] &');
+    },
+  ],
 } satisfies Config;

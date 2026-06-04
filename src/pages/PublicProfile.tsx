@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { ArrowLeft, MessageSquare, Package, Sparkles, User } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link, Navigate, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { EquipmentGrid } from "@/components/equipment/EquipmentGrid";
 import { EmptyState } from "@/components/shared/EmptyState";
@@ -18,14 +19,15 @@ import { useNotificationHighlight } from "@/hooks/useNotificationHighlight";
 
 type ProfileTab = "listings" | "reviews" | "about";
 
-const tabs: { id: ProfileTab; label: string; icon: typeof Package }[] = [
-  { id: "listings", label: "Listings", icon: Package },
-  { id: "reviews", label: "Reviews", icon: MessageSquare },
-  { id: "about", label: "About", icon: User },
-];
-
 export function PublicProfile() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
+
+  const tabs: { id: ProfileTab; label: string; icon: typeof Package }[] = [
+    { id: "listings", label: t("profile.tabListings"), icon: Package },
+    { id: "reviews", label: t("profile.tabReviews"), icon: MessageSquare },
+    { id: "about", label: t("profile.tabAbout"), icon: User },
+  ];
   const { userId } = useParams<{ userId: string }>();
   const [searchParams] = useSearchParams();
   const currentUser = useAuthStore((s) => s.user);
@@ -40,9 +42,9 @@ export function PublicProfile() {
       const p = await userService.getPublicProfile(userId);
       setProfile(p);
     } catch {
-      setError("This profile could not be found.");
+      setError(t("profile.notFound"));
     }
-  }, [userId]);
+  }, [userId, t]);
 
   const highlightedReviewId = useNotificationHighlight(loadProfile);
 
@@ -79,7 +81,7 @@ export function PublicProfile() {
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 px-4">
         <p className="text-center text-stone-600">{error}</p>
         <Link to="/search" className="btn btn-primary">
-          Browse equipment
+          {t("bookings.browseCta")}
         </Link>
       </div>
     );
@@ -115,8 +117,8 @@ export function PublicProfile() {
               to="/search"
               className="inline-flex items-center gap-1.5 text-sm font-medium text-stone-600 transition-colors hover:text-brand-600"
             >
-              <ArrowLeft className="h-4 w-4" aria-hidden />
-              Back to search
+              <ArrowLeft className="h-4 w-4 rtl:rotate-180" aria-hidden />
+              {t("profile.backToSearch")}
             </Link>
           </div>
         </div>
@@ -126,11 +128,10 @@ export function PublicProfile() {
             {profile.name}
           </h1>
           <p className="mt-2 max-w-md text-sm text-stone-500 dark:text-stone-400">
-            This member rents equipment on {PLATFORM_NAME}. Public host profiles are only available
-            for equipment owners.
+            {t("profile.renterOnlyBody", { name: PLATFORM_NAME })}
           </p>
           <Link to="/search" className="btn btn-primary mt-8">
-            Browse equipment
+            {t("bookings.browseCta")}
           </Link>
         </div>
       </div>
@@ -139,7 +140,7 @@ export function PublicProfile() {
 
   const bioText =
     profile.bio?.trim() ||
-    `${profile.name} rents out quality equipment on ${PLATFORM_NAME}. Browse their listings below and book with confidence.`;
+    t("profile.defaultBio", { name: profile.name, platform: PLATFORM_NAME });
 
   return (
     <div className="min-h-screen bg-canvas">
@@ -149,8 +150,8 @@ export function PublicProfile() {
             to="/search"
             className="inline-flex items-center gap-1.5 text-sm font-medium text-stone-600 transition-colors hover:text-brand-600"
           >
-            <ArrowLeft className="h-4 w-4" aria-hidden />
-            Back to search
+            <ArrowLeft className="h-4 w-4 rtl:rotate-180" aria-hidden />
+            {t("profile.backToSearch")}
           </Link>
         </div>
       </div>
@@ -212,12 +213,14 @@ export function PublicProfile() {
               <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
                 <div>
                   <h2 className="font-display text-xl font-semibold text-stone-900">
-                    Available equipment
+                    {t("profile.availableEquipment")}
                   </h2>
                   <p className="mt-1 text-sm text-stone-500">
                     {profile.stats.listings === 0
-                      ? "No live listings right now."
-                      : `${profile.stats.listings} item${profile.stats.listings !== 1 ? "s" : ""} ready to rent`}
+                      ? t("profile.noLiveListings")
+                      : profile.stats.listings === 1
+                        ? t("profile.itemReady", { count: profile.stats.listings })
+                        : t("profile.itemsReady", { count: profile.stats.listings })}
                   </p>
                 </div>
               </div>
@@ -226,16 +229,16 @@ export function PublicProfile() {
               ) : (
                 <EmptyState
                   icon={Package}
-                  title="No listings yet"
+                  title={t("listing.noListings")}
                   description={
                     isOwnProfile
-                      ? "Publish your first listing from the dashboard to show it here."
-                      : "This owner has not published any available equipment yet."
+                      ? t("profile.publishFromDashboard")
+                      : t("profile.ownerNoEquipment")
                   }
                   action={
                     isOwnProfile
                       ? {
-                          label: "Create listing",
+                          label: t("profile.createListing"),
                           onClick: () => navigate("/equipment/new"),
                         }
                       : undefined
@@ -248,19 +251,17 @@ export function PublicProfile() {
           {tab === "reviews" ? (
             <div className="mx-auto max-w-2xl space-y-6">
               <h2 className="font-display text-xl font-semibold text-stone-900">
-                Reviews
+                {t("equipment.reviews")}
               </h2>
-              <p className="text-sm text-stone-500">
-                Host feedback and reviews on this owner&apos;s listings.
-              </p>
+              <p className="text-sm text-stone-500">{t("profile.reviewsHostSubtitle")}</p>
               {currentUser &&
               !isOwnProfile &&
               (profile.role === "OWNER" || profile.role === "BOTH") ? (
                 <ReviewForm
                   variant="owner"
                   revieweeId={profile.id}
-                  title="Review this owner"
-                  description="Share your experience working with this host. Owners can also review each other."
+                  title={t("profile.reviewOwnerTitle")}
+                  description={t("profile.reviewOwnerDesc")}
                   onSuccess={() => void loadProfile()}
                 />
               ) : null}
@@ -282,10 +283,8 @@ export function PublicProfile() {
               ) : (
                 <div className="rounded-2xl border border-dashed border-stone-200 bg-canvas-card px-6 py-12 text-center">
                   <Sparkles className="mx-auto h-10 w-10 text-stone-300" aria-hidden />
-                  <p className="mt-3 font-medium text-stone-700">No reviews yet</p>
-                  <p className="mt-1 text-sm text-stone-500">
-                    Be the first to leave a review after renting or interacting with this host.
-                  </p>
+                  <p className="mt-3 font-medium text-stone-700">{t("profile.noReviewsHostTitle")}</p>
+                  <p className="mt-1 text-sm text-stone-500">{t("profile.noReviewsHostBody")}</p>
                 </div>
               )}
             </div>
@@ -294,30 +293,32 @@ export function PublicProfile() {
           {tab === "about" ? (
             <div className="mx-auto max-w-2xl space-y-6">
               <div className="rounded-2xl border border-stone-200 bg-canvas-card p-6 shadow-sm">
-                <h2 className="font-display text-xl font-semibold text-stone-900">About</h2>
+                <h2 className="font-display text-xl font-semibold text-stone-900">
+                  {t("profile.aboutSectionTitle")}
+                </h2>
                 <p className="mt-4 whitespace-pre-wrap text-sm leading-relaxed text-stone-600">
                   {bioText}
                 </p>
               </div>
               <div className="rounded-2xl border border-stone-200 bg-canvas-card p-6 shadow-sm">
                 <h3 className="text-sm font-semibold uppercase tracking-wide text-stone-400">
-                  Trust & verification
+                  {t("profile.trustTitle")}
                 </h3>
                 <ul className="mt-4 space-y-3 text-sm text-stone-600">
                   <li className="flex gap-2">
                     <span className="text-brand-500">✓</span>
                     {profile.kycStatus === "APPROVED"
-                      ? `Identity verified by ${PLATFORM_NAME}`
-                      : "Identity verification pending"}
+                      ? t("profile.identityVerified", { name: PLATFORM_NAME })
+                      : t("profile.identityPending")}
                   </li>
                   <li className="flex gap-2">
                     <span className="text-brand-500">✓</span>
-                    Member since {profile.createdAt.slice(0, 10)}
+                    {t("profile.memberSinceDate", { date: profile.createdAt.slice(0, 10) })}
                   </li>
                   {profile.location ? (
                     <li className="flex gap-2">
                       <span className="text-brand-500">✓</span>
-                      Based in {profile.location}
+                      {t("profile.basedIn", { location: profile.location })}
                     </li>
                   ) : null}
                 </ul>

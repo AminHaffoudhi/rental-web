@@ -6,7 +6,7 @@ export type EquipmentSort = "recent" | "price_asc" | "price_desc" | "rating";
 
 export interface EquipmentFilters {
   q?: string;
-  /** Category slug (e.g. `construction`) */
+  /** Category slug from admin API (e.g. `power-tools`) */
   category?: string;
   minPrice?: number;
   maxPrice?: number;
