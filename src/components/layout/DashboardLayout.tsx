@@ -121,6 +121,10 @@ export function DashboardLayout() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const { isOwner, sections, mobileLinks, breadcrumbs } = useDashboardNav();
 
+  const isChatWorkspace =
+    location.pathname === "/dashboard/ai" ||
+    location.pathname === "/dashboard/assistant";
+
   useEffect(() => {
     mainRef.current?.scrollTo(0, 0);
   }, [location.pathname]);
@@ -217,11 +221,26 @@ export function DashboardLayout() {
         </aside>
 
         <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-          <main ref={mainRef} className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain">
-          <div className="mx-auto w-full max-w-7xl p-6 pb-[max(5.5rem,env(safe-area-inset-bottom,0px))] sm:p-8 lg:pb-8">
-            <Outlet />
-          </div>
-        </main>
+          <main
+            ref={mainRef}
+            className={cn(
+              "min-h-0 flex-1",
+              isChatWorkspace
+                ? "flex flex-col overflow-hidden"
+                : "overflow-y-auto overscroll-y-contain"
+            )}
+          >
+            <div
+              className={cn(
+                "mx-auto flex w-full flex-col",
+                isChatWorkspace
+                  ? "min-h-0 flex-1 max-w-7xl px-4 py-4 pb-[max(5.5rem,env(safe-area-inset-bottom,0px))] sm:px-6 sm:py-5 lg:pb-5"
+                  : "max-w-7xl p-6 pb-[max(5.5rem,env(safe-area-inset-bottom,0px))] sm:p-8 lg:pb-8"
+              )}
+            >
+              <Outlet />
+            </div>
+          </main>
 
         <nav className="fixed bottom-0 start-0 end-0 z-30 flex items-center justify-around border-t border-stone-200 bg-canvas-card px-1 py-2 safe-bottom dark:border-stone-800 lg:hidden">
           {mobileLinks.map((item) => {

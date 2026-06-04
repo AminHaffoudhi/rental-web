@@ -18,6 +18,11 @@ function stripHeadingMarks(text: string): string {
   return text.replace(/^#+\s*/, "").replace(/\*\*/g, "").trim();
 }
 
+/** Claude sometimes prefixes list lines with an extra dash after the number. */
+function normalizeListItem(text: string): string {
+  return text.replace(/^[-*•]\s+/, "").trim();
+}
+
 function parseBlocks(content: string): Block[] {
   const lines = content.split("\n");
   const blocks: Block[] = [];
@@ -70,7 +75,7 @@ function parseBlocks(content: string): Block[] {
         const t = lines[i].trim();
         const bullet = t.match(/^[-*•]\s+(.+)$/);
         if (!bullet) break;
-        items.push(bullet[1]);
+        items.push(normalizeListItem(bullet[1]));
         i++;
       }
       blocks.push({ type: "ul", items });
@@ -84,7 +89,7 @@ function parseBlocks(content: string): Block[] {
         const t = lines[i].trim();
         const num = t.match(/^\d+\.\s+(.+)$/);
         if (!num) break;
-        items.push(num[1]);
+        items.push(normalizeListItem(num[1]));
         i++;
       }
       blocks.push({ type: "ol", items });
@@ -130,7 +135,7 @@ function toInternalPath(href: string): string | null {
 function renderLink(label: string, href: string, key: string): ReactNode {
   const internal = toInternalPath(href);
   const className =
-    "inline-flex items-center gap-0.5 rounded-md bg-brand-500/10 px-1.5 py-0.5 font-semibold text-brand-700 underline decoration-brand-300 underline-offset-2 transition-colors hover:bg-brand-500/15 hover:text-brand-800 dark:text-brand-300 dark:hover:text-brand-200";
+    "font-medium text-stone-800 underline decoration-brand-400 decoration-2 underline-offset-2 transition-colors hover:text-brand-700 dark:text-stone-100 dark:hover:text-brand-300";
 
   if (internal) {
     return (
@@ -237,16 +242,18 @@ export function AssistantMessage({
                       className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500"
                       aria-hidden
                     />
-                    <span className="min-w-0 flex-1">{renderInline(item)}</span>
+                    <span className="min-w-0 flex-1 text-stone-700 dark:text-stone-200">
+                      {renderInline(item)}
+                    </span>
                   </li>
                 ))}
               </ul>
             );
           case "ol":
             return (
-              <ol key={i} className="my-2 list-decimal space-y-2 ps-5 marker:text-brand-600">
+              <ol key={i} className="my-2 list-decimal space-y-2 ps-5 marker:font-medium marker:text-stone-500 dark:marker:text-stone-400">
                 {block.items.map((item, j) => (
-                  <li key={j} className="ps-1">
+                  <li key={j} className="ps-1 text-stone-700 dark:text-stone-200">
                     {renderInline(item)}
                   </li>
                 ))}

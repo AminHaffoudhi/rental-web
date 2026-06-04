@@ -17,9 +17,9 @@ export function DashboardAssistant() {
   );
 
   return (
-    <div className="flex min-h-0 w-full min-w-0 flex-col">
+    <div className="flex h-full min-h-0 w-full min-w-0 flex-1 flex-col">
       <AssistantChat
-        className="flex-1"
+        className="h-full min-h-0 flex-1"
         variant="renter"
         title={t("assistant.renterTitle")}
         subtitle={t("assistant.renterSubtitle")}

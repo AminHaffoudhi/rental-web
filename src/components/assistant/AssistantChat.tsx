@@ -109,11 +109,14 @@ export function AssistantChat({
       ? [{ role: "assistant" as const, content: welcomeMessage }]
       : messages;
 
+  function formatSuggestionLabel(text: string): string {
+    return text.replace(/^#+\s*/, "").replace(/\*\*/g, "").trim();
+  }
+
   return (
     <div
       className={cn(
-        "flex w-full min-w-0 flex-col overflow-hidden rounded-2xl border border-stone-200 bg-canvas-card shadow-elevated dark:border-stone-700 dark:bg-stone-900",
-        "min-h-[min(720px,calc(100dvh-11rem))] lg:min-h-[min(720px,calc(100dvh-9rem))]",
+        "flex h-full min-h-0 w-full min-w-0 flex-col overflow-hidden rounded-2xl border border-stone-200 bg-canvas-card shadow-elevated dark:border-stone-700 dark:bg-stone-900",
         className
       )}
     >
@@ -235,7 +238,7 @@ export function AssistantChat({
                   onClick={() => void sendMessage(p)}
                   className="rounded-xl border border-stone-200 bg-white px-3.5 py-2 text-start text-sm font-medium text-stone-700 shadow-sm transition-all hover:border-brand-300 hover:bg-brand-50 hover:text-brand-800 disabled:opacity-50 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200 dark:hover:border-brand-500/40 dark:hover:bg-brand-500/10"
                 >
-                  {p}
+                  {formatSuggestionLabel(p)}
                 </button>
               ))}
             </div>
