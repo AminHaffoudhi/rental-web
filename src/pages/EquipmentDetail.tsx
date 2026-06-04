@@ -8,7 +8,6 @@ import {
   ChevronRight,
   Clock,
   Coins,
-  Home,
   LayoutDashboard,
   MapPin,
   MessageSquare,
@@ -17,23 +16,24 @@ import {
   Truck,
   XCircle,
 } from "lucide-react";
-import { format, parseISO } from "date-fns";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { BookingForm } from "@/components/booking/BookingForm";
+import { PageBreadcrumb } from "@/components/shared/PageBreadcrumb";
 import { EquipmentDetailGallery } from "@/components/equipment/EquipmentDetailGallery";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { ReviewForm } from "@/components/review/ReviewForm";
 import { ReviewCard } from "@/components/user/ReviewCard";
 import { UserAvatar } from "@/components/user/UserAvatar";
 import { useEquipmentDetail } from "@/hooks/useEquipment";
+import { useLocaleFormat } from "@/hooks/useLocaleFormat";
 import { useNotificationHighlight } from "@/hooks/useNotificationHighlight";
+import { localizedCategory } from "@/i18n/categoryLocale";
 import * as bookingService from "@/services/booking.service";
 import { getApiErrorDetail } from "@/services/api";
 import { useAuthStore } from "@/store/authStore";
 import type { Equipment } from "@/types/equipment";
 import { cn } from "@/utils/cn";
-import { formatCurrency } from "@/utils/currency";
 import { equipmentReviewStats } from "@/utils/reviewStats";
 
 function DetailSkeleton() {
@@ -64,9 +64,11 @@ function DescriptionBlock({ text }: { text: string }) {
   const shown = long && !open ? `${text.slice(0, 280)}…` : text;
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-stone-200 bg-canvas-card p-6 shadow-sm">
-      <h3 className="font-display text-xl font-semibold text-stone-900">{t("equipment.aboutTitle")}</h3>
-      <p className="mt-4 max-w-full whitespace-pre-wrap leading-relaxed text-stone-600 [overflow-wrap:anywhere]">
+    <section className="overflow-hidden rounded-2xl border border-stone-200 bg-canvas-card p-6 shadow-sm dark:border-stone-700 dark:bg-stone-900">
+      <h3 className="font-display text-xl font-semibold text-stone-900 dark:text-stone-100">
+        {t("equipment.aboutTitle")}
+      </h3>
+      <p className="mt-4 max-w-full whitespace-pre-wrap leading-relaxed text-stone-600 dark:text-stone-300 [overflow-wrap:anywhere]">
         {shown}
       </p>
       {long ? (
@@ -84,6 +86,7 @@ function DescriptionBlock({ text }: { text: string }) {
 
 function PricingCard({ equipment }: { equipment: Equipment }) {
   const { t } = useTranslation();
+  const { formatCurrency } = useLocaleFormat();
   const rows: {
     icon: typeof Coins;
     label: string;
@@ -149,7 +152,9 @@ function PricingCard({ equipment }: { equipment: Equipment }) {
                 >
                   {row.value}
                   {row.sub ? (
-                    <span className="ml-1 font-normal text-stone-400">· {row.sub}</span>
+                    <span className="ms-1 font-normal text-stone-400 dark:text-stone-500">
+                      · {row.sub}
+                    </span>
                   ) : null}
                 </dd>
               </div>
@@ -163,22 +168,29 @@ function PricingCard({ equipment }: { equipment: Equipment }) {
 
 function EquipmentHeader({ equipment }: { equipment: Equipment }) {
   const { t } = useTranslation();
-  const cat = equipment.category?.name ?? t("equipment.defaultCategory");
-  const listed = format(parseISO(equipment.createdAt), "MMMM yyyy");
+  const { formatMonthYear } = useLocaleFormat();
+  const cat = equipment.category
+    ? localizedCategory(
+        equipment.category.slug,
+        { name: equipment.category.name },
+        t
+      ).name
+    : t("equipment.defaultCategory");
+  const listed = formatMonthYear(equipment.createdAt);
   const { count: reviewCount, average: avg } = equipmentReviewStats(equipment);
 
   return (
-    <header>
+    <header className="text-start">
       <div className="flex flex-wrap items-center gap-2">
         <span className="badge badge-brand">{cat}</span>
         <span className={cn("badge", equipment.isAvailable ? "badge-green" : "badge-red")}>
           {equipment.isAvailable ? t("equipment.availableNow") : t("equipment.unavailable")}
         </span>
       </div>
-      <h1 className="mt-3 break-words font-display text-3xl font-semibold tracking-tight text-stone-900 md:text-4xl">
+      <h1 className="mt-3 break-words font-display text-3xl font-semibold tracking-tight text-stone-900 dark:text-stone-50 md:text-4xl">
         {equipment.title}
       </h1>
-      <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-stone-500">
+      <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-stone-500 dark:text-stone-400">
         <span className="inline-flex items-center gap-1.5">
           <MapPin className="h-4 w-4 shrink-0 text-brand-500" aria-hidden />
           {equipment.location}
@@ -209,11 +221,10 @@ function EquipmentHeader({ equipment }: { equipment: Equipment }) {
 
 function OwnerCard({ equipment }: { equipment: Equipment }) {
   const { t } = useTranslation();
+  const { formatMonthYear } = useLocaleFormat();
   const owner = equipment.owner;
   const { count: reviewCount, average: avg } = equipmentReviewStats(equipment);
-  const since = owner.createdAt
-    ? format(parseISO(owner.createdAt), "MMMM yyyy")
-    : null;
+  const since = owner.createdAt ? formatMonthYear(owner.createdAt) : null;
   const isVerified = owner.kycStatus === "APPROVED";
 
   return (
@@ -482,7 +493,15 @@ export function EquipmentDetail() {
   const [submitting, setSubmitting] = useState(false);
 
   const isOwner = Boolean(user && equipment && user.id === equipment.owner.id);
-  const catSlug = equipment?.category?.name ?? t("equipment.defaultCategory");
+  const { formatCurrency } = useLocaleFormat();
+
+  const categoryLabel = equipment?.category
+    ? localizedCategory(
+        equipment.category.slug,
+        { name: equipment.category.name },
+        t
+      ).name
+    : t("equipment.defaultCategory");
   const catFilterSlug = equipment?.category?.slug;
 
   async function handleBook(data: { startDate: Date; endDate: Date; notes?: string }) {
@@ -520,22 +539,21 @@ export function EquipmentDetail() {
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-canvas pb-28 lg:pb-16">
-      <div className="border-b border-stone-200 bg-canvas-card">
-        <nav className="container flex flex-wrap items-center gap-1 py-3 text-sm text-stone-500">
-          <Link to="/" className="inline-flex items-center gap-1 hover:text-brand-600">
-            <Home className="h-4 w-4" aria-hidden />
-            {t("common.home")}
-          </Link>
-          <ChevronRight className="h-4 w-4 opacity-40" aria-hidden />
-          <Link
-            to={catFilterSlug ? `/search?category=${encodeURIComponent(catFilterSlug)}` : "/search"}
-            className="hover:text-brand-600"
-          >
-            {catSlug}
-          </Link>
-          <ChevronRight className="h-4 w-4 opacity-40" aria-hidden />
-          <span className="line-clamp-1 font-medium text-stone-700">{equipment.title}</span>
-        </nav>
+      <div className="border-b border-stone-200 bg-canvas-card dark:border-stone-800 dark:bg-stone-900">
+        <div className="container py-3">
+          <PageBreadcrumb
+            items={[
+              { label: t("common.home"), to: "/", home: true },
+              {
+                label: categoryLabel,
+                to: catFilterSlug
+                  ? `/search?category=${encodeURIComponent(catFilterSlug)}`
+                  : "/search",
+              },
+              { label: equipment.title },
+            ]}
+          />
+        </div>
       </div>
 
       <div className="container py-8 pb-16">
@@ -552,8 +570,8 @@ export function EquipmentDetail() {
               <PricingCard equipment={equipment} />
             </div>
             <DescriptionBlock text={equipment.description} />
-            <section className="overflow-hidden rounded-2xl border border-stone-200 bg-canvas-card p-6 shadow-sm">
-              <h3 className="font-display text-xl font-semibold text-stone-900">
+            <section className="overflow-hidden rounded-2xl border border-stone-200 bg-canvas-card p-6 shadow-sm dark:border-stone-700 dark:bg-stone-900">
+              <h3 className="font-display text-xl font-semibold text-stone-900 dark:text-stone-100">
                 {t("equipment.whatsIncluded")}
               </h3>
               <ul className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -563,7 +581,10 @@ export function EquipmentDetail() {
                   t("equipment.included3"),
                   t("equipment.included4"),
                 ].map((line) => (
-                  <li key={line} className="flex items-start gap-2.5 text-sm text-stone-600">
+                  <li
+                    key={line}
+                    className="flex items-start gap-2.5 text-sm text-stone-600 dark:text-stone-300"
+                  >
                     <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-50">
                       <Check className="h-3 w-3 text-brand-600" aria-hidden />
                     </span>
@@ -607,14 +628,16 @@ export function EquipmentDetail() {
       </div>
 
       {!isOwner && equipment.approvalStatus === "APPROVED" && equipment.isAvailable ? (
-        <div className="fixed bottom-0 start-0 end-0 z-40 flex items-center justify-between gap-4 border-t border-stone-200 bg-canvas-card/95 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-8px_32px_rgba(0,0,0,0.08)] backdrop-blur-sm lg:hidden">
-          <div>
-            <p className="text-[11px] font-medium uppercase tracking-wide text-stone-400">
+        <div className="fixed bottom-0 start-0 end-0 z-40 flex items-center justify-between gap-4 border-t border-stone-200 bg-canvas-card/95 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-8px_32px_rgba(0,0,0,0.08)] backdrop-blur-sm dark:border-stone-800 dark:bg-stone-900/95 lg:hidden">
+          <div className="min-w-0">
+            <p className="text-[11px] font-medium uppercase tracking-wide text-stone-400 dark:text-stone-500">
               {t("equipment.from")}
             </p>
-            <p className="font-display text-xl font-semibold text-stone-900">
-              {Math.round(equipment.dailyRate)} {t("common.tnd")}
-              <span className="text-sm font-normal text-stone-500">{t("equipment.perDaySuffix")}</span>
+            <p className="font-display text-xl font-semibold text-stone-900 dark:text-stone-100">
+              {formatCurrency(equipment.dailyRate)}
+              <span className="text-sm font-normal text-stone-500 dark:text-stone-400">
+                {t("equipment.perDaySuffix")}
+              </span>
             </p>
           </div>
           <button type="button" className="btn btn-primary shrink-0" onClick={scrollToBook}>

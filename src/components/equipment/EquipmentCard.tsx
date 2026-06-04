@@ -5,6 +5,8 @@ import { useTranslation } from "react-i18next";
 import { UserAvatar } from "@/components/user/UserAvatar";
 import { CategoryIcon } from "@/components/equipment/CategoryIcon";
 import type { Equipment } from "@/types/equipment";
+import { useLocaleFormat } from "@/hooks/useLocaleFormat";
+import { localizedCategory } from "@/i18n/categoryLocale";
 import { cn } from "@/utils/cn";
 import { equipmentReviewStats } from "@/utils/reviewStats";
 
@@ -14,16 +16,19 @@ interface EquipmentCardProps {
 
 export function EquipmentCard({ equipment }: EquipmentCardProps) {
   const { t } = useTranslation();
+  const { formatCurrency } = useLocaleFormat();
   const img = equipment.images[0];
   const cat = equipment.category;
-  const catLabel = cat?.name ?? t("equipment.defaultCategory");
+  const catLabel = cat
+    ? localizedCategory(cat.slug, { name: cat.name }, t).name
+    : t("equipment.defaultCategory");
 
   const { count: reviewCount, average: avgRating } = equipmentReviewStats(equipment);
   const roundedRating = avgRating !== null ? Math.round(avgRating * 10) / 10 : null;
 
   const [favorited, setFavorited] = useState(false);
 
-  const daily = Math.round(equipment.dailyRate);
+  const dailyFormatted = formatCurrency(equipment.dailyRate);
 
   return (
     <div
@@ -98,7 +103,7 @@ export function EquipmentCard({ equipment }: EquipmentCardProps) {
                         )}
                       />
                     ))}
-                    <span className="ml-0.5 text-[12px] font-medium tabular-nums text-stone-700">
+                    <span className="ms-0.5 text-[12px] font-medium tabular-nums text-stone-700">
                       {roundedRating}
                     </span>
                   </div>
@@ -118,7 +123,7 @@ export function EquipmentCard({ equipment }: EquipmentCardProps) {
 
           <div className="flex items-center justify-between gap-3">
             <p className="price-tag text-xl leading-none">
-              {daily} {t("common.tnd")}
+              {dailyFormatted}
               <span>{t("equipment.perDaySuffix")}</span>
             </p>
             <span

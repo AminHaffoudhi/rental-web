@@ -5,6 +5,108 @@
     "fr": "Français",
     "ar": "العربية"
   },
+  "notifications": {
+    "title": "Notifications",
+    "ariaLabel": "Notifications",
+    "newBadge": "{{count}} nouvelle(s)",
+    "readAll": "Tout marquer lu",
+    "enableTitle": "Activer les notifications push",
+    "enableDesc": "Recevez des alertes instantanées pour les réservations, paiements et mises à jour",
+    "enableBtn": "Activer les notifications →",
+    "enabling": "Activation…",
+    "emptyTitle": "Vous êtes à jour",
+    "emptyDesc": "Les notifications sur les réservations, paiements et mises à jour apparaissent ici",
+    "view": "Voir",
+    "dismiss": "Ignorer",
+    "clearAll": "Tout effacer",
+    "count": "{{count}} notification",
+    "count_plural": "{{count}} notifications",
+    "someone": "Quelqu'un",
+    "yourListing": "votre annonce",
+    "defaultReason": "Veuillez vérifier les exigences et réessayer.",
+    "types": {
+      "kyc_submitted": {
+        "title": "Document d'identité en cours d'examen",
+        "body": "Notre équipe examine votre dossier. Nous vous préviendrons dès que c'est terminé."
+      },
+      "kyc_approved": {
+        "title": "Vous êtes vérifié — publiez vos annonces",
+        "body": "Votre identité a été approuvée. Vous pouvez créer des annonces et commencer à gagner."
+      },
+      "kyc_rejected": {
+        "title": "Vérification d'identité à corriger",
+        "body": "Votre document n'a pas été accepté : {{reason}}. Veuillez le téléverser à nouveau."
+      },
+      "equipment_pending": {
+        "title": "Annonce soumise pour examen",
+        "body": "« {{equipmentTitle}} » attend l'approbation de l'administrateur."
+      },
+      "equipment_approved": {
+        "title": "Annonce approuvée",
+        "body": "« {{equipmentTitle}} » a été approuvée. Activez la visibilité quand vous êtes prêt."
+      },
+      "equipment_rejected": {
+        "title": "Annonce à modifier",
+        "body": "« {{equipmentTitle}} » n'a pas été approuvée : {{reason}}"
+      },
+      "review_equipment_received": {
+        "title": "Nouvel avis sur votre annonce",
+        "body": "{{reviewerName}} a évalué « {{equipmentTitle}} » — en attente d'approbation."
+      },
+      "review_owner_received": {
+        "title": "Nouvel avis sur votre profil",
+        "body": "{{reviewerName}} vous a laissé un avis — en attente d'approbation."
+      },
+      "review_approved_listing": {
+        "title": "Avis sur l'annonce publié",
+        "body": "Un avis de {{reviewerName}} sur « {{equipmentTitle}} » est maintenant visible."
+      },
+      "review_approved_profile": {
+        "title": "Avis sur le profil publié",
+        "body": "Un avis de {{reviewerName}} est maintenant visible sur votre profil."
+      },
+      "booking_request": {
+        "title": "Nouvelle demande de réservation",
+        "body": "{{renterName}} souhaite louer « {{equipmentTitle}} »."
+      },
+      "booking_approved": {
+        "title": "Réservation approuvée",
+        "body": "Votre demande pour « {{equipmentTitle}} » a été approuvée. Finalisez le paiement pour confirmer."
+      },
+      "booking_rejected": {
+        "title": "Réservation refusée",
+        "body": "Votre demande pour « {{equipmentTitle}} » n'a pas été approuvée."
+      },
+      "payment_confirmed": {
+        "title": "Paiement confirmé",
+        "body": "Le paiement pour « {{equipmentTitle}} » est confirmé. La livraison sera planifiée bientôt."
+      },
+      "payment_received": {
+        "title": "Paiement reçu",
+        "body": "Le paiement pour « {{equipmentTitle}} » a été confirmé."
+      },
+      "delivery_scheduled": {
+        "title": "Livraison planifiée",
+        "body": "« {{equipmentTitle}} » sera livré le {{slot}}"
+      },
+      "return_reminder": {
+        "title": "Rappel de retour",
+        "body": "« {{equipmentTitle}} » doit être rendu demain. Préparez-le pour la récupération."
+      },
+      "dispute_opened": {
+        "title": "Litige ouvert",
+        "body": "Un litige a été ouvert sur votre réservation. Notre équipe l'examinera sous peu."
+      },
+      "payout_sent": {
+        "title": "Versement envoyé !",
+        "body": "{{amount}} TND pour « {{equipmentTitle}} » est en route vers votre compte."
+      },
+      "general": {
+        "title": "Mise à jour de réservation",
+        "body": "Votre réservation pour « {{equipmentTitle}} » a été mise à jour."
+      }
+    }
+  },
   "common": {
     "search": "Rechercher",
     "searchPlaceholder": "Rechercher du matériel…",
@@ -493,8 +595,20 @@
     "identityVerified": "Identité vérifiée par {{name}}",
     "identityPending": "Vérification d'identité en attente",
     "memberSinceDate": "Membre depuis {{date}}",
+    "memberSince": "Membre depuis {{date}}",
     "basedIn": "Basé à {{location}}",
-    "defaultBio": "{{name}} propose du matériel de qualité sur {{platform}}. Parcourez ses annonces et réservez en confiance."
+    "defaultBio": "{{name}} propose du matériel de qualité sur {{platform}}. Parcourez ses annonces et réservez en confiance.",
+    "verified": "Vérifié",
+    "equipmentOwner": "Propriétaire d'équipement",
+    "noReviewsYet": "Aucun avis pour l'instant",
+    "oneReview": "1 avis",
+    "reviewsCount": "{{count}} avis",
+    "editProfile": "Modifier le profil",
+    "openPublicPage": "Ouvrir la page publique",
+    "statListings": "Annonces",
+    "statReviews": "Avis",
+    "statRating": "Note",
+    "statOnPlatform": "Sur la plateforme"
   },
   "contact": {
     "title": "Nous contacter",
@@ -592,7 +706,16 @@
     "new": "Nouveau",
     "addFavorite": "Ajouter aux favoris",
     "removeFavorite": "Retirer des favoris",
-    "defaultCategory": "Matériel"
+    "defaultCategory": "Matériel",
+    "reviewStatusPending": "En attente d'approbation",
+    "reviewStatusRejected": "Refusé",
+    "reviewListingLabel": "Annonce :"
+  },
+  "paymentStatus": {
+    "PENDING": "En attente",
+    "CONFIRMED": "Confirmé",
+    "PAYOUT_PENDING": "Versement en attente",
+    "PAYOUT_SENT": "Versement envoyé"
   },
   "bookingStatus": {
     "PENDING": "En attente",
@@ -699,7 +822,9 @@
     "completeToRank": "Terminez des locations pour voir le classement.",
     "tableBookingsCol": "Réservations",
     "tableGross": "Brut",
-    "tableNet": "Net"
+    "tableNet": "Net",
+    "vsLastMonth": "{{sign}}{{pct}}% vs le mois dernier",
+    "earningsBarTooltip": "{{month}} : {{amount}} ({{count}} réservations)"
   },
   "listing": {
     "backToListings": "Retour à mes annonces",

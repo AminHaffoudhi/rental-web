@@ -11,7 +11,7 @@ import { useDashboardNav } from "@/hooks/useDashboardNav";
 import { useAuthStore } from "@/store/authStore";
 import { cn } from "@/utils/cn";
 
-function DashboardBreadcrumb({
+function DashboardPageTitle({
   labels,
   fallback,
 }: {
@@ -21,12 +21,9 @@ function DashboardBreadcrumb({
   const location = useLocation();
   const label = labels[location.pathname] ?? fallback;
   return (
-    <div>
-      <PlatformLogo size="sm" linkTo={false} className="mb-1 opacity-90" />
-      <h1 className="font-display text-lg font-semibold leading-tight text-stone-900 dark:text-stone-100">
-        {label}
-      </h1>
-    </div>
+    <h1 className="app-topbar-title min-w-0 truncate font-display text-lg font-semibold leading-tight text-stone-900 dark:text-stone-100">
+      {label}
+    </h1>
   );
 }
 
@@ -43,9 +40,9 @@ function SidebarNav({
 }) {
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <div className="border-b border-[var(--surface-inverse-border)] px-6 py-5">
-        <NavLink to="/" className="inline-flex" onClick={onNavigate}>
-          <PlatformLogo size="lg" linkTo={false} onDarkBackground />
+      <div className="flex justify-center border-b border-[var(--surface-inverse-border)] px-6 py-5">
+        <NavLink to="/" className="inline-flex w-full justify-center" onClick={onNavigate}>
+          <PlatformLogo size="lg" linkTo={false} onDarkBackground centered />
         </NavLink>
       </div>
 
@@ -137,22 +134,48 @@ export function DashboardLayout() {
   const closeMobile = () => setMobileNavOpen(false);
 
   return (
-    <div className="flex h-[100dvh] overflow-hidden bg-canvas">
-      {mobileNavOpen ? (
-        <button
-          type="button"
-          className="fixed inset-0 z-40 bg-black/40 lg:hidden"
-          aria-label={t("dashboard.closeMenu")}
-          onClick={closeMobile}
-        />
-      ) : null}
+    <div className="flex h-[100dvh] flex-col overflow-hidden bg-canvas">
+      <header className="app-topbar z-30 flex h-16 w-full shrink-0 flex-nowrap items-center justify-between gap-3 border-b border-stone-200 bg-canvas-card px-4 sm:px-6 lg:px-8 dark:border-stone-800">
+        <div className="flex min-w-0 flex-1 flex-nowrap items-center gap-3">
+          <button
+            type="button"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-stone-600 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-800 lg:hidden"
+            aria-label={t("dashboard.openMenu")}
+            onClick={() => setMobileNavOpen(true)}
+          >
+            <Menu size={20} />
+          </button>
+          <DashboardPageTitle labels={breadcrumbs} fallback={t("dashboard.defaultTitle")} />
+        </div>
+        <div className="flex shrink-0 flex-nowrap items-center gap-2 sm:gap-3">
+          <LanguageSwitcher compact className="hidden sm:flex" />
+          <ThemeToggle />
+          <NotificationBell />
+          <NavLink
+            to="/profile"
+            className="shrink-0 rounded-full ring-offset-2 ring-offset-[var(--canvas-card)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+          >
+            <UserAvatar user={user} size="sm" />
+          </NavLink>
+        </div>
+      </header>
 
-      <aside
-        className={cn(
-          "fixed inset-y-0 start-0 z-50 flex h-full w-60 shrink-0 flex-col bg-stone-inv transition-transform duration-200 lg:static lg:h-auto lg:translate-x-0",
-          mobileNavOpen ? "translate-x-0" : "-translate-x-full rtl:translate-x-full lg:translate-x-0"
-        )}
-      >
+      <div className="relative flex min-h-0 flex-1 overflow-hidden">
+        {mobileNavOpen ? (
+          <button
+            type="button"
+            className="fixed inset-0 top-16 z-40 bg-black/40 lg:hidden"
+            aria-label={t("dashboard.closeMenu")}
+            onClick={closeMobile}
+          />
+        ) : null}
+
+        <aside
+          className={cn(
+            "fixed bottom-0 start-0 top-16 z-50 flex w-60 shrink-0 flex-col bg-stone-inv transition-transform duration-200 lg:static lg:top-auto lg:h-full lg:translate-x-0",
+            mobileNavOpen ? "translate-x-0" : "-translate-x-full rtl:translate-x-full lg:translate-x-0"
+          )}
+        >
         <button
           type="button"
           className="absolute end-3 top-4 rounded-lg p-2 text-[var(--surface-inverse-muted)] hover:bg-canvas-card/5 hover:text-white lg:hidden"
@@ -170,51 +193,28 @@ export function DashboardLayout() {
         <div className="mt-auto border-t border-[var(--surface-inverse-border)] p-4">
           <div className="mb-3 flex items-center gap-3">
             <UserAvatar user={user} size="sm" />
-            <div className="min-w-0 flex-1">
+            <div className="min-w-0 flex-1 text-start">
               <p className="truncate text-sm font-medium text-[var(--surface-inverse-fg)]">
                 {user?.name}
               </p>
-              <p className="truncate text-xs text-[var(--surface-inverse-muted)]">{user?.email}</p>
+              <p className="truncate text-xs text-[var(--surface-inverse-muted)]" dir="ltr">
+                {user?.email}
+              </p>
             </div>
           </div>
           <button
             type="button"
             onClick={handleLogout}
-            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[var(--surface-inverse-muted)] transition-all duration-150 hover:bg-red-500/10 hover:text-red-400"
+            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-start text-sm text-[var(--surface-inverse-muted)] transition-all duration-150 hover:bg-red-500/10 hover:text-red-400"
           >
             <LogOut size={15} />
             {t("dashboard.logout")}
           </button>
         </div>
-      </aside>
+        </aside>
 
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-        <header className="relative z-30 flex h-16 shrink-0 items-center justify-between overflow-visible border-b border-stone-200 bg-canvas-card px-4 shadow-elevated sm:px-8 dark:border-stone-800">
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              className="flex h-10 w-10 items-center justify-center rounded-full text-stone-600 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-800 lg:hidden"
-              aria-label={t("dashboard.openMenu")}
-              onClick={() => setMobileNavOpen(true)}
-            >
-              <Menu size={20} />
-            </button>
-            <DashboardBreadcrumb labels={breadcrumbs} fallback={t("dashboard.defaultTitle")} />
-          </div>
-          <div className="flex items-center gap-3">
-            <LanguageSwitcher compact className="hidden sm:flex" />
-            <ThemeToggle />
-            <NotificationBell />
-            <NavLink
-              to="/profile"
-              className="rounded-full ring-offset-2 ring-offset-[var(--canvas-card)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
-            >
-              <UserAvatar user={user} size="sm" />
-            </NavLink>
-          </div>
-        </header>
-
-        <main ref={mainRef} className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+          <main ref={mainRef} className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain">
           <div className="mx-auto w-full max-w-7xl p-6 pb-[max(5.5rem,env(safe-area-inset-bottom,0px))] sm:p-8 lg:pb-8">
             <Outlet />
           </div>
@@ -240,7 +240,8 @@ export function DashboardLayout() {
               </NavLink>
             );
           })}
-        </nav>
+          </nav>
+        </div>
       </div>
     </div>
   );

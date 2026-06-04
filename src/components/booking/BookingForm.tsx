@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { PLATFORM_FEE_PERCENT } from "@/config/constants";
 import type { Equipment } from "@/types/equipment";
-import { formatCurrency } from "@/utils/currency";
+import { useLocaleFormat } from "@/hooks/useLocaleFormat";
 import { getDaysBetween } from "@/utils/dates";
 import { startOfDay } from "date-fns";
 import { Headphones, RotateCcw, Shield, Star } from "lucide-react";
@@ -59,6 +59,7 @@ export function BookingForm({
   isSubmitting = false,
 }: BookingFormProps) {
   const { t } = useTranslation();
+  const { formatCurrency } = useLocaleFormat();
   const user = useAuthStore((s) => s.user);
   const [startStr, setStartStr] = useState("");
   const [endStr, setEndStr] = useState("");

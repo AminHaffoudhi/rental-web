@@ -11,11 +11,13 @@ import { useAuthStore } from "@/store/authStore";
 import { PlatformLogo } from "@/components/brand/PlatformLogo";
 import { LanguageSwitcher } from "@/components/shared/LanguageSwitcher";
 import { isOwnerRole } from "@/lib/roles";
+import { useLocaleStore } from "@/store/localeStore";
 import { cn } from "@/utils/cn";
 import { useTranslation } from "react-i18next";
 
 export function Navbar() {
   const { t } = useTranslation();
+  const isArabic = useLocaleStore((s) => s.language === "ar");
   const navigate = useNavigate();
   const location = useLocation();
   const hideNavSearch = location.pathname === "/search";
@@ -78,17 +80,21 @@ export function Navbar() {
     <>
       <header
         className={cn(
-          "sticky top-0 z-50 border-b border-stone-200 bg-canvas-card/95 backdrop-blur-sm transition-all duration-300",
-          scrolled && "shadow-md"
+          "app-topbar sticky top-0 z-50 w-full border-b border-stone-200 bg-canvas-card transition-[box-shadow] duration-300",
+          scrolled && "shadow-sm"
         )}
       >
         <div
           className={cn(
-            "mx-auto flex max-w-7xl items-center gap-4 px-4 transition-all duration-300",
-            scrolled ? "min-h-[64px] py-2 md:min-h-[64px]" : "min-h-[64px] py-3 md:min-h-[76px]"
+            "mx-auto flex h-16 max-w-7xl flex-nowrap items-center gap-3 px-4 sm:gap-4",
+            !scrolled && "md:h-[76px]"
           )}
         >
-          <PlatformLogo size="lg" className="shrink-0" />
+          <PlatformLogo
+            size={isArabic ? "md" : "lg"}
+            className="shrink-0"
+            imgClassName={isArabic ? "max-w-[min(140px,36vw)] sm:max-w-[165px]" : undefined}
+          />
 
           <div
             className={cn(
@@ -116,7 +122,7 @@ export function Navbar() {
             </div>
           </div>
 
-          <div className="ml-auto flex items-center gap-1 md:gap-2">
+          <div className="ms-auto flex shrink-0 items-center gap-1 md:gap-2">
             <LanguageSwitcher compact className="hidden sm:flex" />
             <ThemeToggle className="hidden sm:flex" />
             {!isAuthenticated ? (
@@ -150,12 +156,14 @@ export function Navbar() {
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.96, y: -6 }}
                         transition={{ duration: 0.18 }}
-                        className="absolute right-0 top-full z-50 mt-2 w-64 overflow-hidden rounded-2xl border border-stone-200 bg-canvas-elevated shadow-elevated"
+                        className="absolute end-0 top-full z-50 mt-2 w-64 overflow-hidden rounded-2xl border border-stone-200 bg-canvas-elevated shadow-elevated"
                         role="menu"
                       >
-                        <div className="border-b border-stone-200 bg-stone-100/80 px-4 py-3 dark:bg-stone-800/50">
+                        <div className="border-b border-stone-200 bg-stone-100/80 px-4 py-3 text-start dark:bg-stone-800/50">
                           <p className="truncate text-sm font-semibold text-stone-900">{user?.name}</p>
-                          <p className="truncate text-xs text-stone-500">{user?.email}</p>
+                          <p className="truncate text-xs text-stone-500" dir="ltr">
+                            {user?.email}
+                          </p>
                         </div>
                         <div className="py-1">
                           <Link
@@ -187,7 +195,7 @@ export function Navbar() {
                           </Link>
                           <button
                             type="button"
-                            className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-red-500 transition-colors hover:bg-red-50"
+                            className="flex w-full items-center gap-3 px-4 py-2.5 text-start text-sm text-red-500 transition-colors hover:bg-red-50"
                             onClick={handleLogout}
                           >
                             <LogOut className="h-4 w-4 shrink-0" />
@@ -252,7 +260,8 @@ export function Navbar() {
                     onChange={(e) => setQuery(e.target.value)}
                     onKeyDown={onSearchKeyDown}
                     placeholder={t("nav.searchEquipmentPlaceholder")}
-                    className="input w-full rounded-full border-stone-200 bg-stone-100 py-3 ltr:pl-11 ltr:pr-4 rtl:pr-11 rtl:pl-4 focus:border-brand-500 focus:bg-canvas-card focus:shadow-elevated"
+                    dir={isArabic ? "rtl" : "ltr"}
+                    className="input w-full rounded-full border-stone-200 bg-stone-100 py-3 text-start ltr:pl-11 ltr:pr-4 rtl:pr-11 rtl:pl-4 focus:border-brand-500 focus:bg-canvas-card focus:shadow-elevated"
                   />
                 </div>
 
@@ -275,31 +284,33 @@ export function Navbar() {
                   </div>
                 ) : (
                   <div className="flex flex-col gap-2 border-t border-stone-200 pt-4">
-                    <p className="text-xs font-medium uppercase tracking-wide text-stone-400">{t("nav.account")}</p>
+                    <p className="text-start text-xs font-medium uppercase tracking-wide text-stone-400">
+                      {t("nav.account")}
+                    </p>
                     <Link
                       to="/dashboard"
-                      className="rounded-lg px-3 py-2 text-stone-800 hover:bg-stone-100 dark:text-stone-200 dark:hover:bg-stone-800"
+                      className="block rounded-lg px-3 py-2 text-start text-stone-800 hover:bg-stone-100 dark:text-stone-200 dark:hover:bg-stone-800"
                       onClick={() => setMobileOpen(false)}
                     >
                       {isOwner ? t("nav.ownerDashboard") : t("nav.myAccount")}
                     </Link>
                     <Link
                       to="/bookings"
-                      className="rounded-lg px-3 py-2 text-stone-800 hover:bg-stone-100"
+                      className="block rounded-lg px-3 py-2 text-start text-stone-800 hover:bg-stone-100"
                       onClick={() => setMobileOpen(false)}
                     >
                       {t("nav.myBookings")}
                     </Link>
                     <Link
                       to="/profile"
-                      className="rounded-lg px-3 py-2 text-stone-800 hover:bg-stone-100 dark:text-stone-200 dark:hover:bg-stone-800"
+                      className="block rounded-lg px-3 py-2 text-start text-stone-800 hover:bg-stone-100 dark:text-stone-200 dark:hover:bg-stone-800"
                       onClick={() => setMobileOpen(false)}
                     >
                       {isOwner ? t("nav.profileSettings") : t("nav.accountSettings")}
                     </Link>
                     <button
                       type="button"
-                      className="rounded-lg px-3 py-2 text-left text-red-600 hover:bg-red-50"
+                      className="rounded-lg px-3 py-2 text-start text-red-600 hover:bg-red-50"
                       onClick={() => {
                         handleLogout();
                         setMobileOpen(false);

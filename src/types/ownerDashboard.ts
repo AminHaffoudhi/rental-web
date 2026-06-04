@@ -52,6 +52,7 @@ export interface OwnerTopEquipment {
 
 export interface OwnerEquipmentByCategory {
   categoryId: string;
+  categorySlug: string;
   categoryName: string;
   count: number;
 }

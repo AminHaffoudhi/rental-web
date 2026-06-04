@@ -5,12 +5,23 @@ import { BookingsPageHeader } from "@/components/booking/BookingsPageHeader";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { useMyBookings } from "@/hooks/useBooking";
 import type { Booking } from "@/types/booking";
+import { useLocaleFormat } from "@/hooks/useLocaleFormat";
+import { useLocaleStore } from "@/store/localeStore";
 import { formatCurrency } from "@/utils/currency";
 import { formatDateRange } from "@/utils/dates";
 type SortKey = "equipment" | "renter" | "period" | "gross" | "fee" | "net" | "status" | "date";
 
+function paymentStatusLabel(status: string | undefined, t: (key: string) => string): string {
+  if (!status) return "—";
+  const key = `paymentStatus.${status}`;
+  const translated = t(key);
+  return translated !== key ? translated : status.replace(/_/g, " ").toLowerCase();
+}
+
 export function DashboardEarnings() {
   const { t } = useTranslation();
+  const { formatDisplayDate } = useLocaleFormat();
+  const language = useLocaleStore((s) => s.language);
   const { bookings, isLoading } = useMyBookings();
   const [sortKey, setSortKey] = useState<SortKey>("date");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
@@ -116,7 +127,10 @@ export function DashboardEarnings() {
           />
         </div>
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-stone-200 bg-canvas-card shadow-elevated">
+        <div
+          key={language}
+          className="overflow-hidden rounded-2xl border border-stone-200 bg-canvas-card shadow-elevated"
+        >
           <div className="overflow-x-auto">
             <table className="w-full min-w-[900px] text-sm">
               <thead>
@@ -167,10 +181,12 @@ export function DashboardEarnings() {
                       {formatCurrency(net(b))}
                     </td>
                     <td className="px-4 py-3">
-                      <span className="badge badge-stone">{b.payment?.status ?? "—"}</span>
+                      <span className="badge badge-stone">
+                        {paymentStatusLabel(b.payment?.status, t)}
+                      </span>
                     </td>
                     <td className="px-4 py-3 text-stone-500">
-                      {new Date(b.createdAt).toLocaleDateString()}
+                      {formatDisplayDate(b.createdAt, "P")}
                     </td>
                   </tr>
                 ))}

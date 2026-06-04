@@ -5,6 +5,108 @@
     "fr": "Français",
     "ar": "العربية"
   },
+  "notifications": {
+    "title": "Notifications",
+    "ariaLabel": "Notifications",
+    "newBadge": "{{count}} new",
+    "readAll": "Read all",
+    "enableTitle": "Enable push notifications",
+    "enableDesc": "Get instant alerts for bookings, payments, and updates",
+    "enableBtn": "Enable Notifications →",
+    "enabling": "Enabling…",
+    "emptyTitle": "All caught up",
+    "emptyDesc": "Notifications about bookings, payments, and updates appear here",
+    "view": "View",
+    "dismiss": "Dismiss",
+    "clearAll": "Clear all",
+    "count": "{{count}} notification",
+    "count_plural": "{{count}} notifications",
+    "someone": "Someone",
+    "yourListing": "your listing",
+    "defaultReason": "Please review the requirements and try again.",
+    "types": {
+      "kyc_submitted": {
+        "title": "Identity document under review",
+        "body": "Our team is reviewing your submission. We'll notify you when it's complete."
+      },
+      "kyc_approved": {
+        "title": "You're verified — start listing equipment",
+        "body": "Your identity has been approved. You can now create listings and start earning."
+      },
+      "kyc_rejected": {
+        "title": "Identity verification needs attention",
+        "body": "Your document was not accepted: {{reason}}. Please re-upload."
+      },
+      "equipment_pending": {
+        "title": "Listing submitted for review",
+        "body": "\"{{equipmentTitle}}\" is waiting for admin approval."
+      },
+      "equipment_approved": {
+        "title": "Listing approved",
+        "body": "\"{{equipmentTitle}}\" was approved. Turn on visibility when you're ready to go live."
+      },
+      "equipment_rejected": {
+        "title": "Listing needs changes",
+        "body": "\"{{equipmentTitle}}\" was not approved: {{reason}}"
+      },
+      "review_equipment_received": {
+        "title": "New review on your listing",
+        "body": "{{reviewerName}} reviewed \"{{equipmentTitle}}\" — pending approval."
+      },
+      "review_owner_received": {
+        "title": "New review on your profile",
+        "body": "{{reviewerName}} left you a review — pending approval."
+      },
+      "review_approved_listing": {
+        "title": "Listing review published",
+        "body": "A review from {{reviewerName}} on \"{{equipmentTitle}}\" is now live."
+      },
+      "review_approved_profile": {
+        "title": "Profile review published",
+        "body": "A review from {{reviewerName}} is now visible on your profile."
+      },
+      "booking_request": {
+        "title": "New booking request",
+        "body": "{{renterName}} requested to rent \"{{equipmentTitle}}\"."
+      },
+      "booking_approved": {
+        "title": "Booking approved",
+        "body": "Your request for \"{{equipmentTitle}}\" was approved. Complete payment to confirm."
+      },
+      "booking_rejected": {
+        "title": "Booking declined",
+        "body": "Your request for \"{{equipmentTitle}}\" was not approved."
+      },
+      "payment_confirmed": {
+        "title": "Payment confirmed",
+        "body": "Payment for \"{{equipmentTitle}}\" was confirmed. Delivery will be scheduled soon."
+      },
+      "payment_received": {
+        "title": "Payment received",
+        "body": "Payment for \"{{equipmentTitle}}\" has been confirmed."
+      },
+      "delivery_scheduled": {
+        "title": "Delivery scheduled",
+        "body": "\"{{equipmentTitle}}\" will be delivered on {{slot}}"
+      },
+      "return_reminder": {
+        "title": "Return reminder",
+        "body": "\"{{equipmentTitle}}\" is due back tomorrow. Please have it ready for pickup."
+      },
+      "dispute_opened": {
+        "title": "Dispute opened",
+        "body": "A dispute has been raised on your booking. Our team will review it shortly."
+      },
+      "payout_sent": {
+        "title": "Payout sent!",
+        "body": "{{amount}} TND for \"{{equipmentTitle}}\" is on its way to your account."
+      },
+      "general": {
+        "title": "Booking update",
+        "body": "Your booking for \"{{equipmentTitle}}\" was updated."
+      }
+    }
+  },
   "common": {
     "search": "Search",
     "searchPlaceholder": "Search equipment…",
@@ -493,8 +595,20 @@
     "identityVerified": "Identity verified by {{name}}",
     "identityPending": "Identity verification pending",
     "memberSinceDate": "Member since {{date}}",
+    "memberSince": "Member since {{date}}",
     "basedIn": "Based in {{location}}",
-    "defaultBio": "{{name}} rents out quality equipment on {{platform}}. Browse their listings below and book with confidence."
+    "defaultBio": "{{name}} rents out quality equipment on {{platform}}. Browse their listings below and book with confidence.",
+    "verified": "Verified",
+    "equipmentOwner": "Equipment owner",
+    "noReviewsYet": "No reviews yet",
+    "oneReview": "1 review",
+    "reviewsCount": "{{count}} reviews",
+    "editProfile": "Edit profile",
+    "openPublicPage": "Open public page",
+    "statListings": "Listings",
+    "statReviews": "Reviews",
+    "statRating": "Rating",
+    "statOnPlatform": "On platform"
   },
   "contact": {
     "title": "Contact us",
@@ -592,7 +706,16 @@
     "new": "New",
     "addFavorite": "Add to favorites",
     "removeFavorite": "Remove from favorites",
-    "defaultCategory": "Equipment"
+    "defaultCategory": "Equipment",
+    "reviewStatusPending": "Pending approval",
+    "reviewStatusRejected": "Rejected",
+    "reviewListingLabel": "Listing:"
+  },
+  "paymentStatus": {
+    "PENDING": "Pending",
+    "CONFIRMED": "Confirmed",
+    "PAYOUT_PENDING": "Payout pending",
+    "PAYOUT_SENT": "Payout sent"
   },
   "bookingStatus": {
     "PENDING": "Pending",
@@ -699,7 +822,9 @@
     "completeToRank": "Complete rentals to see performance rankings.",
     "tableBookingsCol": "Bookings",
     "tableGross": "Gross",
-    "tableNet": "Net"
+    "tableNet": "Net",
+    "vsLastMonth": "{{sign}}{{pct}}% vs last month",
+    "earningsBarTooltip": "{{month}}: {{amount}} ({{count}} bookings)"
   },
   "listing": {
     "backToListings": "Back to my listings",

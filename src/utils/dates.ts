@@ -1,12 +1,18 @@
 import { eachDayOfInterval, format, parseISO } from "date-fns";
+import type { AppLanguage } from "@/i18n";
+import { useLocaleStore } from "@/store/localeStore";
+import { formatDateRangeLocalized, formatDisplayDate } from "@/utils/localeFormat";
 
-export function formatDate(date: string | Date): string {
-  const d = typeof date === "string" ? parseISO(date) : date;
-  return format(d, "MMM d, yyyy");
+function activeLanguage(language?: AppLanguage): AppLanguage {
+  return language ?? useLocaleStore.getState().language;
 }
 
-export function formatDateRange(start: string, end: string): string {
-  return `${formatDate(start)} – ${formatDate(end)}`;
+export function formatDate(date: string | Date, language?: AppLanguage): string {
+  return formatDisplayDate(date, activeLanguage(language), "MMM d, yyyy");
+}
+
+export function formatDateRange(start: string, end: string, language?: AppLanguage): string {
+  return formatDateRangeLocalized(start, end, activeLanguage(language));
 }
 
 export function getDaysBetween(start: string, end: string): number {

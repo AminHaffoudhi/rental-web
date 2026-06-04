@@ -7,6 +7,8 @@ import type {
   OwnerEarningsMonth,
 } from "@/types/ownerDashboard";
 import type { BookingStatus } from "@/types/booking";
+import { useLocaleFormat } from "@/hooks/useLocaleFormat";
+import { localizedCategory } from "@/i18n/categoryLocale";
 import { formatCurrency } from "@/utils/currency";
 import { cn } from "@/utils/cn";
 
@@ -64,6 +66,7 @@ function ChartCard({
 
 export function EarningsBarChart({ months }: { months: OwnerEarningsMonth[] }) {
   const { t } = useTranslation();
+  const { formatMonthShort } = useLocaleFormat();
   const max = Math.max(...months.map((m) => m.net), 1);
 
   return (
@@ -83,10 +86,16 @@ export function EarningsBarChart({ months }: { months: OwnerEarningsMonth[] }) {
                   <div
                     className="w-full rounded-t-lg bg-gradient-to-t from-brand-600 to-brand-400 transition-all duration-500"
                     style={{ height: `${pct}%`, minHeight: m.net > 0 ? "0.5rem" : 0 }}
-                    title={`${m.label}: ${formatCurrency(m.net)} (${m.bookings} bookings)`}
+                    title={t("charts.earningsBarTooltip", {
+                      month: formatMonthShort(m.month),
+                      amount: formatCurrency(m.net),
+                      count: m.bookings,
+                    })}
                   />
                 </div>
-                <span className="text-[10px] font-medium text-stone-500 sm:text-xs">{m.label}</span>
+                <span className="text-[10px] font-medium text-stone-500 sm:text-xs">
+                  {formatMonthShort(m.month)}
+                </span>
               </div>
             );
           })}
@@ -98,6 +107,7 @@ export function EarningsBarChart({ months }: { months: OwnerEarningsMonth[] }) {
 
 export function BookingsTrendChart({ days }: { days: OwnerBookingsTrendDay[] }) {
   const { t } = useTranslation();
+  const { formatChartDayLabel } = useLocaleFormat();
   const max = Math.max(...days.map((d) => d.count), 1);
   const w = 100;
   const h = 48;
@@ -149,9 +159,15 @@ export function BookingsTrendChart({ days }: { days: OwnerBookingsTrendDay[] }) 
           ) : null}
         </svg>
         <div className="mt-2 flex justify-between text-[10px] text-stone-400 sm:text-xs">
-          <span>{days[0]?.label}</span>
-          <span>{days[Math.floor(days.length / 2)]?.label}</span>
-          <span>{days[days.length - 1]?.label}</span>
+          <span>{days[0] ? formatChartDayLabel(days[0].date) : ""}</span>
+          <span>
+            {days[Math.floor(days.length / 2)]
+              ? formatChartDayLabel(days[Math.floor(days.length / 2)].date)
+              : ""}
+          </span>
+          <span>
+            {days[days.length - 1] ? formatChartDayLabel(days[days.length - 1].date) : ""}
+          </span>
         </div>
       </div>
     </ChartCard>
@@ -216,7 +232,7 @@ export function BookingsStatusChart({
               </span>
               <span className="shrink-0 tabular-nums font-semibold text-stone-900">
                 {s.count}
-                <span className="ml-1 text-xs font-normal text-stone-400">
+                <span className="ms-1 text-xs font-normal text-stone-400">
                   ({Math.round(s.pct)}%)
                 </span>
               </span>
@@ -299,10 +315,16 @@ export function CategoryBreakdownChart({
         <p className="py-6 text-center text-sm text-stone-500">{t("charts.noCategories")}</p>
       ) : (
         <ul className="space-y-3">
-          {categories.map((c, i) => (
+          {categories.map((c, i) => {
+            const catLabel = localizedCategory(
+              c.categorySlug ?? c.categoryId,
+              { name: c.categoryName },
+              t
+            ).name;
+            return (
             <li key={c.categoryId}>
               <div className="mb-1 flex justify-between gap-2 text-sm">
-                <span className="min-w-0 truncate text-stone-600">{c.categoryName}</span>
+                <span className="min-w-0 truncate text-stone-600">{catLabel}</span>
                 <span className="shrink-0 font-semibold tabular-nums text-stone-900">
                   {c.count}
                 </span>
@@ -317,7 +339,8 @@ export function CategoryBreakdownChart({
                 />
               </div>
             </li>
-          ))}
+            );
+          })}
         </ul>
       )}
     </ChartCard>
@@ -390,6 +413,7 @@ export function TopEquipmentTable({
 }
 
 export function MonthChangeBadge({ pct }: { pct: number | null }) {
+  const { t } = useTranslation();
   if (pct === null) return null;
   const up = pct >= 0;
   const Icon = up ? TrendingUp : TrendingDown;
@@ -401,8 +425,10 @@ export function MonthChangeBadge({ pct }: { pct: number | null }) {
       )}
     >
       <Icon className="h-3 w-3" aria-hidden />
-      {up ? "+" : ""}
-      {pct}% vs last month
+      {t("charts.vsLastMonth", {
+        sign: up ? "+" : "",
+        pct: Math.abs(pct),
+      })}
     </span>
   );
 }

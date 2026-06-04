@@ -143,12 +143,12 @@ export function PublicProfile() {
     t("profile.defaultBio", { name: profile.name, platform: PLATFORM_NAME });
 
   return (
-    <div className="min-h-screen bg-canvas">
-      <div className="border-b border-stone-200 bg-canvas-card/80">
-        <div className="container flex items-center gap-2 py-3">
+    <div className="relative min-h-screen bg-canvas">
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-20">
+        <div className="container flex py-4">
           <Link
             to="/search"
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-stone-600 transition-colors hover:text-brand-600"
+            className="pointer-events-auto inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-stone-900/40 px-3.5 py-2 text-sm font-medium text-white shadow-lg backdrop-blur-md transition-colors hover:bg-stone-900/55"
           >
             <ArrowLeft className="h-4 w-4 rtl:rotate-180" aria-hidden />
             {t("profile.backToSearch")}
@@ -158,39 +158,39 @@ export function PublicProfile() {
 
       <OwnerProfileHero profile={profile} isOwnProfile={isOwnProfile} />
 
-      <div className="container py-10">
-        <div className="flex flex-wrap gap-2 border-b border-stone-200 pb-4">
-          {tabs.map((t) => {
-            const active = tab === t.id;
+      <div className="container pb-16 pt-2">
+        <div className="flex flex-wrap gap-1.5 rounded-2xl border border-stone-200 bg-canvas-card p-1.5 shadow-sm dark:border-stone-700 dark:bg-stone-900 sm:gap-2">
+          {tabs.map((tabItem) => {
+            const active = tab === tabItem.id;
             return (
               <button
-                key={t.id}
+                key={tabItem.id}
                 type="button"
-                onClick={() => setTab(t.id)}
+                onClick={() => setTab(tabItem.id)}
                 className={cn(
-                  "inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-all",
+                  "inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all sm:flex-none sm:justify-start sm:px-4",
                   active
                     ? "bg-brand-500 text-white shadow-warm"
-                    : "bg-canvas-card text-stone-600 ring-1 ring-stone-200 hover:bg-stone-100"
+                    : "text-stone-600 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-800"
                 )}
               >
-                <t.icon className="h-4 w-4" aria-hidden />
-                {t.label}
-                {t.id === "listings" ? (
+                <tabItem.icon className="h-4 w-4 shrink-0" aria-hidden />
+                <span className="truncate">{tabItem.label}</span>
+                {tabItem.id === "listings" ? (
                   <span
                     className={cn(
-                      "rounded-full px-1.5 py-0.5 text-[11px] tabular-nums",
-                      active ? "bg-white/20" : "bg-stone-100"
+                      "shrink-0 rounded-full px-1.5 py-0.5 text-[11px] tabular-nums",
+                      active ? "bg-white/20" : "bg-stone-100 dark:bg-stone-800"
                     )}
                   >
                     {profile.stats.listings}
                   </span>
                 ) : null}
-                {t.id === "reviews" ? (
+                {tabItem.id === "reviews" ? (
                   <span
                     className={cn(
-                      "rounded-full px-1.5 py-0.5 text-[11px] tabular-nums",
-                      active ? "bg-white/20" : "bg-stone-100"
+                      "shrink-0 rounded-full px-1.5 py-0.5 text-[11px] tabular-nums",
+                      active ? "bg-white/20" : "bg-stone-100 dark:bg-stone-800"
                     )}
                   >
                     {profile.stats.reviews}
@@ -206,16 +206,16 @@ export function PublicProfile() {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.25 }}
-          className="mt-8"
+          className="mt-10"
         >
           {tab === "listings" ? (
             <div>
               <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
                 <div>
-                  <h2 className="font-display text-xl font-semibold text-stone-900">
+                  <h2 className="font-display text-xl font-semibold text-stone-900 dark:text-stone-100">
                     {t("profile.availableEquipment")}
                   </h2>
-                  <p className="mt-1 text-sm text-stone-500">
+                  <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
                     {profile.stats.listings === 0
                       ? t("profile.noLiveListings")
                       : profile.stats.listings === 1
@@ -250,10 +250,12 @@ export function PublicProfile() {
 
           {tab === "reviews" ? (
             <div className="mx-auto max-w-2xl space-y-6">
-              <h2 className="font-display text-xl font-semibold text-stone-900">
+              <h2 className="font-display text-xl font-semibold text-stone-900 dark:text-stone-100">
                 {t("equipment.reviews")}
               </h2>
-              <p className="text-sm text-stone-500">{t("profile.reviewsHostSubtitle")}</p>
+              <p className="text-sm text-stone-500 dark:text-stone-400">
+                {t("profile.reviewsHostSubtitle")}
+              </p>
               {currentUser &&
               !isOwnProfile &&
               (profile.role === "OWNER" || profile.role === "BOTH") ? (
@@ -281,10 +283,14 @@ export function PublicProfile() {
                   ))}
                 </div>
               ) : (
-                <div className="rounded-2xl border border-dashed border-stone-200 bg-canvas-card px-6 py-12 text-center">
-                  <Sparkles className="mx-auto h-10 w-10 text-stone-300" aria-hidden />
-                  <p className="mt-3 font-medium text-stone-700">{t("profile.noReviewsHostTitle")}</p>
-                  <p className="mt-1 text-sm text-stone-500">{t("profile.noReviewsHostBody")}</p>
+                <div className="rounded-2xl border border-dashed border-stone-200 bg-canvas-card px-6 py-12 text-center dark:border-stone-700 dark:bg-stone-900">
+                  <Sparkles className="mx-auto h-10 w-10 text-stone-300 dark:text-stone-600" aria-hidden />
+                  <p className="mt-3 font-medium text-stone-700 dark:text-stone-200">
+                    {t("profile.noReviewsHostTitle")}
+                  </p>
+                  <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
+                    {t("profile.noReviewsHostBody")}
+                  </p>
                 </div>
               )}
             </div>
@@ -292,19 +298,19 @@ export function PublicProfile() {
 
           {tab === "about" ? (
             <div className="mx-auto max-w-2xl space-y-6">
-              <div className="rounded-2xl border border-stone-200 bg-canvas-card p-6 shadow-sm">
-                <h2 className="font-display text-xl font-semibold text-stone-900">
+              <div className="rounded-2xl border border-stone-200 bg-canvas-card p-6 shadow-sm dark:border-stone-700 dark:bg-stone-900">
+                <h2 className="font-display text-xl font-semibold text-stone-900 dark:text-stone-100">
                   {t("profile.aboutSectionTitle")}
                 </h2>
-                <p className="mt-4 whitespace-pre-wrap text-sm leading-relaxed text-stone-600">
+                <p className="mt-4 whitespace-pre-wrap text-sm leading-relaxed text-stone-600 dark:text-stone-300">
                   {bioText}
                 </p>
               </div>
-              <div className="rounded-2xl border border-stone-200 bg-canvas-card p-6 shadow-sm">
-                <h3 className="text-sm font-semibold uppercase tracking-wide text-stone-400">
+              <div className="rounded-2xl border border-stone-200 bg-canvas-card p-6 shadow-sm dark:border-stone-700 dark:bg-stone-900">
+                <h3 className="text-sm font-semibold uppercase tracking-wide text-stone-400 dark:text-stone-500">
                   {t("profile.trustTitle")}
                 </h3>
-                <ul className="mt-4 space-y-3 text-sm text-stone-600">
+                <ul className="mt-4 space-y-3 text-sm text-stone-600 dark:text-stone-300">
                   <li className="flex gap-2">
                     <span className="text-brand-500">✓</span>
                     {profile.kycStatus === "APPROVED"

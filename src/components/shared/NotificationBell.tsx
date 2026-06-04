@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useClickOutside } from "@/hooks/useClickOutside";
-import { formatDistanceToNow } from "date-fns";
+import { useLocaleFormat } from "@/hooks/useLocaleFormat";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   BadgeCheck,
@@ -46,6 +47,7 @@ import {
   markNotificationRead,
 } from "@/lib/notificationState";
 import { cleanNotificationTitle } from "@/lib/notificationDisplay";
+import { localizeNotification } from "@/lib/localizeNotification";
 import {
   equipmentIdFromNotification,
   notificationTargetPath,
@@ -59,6 +61,8 @@ export interface AppNotification {
   url?: string;
   timestamp: Date;
   read: boolean;
+  /** OneSignal / API metadata for localized copy */
+  data?: Record<string, unknown>;
 }
 
 type NotificationVisual = {
@@ -127,6 +131,8 @@ interface ApiNotificationRow {
 }
 
 export default function NotificationBell() {
+  const { t } = useTranslation();
+  const { formatRelativeTime } = useLocaleFormat();
   const navigate = useNavigate();
   const token = useAuthStore((s) => s.token);
   const [open, setOpen] = useState(false);
@@ -168,6 +174,7 @@ export default function NotificationBell() {
         body,
         type,
         url,
+        data,
         timestamp: new Date(),
         read: false,
       });
@@ -308,7 +315,7 @@ export default function NotificationBell() {
           "relative flex h-9 w-9 items-center justify-center rounded-full transition-all duration-150",
           open ? "bg-brand-50 text-brand-500" : "text-stone-400 hover:bg-stone-100 hover:text-stone-700"
         )}
-        aria-label="Notifications"
+        aria-label={t("notifications.ariaLabel")}
       >
         <AnimatePresence mode="wait">
           {unread > 0 ? (
@@ -338,7 +345,7 @@ export default function NotificationBell() {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0 }}
-              className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-brand-500 px-1 text-[10px] font-bold leading-none text-white shadow-sm"
+              className="absolute -end-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-brand-500 px-1 text-[10px] font-bold leading-none text-white shadow-sm"
             >
               {unread > 9 ? "9+" : unread}
             </motion.span>
@@ -353,14 +360,20 @@ export default function NotificationBell() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: -6 }}
             transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute right-0 top-11 z-[100] w-[340px] overflow-hidden rounded-2xl border border-stone-200 bg-canvas-elevated shadow-elevated"
+            className="absolute end-0 top-11 z-[100] w-[min(340px,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-stone-200 bg-canvas-elevated shadow-elevated"
             role="menu"
           >
-            <div className="flex items-center justify-between border-b border-stone-200 bg-stone-100/80 px-4 py-3">
+            <div className="flex items-center justify-between border-b border-stone-200 bg-stone-100/80 px-4 py-3 text-start">
               <div className="flex items-center gap-2">
                 <Bell size={13} className="text-stone-400" />
-                <span className="text-sm font-semibold text-stone-800">Notifications</span>
-                {unread > 0 ? <span className="badge badge-brand text-[10px]">{unread} new</span> : null}
+                <span className="text-sm font-semibold text-stone-800 dark:text-stone-100">
+                  {t("notifications.title")}
+                </span>
+                {unread > 0 ? (
+                  <span className="badge badge-brand text-[10px]">
+                    {t("notifications.newBadge", { count: unread })}
+                  </span>
+                ) : null}
               </div>
               <div className="flex items-center gap-1">
                 {unread > 0 ? (
@@ -370,7 +383,7 @@ export default function NotificationBell() {
                     className="flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-semibold text-brand-500 transition-all hover:bg-brand-50 hover:text-brand-600"
                   >
                     <CheckCheck size={12} />
-                    Read all
+                    {t("notifications.readAll")}
                   </button>
                 ) : null}
               </div>
@@ -384,10 +397,10 @@ export default function NotificationBell() {
                   </div>
                   <div className="flex-1">
                     <p className="text-xs font-semibold text-brand-900 dark:text-brand-100">
-                      Enable push notifications
+                      {t("notifications.enableTitle")}
                     </p>
                     <p className="mt-0.5 text-[11px] leading-relaxed text-brand-700 dark:text-brand-300">
-                      Get instant alerts for bookings, payments, and updates
+                      {t("notifications.enableDesc")}
                     </p>
                     <button
                       type="button"
@@ -395,7 +408,7 @@ export default function NotificationBell() {
                       disabled={requesting}
                       className="btn btn-primary btn-sm mt-2 w-full"
                     >
-                      {requesting ? "Enabling…" : "Enable Notifications →"}
+                      {requesting ? t("notifications.enabling") : t("notifications.enableBtn")}
                     </button>
                   </div>
                 </div>
@@ -408,11 +421,11 @@ export default function NotificationBell() {
                   <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-stone-100">
                     <Bell size={22} className="text-stone-300" />
                   </div>
-                  <p className="text-sm font-semibold text-stone-700">All caught up</p>
+                  <p className="text-sm font-semibold text-stone-700 dark:text-stone-200">
+                    {t("notifications.emptyTitle")}
+                  </p>
                   <p className="mt-1 text-xs leading-relaxed text-stone-400">
-                    Notifications about bookings,
-                    <br />
-                    payments, and updates appear here
+                    {t("notifications.emptyDesc")}
                   </p>
                 </div>
               ) : (
@@ -420,6 +433,7 @@ export default function NotificationBell() {
                   {notifications.map((n) => {
                     const config = TYPE_CONFIG[n.type] ?? TYPE_CONFIG.general;
                     const { Icon } = config;
+                    const { title: localizedTitle, body: localizedBody } = localizeNotification(n, t);
                     return (
                       <motion.div
                         key={n.id}
@@ -463,32 +477,32 @@ export default function NotificationBell() {
                           <Icon size={16} strokeWidth={2} className={config.iconClass} aria-hidden />
                         </div>
 
-                        <div className="min-w-0 flex-1 pr-4">
+                        <div className="min-w-0 flex-1 pe-4 text-start">
                           <p
                             className={cn(
                               "text-[13px] leading-snug",
                               n.read ? "text-stone-600" : "font-semibold text-stone-900 dark:text-stone-100"
                             )}
                           >
-                            {cleanNotificationTitle(n.title)}
+                            {localizedTitle}
                           </p>
-                          <p className="mt-0.5 line-clamp-2 text-[11px] leading-relaxed text-stone-500">
-                            {n.body}
+                          <p className="mt-0.5 line-clamp-2 text-[11px] leading-relaxed text-stone-500 dark:text-stone-400">
+                            {localizedBody}
                           </p>
                           <div className="mt-1.5 flex items-center gap-3">
                             <span className="text-[10px] text-stone-400">
-                              {formatDistanceToNow(n.timestamp, { addSuffix: true })}
+                              {formatRelativeTime(n.timestamp)}
                             </span>
                             {n.url ? (
                               <span className="flex items-center gap-0.5 text-[10px] font-semibold text-brand-500">
-                                View <ExternalLink size={9} />
+                                {t("notifications.view")} <ExternalLink size={9} />
                               </span>
                             ) : null}
                           </div>
                         </div>
 
                         {!n.read ? (
-                          <div className="absolute right-8 top-4 h-2 w-2 rounded-full bg-brand-500" />
+                          <div className="absolute end-8 top-4 h-2 w-2 rounded-full bg-brand-500" />
                         ) : null}
 
                         <button
@@ -497,8 +511,8 @@ export default function NotificationBell() {
                             e.stopPropagation();
                             dismiss(n.id);
                           }}
-                          className="absolute right-2.5 top-2.5 flex h-5 w-5 items-center justify-center rounded-full bg-stone-100 opacity-0 transition-opacity hover:bg-stone-200 group-hover:opacity-100"
-                          aria-label="Dismiss"
+                          className="absolute end-2.5 top-2.5 flex h-5 w-5 items-center justify-center rounded-full bg-stone-100 opacity-0 transition-opacity hover:bg-stone-200 group-hover:opacity-100"
+                          aria-label={t("notifications.dismiss")}
                         >
                           <X size={10} className="text-stone-500" />
                         </button>
@@ -512,14 +526,16 @@ export default function NotificationBell() {
             {notifications.length > 0 ? (
               <div className="flex items-center justify-between border-t border-stone-200 bg-stone-100/80 px-4 py-2.5">
                 <span className="text-[11px] text-stone-400">
-                  {notifications.length} notification{notifications.length !== 1 ? "s" : ""}
+                  {notifications.length === 1
+                    ? t("notifications.count", { count: notifications.length })
+                    : t("notifications.count_plural", { count: notifications.length })}
                 </span>
                 <button
                   type="button"
                   onClick={clearAll}
                   className="text-[11px] font-medium text-stone-400 transition-colors hover:text-red-500"
                 >
-                  Clear all
+                  {t("notifications.clearAll")}
                 </button>
               </div>
             ) : null}

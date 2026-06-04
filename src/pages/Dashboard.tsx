@@ -29,6 +29,7 @@ import { useMyBookings } from "@/hooks/useBooking";
 import { useOwnerDashboard } from "@/hooks/useOwnerDashboard";
 import * as authService from "@/services/auth.service";
 import { useAuthStore } from "@/store/authStore";
+import { useLocaleStore } from "@/store/localeStore";
 import { isOwnerRole } from "@/lib/roles";
 import { formatCurrency } from "@/utils/currency";
 import { formatDateRange } from "@/utils/dates";
@@ -93,6 +94,7 @@ function StatCard({
 
 export function Dashboard() {
   const { t } = useTranslation();
+  const language = useLocaleStore((s) => s.language);
   const user = useAuthStore((s) => s.user);
   const setUser = useAuthStore((s) => s.setUser);
   const { data: dashboard, isLoading: dashLoading, canFetch } = useOwnerDashboard();
@@ -274,7 +276,7 @@ export function Dashboard() {
             </div>
           ) : dashboard ? (
             <>
-              <div className="grid gap-5 lg:grid-cols-2">
+              <div key={language} className="grid gap-5 lg:grid-cols-2">
                 <EarningsBarChart months={dashboard.earningsByMonth} />
                 <BookingsTrendChart days={dashboard.bookingsTrend} />
               </div>

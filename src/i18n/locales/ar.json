@@ -5,6 +5,108 @@
     "fr": "Français",
     "ar": "العربية"
   },
+  "notifications": {
+    "title": "الإشعارات",
+    "ariaLabel": "الإشعارات",
+    "newBadge": "{{count}} جديد",
+    "readAll": "تعليم الكل كمقروء",
+    "enableTitle": "تفعيل الإشعارات الفورية",
+    "enableDesc": "تلقّ تنبيهات فورية للحجوزات والمدفوعات والتحديثات",
+    "enableBtn": "تفعيل الإشعارات ←",
+    "enabling": "جاري التفعيل…",
+    "emptyTitle": "لا جديد حالياً",
+    "emptyDesc": "تظهر هنا إشعارات الحجوزات والمدفوعات والتحديثات",
+    "view": "عرض",
+    "dismiss": "إغلاق",
+    "clearAll": "مسح الكل",
+    "count": "{{count}} إشعار",
+    "count_plural": "{{count}} إشعارات",
+    "someone": "شخص ما",
+    "yourListing": "إعلانك",
+    "defaultReason": "يرجى مراجعة المتطلبات والمحاولة مرة أخرى.",
+    "types": {
+      "kyc_submitted": {
+        "title": "وثيقة الهوية قيد المراجعة",
+        "body": "فريقنا يراجع طلبك. سنُعلمك عند الانتهاء."
+      },
+      "kyc_approved": {
+        "title": "تم التحقق — ابدأ بنشر المعدات",
+        "body": "تمت الموافقة على هويتك. يمكنك الآن إنشاء إعلانات والبدء في الكسب."
+      },
+      "kyc_rejected": {
+        "title": "التحقق من الهوية يحتاج انتباهك",
+        "body": "لم تُقبل وثيقتك: {{reason}}. يرجى إعادة الرفع."
+      },
+      "equipment_pending": {
+        "title": "تم إرسال الإعلان للمراجعة",
+        "body": "«{{equipmentTitle}}» بانتظار موافقة الإدارة."
+      },
+      "equipment_approved": {
+        "title": "تمت الموافقة على الإعلان",
+        "body": "تمت الموافقة على «{{equipmentTitle}}». فعّل الظهور عندما تكون جاهزاً."
+      },
+      "equipment_rejected": {
+        "title": "الإعلان يحتاج تعديلات",
+        "body": "لم تُوافق على «{{equipmentTitle}}»: {{reason}}"
+      },
+      "review_equipment_received": {
+        "title": "تقييم جديد على إعلانك",
+        "body": "{{reviewerName}} قيّم «{{equipmentTitle}}» — بانتظار الموافقة."
+      },
+      "review_owner_received": {
+        "title": "تقييم جديد على ملفك",
+        "body": "{{reviewerName}} ترك لك تقييماً — بانتظار الموافقة."
+      },
+      "review_approved_listing": {
+        "title": "نُشر تقييم الإعلان",
+        "body": "تقييم من {{reviewerName}} على «{{equipmentTitle}}» أصبح مرئياً."
+      },
+      "review_approved_profile": {
+        "title": "نُشر تقييم الملف",
+        "body": "تقييم من {{reviewerName}} أصبح مرئياً على ملفك."
+      },
+      "booking_request": {
+        "title": "طلب حجز جديد",
+        "body": "{{renterName}} طلب استئجار «{{equipmentTitle}}»."
+      },
+      "booking_approved": {
+        "title": "تمت الموافقة على الحجز",
+        "body": "تمت الموافقة على طلبك لـ «{{equipmentTitle}}». أكمل الدفع للتأكيد."
+      },
+      "booking_rejected": {
+        "title": "تم رفض الحجز",
+        "body": "لم تُوافق على طلبك لـ «{{equipmentTitle}}»."
+      },
+      "payment_confirmed": {
+        "title": "تم تأكيد الدفع",
+        "body": "تم تأكيد الدفع لـ «{{equipmentTitle}}». سيتم جدولة التسليم قريباً."
+      },
+      "payment_received": {
+        "title": "تم استلام الدفع",
+        "body": "تم تأكيد الدفع لـ «{{equipmentTitle}}»."
+      },
+      "delivery_scheduled": {
+        "title": "تم جدولة التسليم",
+        "body": "سيتم تسليم «{{equipmentTitle}}» في {{slot}}"
+      },
+      "return_reminder": {
+        "title": "تذكير بالإرجاع",
+        "body": "«{{equipmentTitle}}» مستحق الإرجاع غداً. يرجى تجهيزه للاستلام."
+      },
+      "dispute_opened": {
+        "title": "تم فتح نزاع",
+        "body": "تم رفع نزاع على حجزك. سيراجعه فريقنا قريباً."
+      },
+      "payout_sent": {
+        "title": "تم إرسال التحويل!",
+        "body": "{{amount}} د.ت لـ «{{equipmentTitle}}» في طريقها إلى حسابك."
+      },
+      "general": {
+        "title": "تحديث الحجز",
+        "body": "تم تحديث حجزك لـ «{{equipmentTitle}}»."
+      }
+    }
+  },
   "common": {
     "search": "بحث",
     "searchPlaceholder": "ابحث عن معدات…",
@@ -493,8 +595,20 @@
     "identityVerified": "الهوية موثّقة من {{name}}",
     "identityPending": "التحقق من الهوية قيد الانتظار",
     "memberSinceDate": "عضو منذ {{date}}",
+    "memberSince": "عضو منذ {{date}}",
     "basedIn": "مقره {{location}}",
-    "defaultBio": "{{name}} يعرض معدات ذات جودة على {{platform}}. تصفّح إعلاناته واحجز بثقة."
+    "defaultBio": "{{name}} يعرض معدات ذات جودة على {{platform}}. تصفّح إعلاناته واحجز بثقة.",
+    "verified": "موثّق",
+    "equipmentOwner": "مالك معدات",
+    "noReviewsYet": "لا توجد مراجعات بعد",
+    "oneReview": "مراجعة واحدة",
+    "reviewsCount": "{{count}} مراجعات",
+    "editProfile": "تعديل الملف",
+    "openPublicPage": "فتح الصفحة العامة",
+    "statListings": "الإعلانات",
+    "statReviews": "المراجعات",
+    "statRating": "التقييم",
+    "statOnPlatform": "على المنصة"
   },
   "contact": {
     "title": "اتصل بنا",
@@ -592,7 +706,16 @@
     "new": "جديد",
     "addFavorite": "إضافة للمفضلة",
     "removeFavorite": "إزالة من المفضلة",
-    "defaultCategory": "معدات"
+    "defaultCategory": "معدات",
+    "reviewStatusPending": "في انتظار الموافقة",
+    "reviewStatusRejected": "مرفوض",
+    "reviewListingLabel": "الإعلان:"
+  },
+  "paymentStatus": {
+    "PENDING": "قيد الانتظار",
+    "CONFIRMED": "مؤكد",
+    "PAYOUT_PENDING": "تحويل معلق",
+    "PAYOUT_SENT": "تم إرسال التحويل"
   },
   "bookingStatus": {
     "PENDING": "قيد الانتظار",
@@ -699,7 +822,9 @@
     "completeToRank": "أكمل تأجيرات لرؤية الترتيب.",
     "tableBookingsCol": "الحجوزات",
     "tableGross": "إجمالي",
-    "tableNet": "صافي"
+    "tableNet": "صافي",
+    "vsLastMonth": "{{sign}}{{pct}}% مقارنة بالشهر الماضي",
+    "earningsBarTooltip": "{{month}}: {{amount}} ({{count}} حجوزات)"
   },
   "listing": {
     "backToListings": "العودة لإعلاناتي",

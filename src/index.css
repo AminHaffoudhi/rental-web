@@ -36,6 +36,23 @@
     text-align: right !important;
   }
 
+  .app-topbar {
+    box-sizing: border-box;
+    transform: none;
+  }
+
+  html[dir="rtl"] .app-topbar .app-topbar-title {
+    text-align: right;
+  }
+
+  html[dir="ltr"] .app-topbar .app-topbar-title {
+    text-align: left;
+  }
+
+  html[dir="rtl"] .app-topbar .input[type="search"] {
+    text-align: right;
+  }
+
   .auth-form[dir="rtl"] .auth-strength-bar {
     direction: rtl;
   }
