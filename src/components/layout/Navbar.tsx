@@ -85,10 +85,10 @@ export function Navbar() {
         <div
           className={cn(
             "mx-auto flex max-w-7xl items-center gap-4 px-4 transition-all duration-300",
-            scrolled ? "min-h-[60px] py-2 md:min-h-[60px]" : "min-h-[60px] py-3 md:min-h-[68px]"
+            scrolled ? "min-h-[64px] py-2 md:min-h-[64px]" : "min-h-[64px] py-3 md:min-h-[76px]"
           )}
         >
-          <PlatformLogo size="md" className="shrink-0" />
+          <PlatformLogo size="lg" className="shrink-0" />
 
           <div
             className={cn(

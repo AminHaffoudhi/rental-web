@@ -22,7 +22,7 @@ function DashboardBreadcrumb({
   const label = labels[location.pathname] ?? fallback;
   return (
     <div>
-      <PlatformLogo size="xs" linkTo={false} className="mb-1 brightness-0 invert opacity-90" />
+      <PlatformLogo size="sm" linkTo={false} className="mb-1 opacity-90" />
       <h1 className="font-display text-lg font-semibold leading-tight text-stone-900 dark:text-stone-100">
         {label}
       </h1>
@@ -45,7 +45,7 @@ function SidebarNav({
     <div className="flex min-h-0 flex-1 flex-col">
       <div className="border-b border-[var(--surface-inverse-border)] px-6 py-5">
         <NavLink to="/" className="inline-flex" onClick={onNavigate}>
-          <PlatformLogo size="md" linkTo={false} className="brightness-0 invert" />
+          <PlatformLogo size="lg" linkTo={false} onDarkBackground />
         </NavLink>
       </div>
 

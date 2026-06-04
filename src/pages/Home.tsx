@@ -4,6 +4,7 @@ import { HomeFeatured } from "@/components/home/HomeFeatured";
 import { HomeHero } from "@/components/home/HomeHero";
 import { HomeHowItWorks } from "@/components/home/HomeHowItWorks";
 import { HomeStats } from "@/components/home/HomeStats";
+import { HomeTestimonials } from "@/components/home/HomeTestimonials";
 import { HomeTrust } from "@/components/home/HomeTrust";
 import { buildCategoryFilters } from "@/config/categories";
 import { useCategories } from "@/hooks/useCategories";
@@ -42,6 +43,7 @@ export function Home() {
         error={error}
         onRetry={() => void refetch()}
       />
+      <HomeTestimonials />
       <HomeTrust />
       <HomeCta />
     </div>

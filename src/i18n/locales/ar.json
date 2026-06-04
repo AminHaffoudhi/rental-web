@@ -31,7 +31,8 @@
     "noResults": "لا توجد نتائج",
     "perDay": "{{price}} د.ت/اليوم",
     "tnd": "د.ت",
-    "home": "الرئيسية"
+    "home": "الرئيسية",
+    "backToHome": "العودة إلى الرئيسية"
   },
   "nav": {
     "browse": "تصفّح",
@@ -134,7 +135,47 @@
     "ctaBodyLong": "اعرضها على {{name}} واربح من أدواتك وآلاتك — فقط عند الحجز.",
     "ctaList": "ابدأ الإعلان",
     "ctaBrowse": "تصفّح السوق",
-    "ctaFinePrint": "إعلان مجاني · بدون اشتراك · عمولة عند الربح فقط"
+    "ctaFinePrint": "إعلان مجاني · بدون اشتراك · عمولة عند الربح فقط",
+    "popularLabel": "شائع:",
+    "bookQuick": "احجز في أقل من دقيقتين",
+    "showcaseDrillTitle": "مثقاب بناء",
+    "showcaseDrillLocation": "تونس",
+    "showcaseGoalsTitle": "مرمى كرة قدم",
+    "showcaseGoalsLocation": "صفاقس",
+    "showcaseTentTitle": "خيمة مناسبات",
+    "showcaseTentLocation": "سوسة",
+    "showcaseToolsTitle": "طقم أدوات كهربائية",
+    "showcaseToolsLocation": "نابل",
+    "testimonialsEyebrow": "آراء العملاء",
+    "testimonialsTitle": "ماذا يقول المستأجرون",
+    "testimonialsSubtitle": "قصص حقيقية من مستأجرين على إكري",
+    "testimonial1Quote": "استأجرت خلاطة خرسانة لمشروع نهاية الأسبوع. كانت العملية سلسة والمالك متعاون جداً.",
+    "testimonial1Name": "أحمد ب.",
+    "testimonial1Meta": "تونس · بناء",
+    "testimonial2Quote": "احتجنا مرمى لبطولة مدرسية. الحجز والاستلام سهلان والمعدات بحالة ممتازة.",
+    "testimonial2Name": "سارة م.",
+    "testimonial2Meta": "صفاقس · رياضة",
+    "testimonial3Quote": "أنقذتنا الخيمة من تقلبات الطقس. أسعار واضحة وتأكيد سريع.",
+    "testimonial3Name": "يوسف ك.",
+    "testimonial3Meta": "سوسة · مناسبات"
+  },
+  "categories": {
+    "construction": {
+      "name": "بناء",
+      "description": "آلات ثقيلة ومعدات مواقع"
+    },
+    "sports": {
+      "name": "رياضة",
+      "description": "معدات رياضية ونشاطات خارجية"
+    },
+    "events": {
+      "name": "مناسبات",
+      "description": "تأجير للحفلات والفعاليات"
+    },
+    "tools": {
+      "name": "أدوات",
+      "description": "أدوات ومعدات ورشة"
+    }
   },
   "auth": {
     "welcomeBack": "مرحباً بعودتك",
@@ -202,7 +243,31 @@
     "readTermsCta": "قراءة شروط الاستخدام ←",
     "createAccountButton": "إنشاء الحساب",
     "phonePlaceholder": "+216 XX XXX XXX",
-    "phoneTooLong": "رقم الهاتف طويل جداً"
+    "phoneTooLong": "رقم الهاتف طويل جداً",
+    "passwordRequired": "كلمة المرور مطلوبة",
+    "emailPlaceholder": "you@example.com",
+    "comingSoon": "قريباً",
+    "signInNewHere": "جديد هنا؟",
+    "signInCreateAccount": "إنشاء حساب",
+    "loginPanelTitle": "مرحباً بعودتك إلى سوق المعدات في تونس",
+    "loginPanelSubtitle": "سجّل الدخول لإدارة الحجوزات، عرض معداتك، والتواصل مع مستأجرين ومالكين موثوقين.",
+    "loginPerkVerified": "مالكون محليون موثّقون",
+    "loginPerkSecure": "إدارة آمنة للتأمينات",
+    "loginPerkDelivery": "التوصيل مشمول",
+    "loginBuiltFor": "© {{year}} {{name}} · صُمم لتونس",
+    "verifyEmailSent": "أرسلنا رمزاً من 6 أرقام إلى {{email}}. تحقق من بريدك للمتابعة.",
+    "goToVerification": "الذهاب إلى التحقق",
+    "signInAgreePrefix": "بتسجيل الدخول فإنك توافق على",
+    "signInAgreeAnd": "و",
+    "registerPanelTitle": "انضم إلى مجتمع تأجير المعدات في تونس",
+    "registerPanelSubtitle": "أنشئ حسابك المجاني في دقائق — استأجر ما تحتاجه أو اربح من عرض معداتك.",
+    "registerWhyJoin": "لماذا تنضم",
+    "registerStatUsers": "مستأجرون ومالكون في جميع أنحاء تونس يثقون بإكري للمعدات المحلية.",
+    "registerPerkListings": "آلاف الإعلانات",
+    "registerPerkDeposits": "تأمين مالي آمن",
+    "registerPerkDelivery": "توصيل متاح",
+    "registerPerkVerified": "مالكون محليون موثّقون",
+    "registerPerkPayments": "أسعار شفافة بالدينار التونسي"
   },
   "search": {
     "title": "البحث عن معدات",

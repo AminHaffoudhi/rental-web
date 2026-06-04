@@ -16,44 +16,46 @@ import { useTranslation } from "react-i18next";
 import { SearchBar } from "@/components/shared/SearchBar";
 import { cn } from "@/utils/cn";
 
-const showcaseItems = [
+const showcaseItemDefs = [
   {
     icon: Drill,
-    title: "Construction Drill",
-    price: "45 TND/day",
-    location: "Tunis",
+    titleKey: "home.showcaseDrillTitle",
+    locationKey: "home.showcaseDrillLocation",
+    price: 45,
     accent: "from-brand-100 to-brand-50",
     delay: 0.05,
     className: "sm:col-start-1 sm:row-start-1",
   },
   {
     icon: Trophy,
-    title: "Football Goals",
-    price: "30 TND/day",
-    location: "Sfax",
+    titleKey: "home.showcaseGoalsTitle",
+    locationKey: "home.showcaseGoalsLocation",
+    price: 30,
     accent: "from-emerald-50 to-canvas-card",
     delay: 0.12,
     className: "sm:col-start-2 sm:row-start-1 sm:translate-y-4",
   },
   {
     icon: Tent,
-    title: "Party Tent",
-    price: "80 TND/day",
-    location: "Sousse",
+    titleKey: "home.showcaseTentTitle",
+    locationKey: "home.showcaseTentLocation",
+    price: 80,
     accent: "from-sky-50 to-canvas-card",
     delay: 0.18,
     className: "sm:col-start-1 sm:row-start-2",
   },
   {
     icon: Wrench,
-    title: "Power Tools Set",
-    price: "35 TND/day",
-    location: "Nabeul",
+    titleKey: "home.showcaseToolsTitle",
+    locationKey: "home.showcaseToolsLocation",
+    price: 35,
     accent: "from-violet-50 to-canvas-card",
     delay: 0.24,
     className: "sm:col-start-2 sm:row-start-2 sm:-translate-y-2",
   },
 ] as const;
+
+const popularCategorySlugs = ["construction", "sports", "events"] as const;
 
 const trustPillKeys = [
   { icon: BadgeCheck, key: "home.trustVerified" },
@@ -134,14 +136,14 @@ export function HomeHero() {
                 }
               />
               <div className="mt-3 flex flex-wrap gap-2 text-xs text-stone-500 sm:text-sm">
-                <span className="font-medium text-stone-600">Popular:</span>
-                {["Construction", "Sports", "Events"].map((tag) => (
+                <span className="font-medium text-stone-600">{t("home.popularLabel")}</span>
+                {popularCategorySlugs.map((slug) => (
                   <Link
-                    key={tag}
-                    to={`/search?q=${encodeURIComponent(tag)}`}
+                    key={slug}
+                    to={`/search?category=${encodeURIComponent(slug)}`}
                     className="rounded-full bg-stone-100 px-3 py-1 font-medium text-stone-700 transition-colors hover:bg-brand-50 hover:text-brand-700"
                   >
-                    {tag}
+                    {t(`categories.${slug}.name`)}
                   </Link>
                 ))}
               </div>
@@ -155,10 +157,10 @@ export function HomeHero() {
             >
               <Link
                 to="/search"
-                className="btn btn-primary btn-lg w-full justify-center shadow-warm min-[400px]:w-auto"
+                className="btn btn-primary btn-lg w-full justify-center gap-2 shadow-warm min-[400px]:w-auto rtl:flex-row-reverse"
               >
                 {t("home.heroCta")}
-                <ArrowRight className="h-4 w-4" aria-hidden />
+                <ArrowRight className="h-4 w-4 rtl:rotate-180" aria-hidden />
               </Link>
               <Link
                 to="/equipment/new"
@@ -194,9 +196,9 @@ export function HomeHero() {
               aria-hidden
             />
             <div className="relative grid grid-cols-2 gap-3 sm:gap-4">
-              {showcaseItems.map((item) => (
+              {showcaseItemDefs.map((item) => (
                 <motion.article
-                  key={item.title}
+                  key={item.titleKey}
                   initial={{ opacity: 0, y: 24, scale: 0.96 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   transition={{
@@ -214,14 +216,14 @@ export function HomeHero() {
                     <item.icon className="h-5 w-5 text-stone-800" strokeWidth={1.75} />
                   </div>
                   <h3 className="mt-3 font-display text-sm font-semibold text-stone-900 sm:text-base">
-                    {item.title}
+                    {t(item.titleKey)}
                   </h3>
                   <p className="mt-1 text-xs font-semibold text-brand-500 sm:text-sm">
-                    {item.price}
+                    {t("common.perDay", { price: item.price })}
                   </p>
                   <p className="mt-2 flex items-center gap-1 text-[11px] font-medium text-brand-500">
                     <MapPin className="h-3 w-3 shrink-0 text-brand-500" aria-hidden />
-                    {item.location}
+                    {t(item.locationKey)}
                   </p>
                 </motion.article>
               ))}
@@ -234,7 +236,7 @@ export function HomeHero() {
             >
               <CalendarCheck className="h-4 w-4 text-brand-500" aria-hidden />
               <span className="whitespace-nowrap text-xs font-semibold text-stone-800 sm:text-sm">
-                Book in under 2 minutes
+                {t("home.bookQuick")}
               </span>
             </motion.div>
           </div>

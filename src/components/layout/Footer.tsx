@@ -58,7 +58,7 @@ export function Footer() {
       <div className="container section-sm">
         <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
           <div className="space-y-4">
-            <PlatformLogo size="lg" linkTo="/" className="brightness-0 invert" />
+            <PlatformLogo size="xl" linkTo="/" onDarkBackground />
             <p className="text-sm font-medium text-stone-300">{t("footer.tagline")}</p>
             <p className="max-w-xs text-sm leading-relaxed text-[var(--surface-inverse-muted)]/80">
               {t("footer.description")}

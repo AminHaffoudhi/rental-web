@@ -31,7 +31,8 @@
     "noResults": "No results found",
     "perDay": "{{price}} TND/day",
     "tnd": "TND",
-    "home": "Home"
+    "home": "Home",
+    "backToHome": "Back to home"
   },
   "nav": {
     "browse": "Browse",
@@ -134,7 +135,47 @@
     "ctaBodyLong": "List it on {{name}} and earn from your tools, gear, and machinery — only when you get booked.",
     "ctaList": "Start listing",
     "ctaBrowse": "Browse marketplace",
-    "ctaFinePrint": "Free to list · No subscription · Pay only when you earn"
+    "ctaFinePrint": "Free to list · No subscription · Pay only when you earn",
+    "popularLabel": "Popular:",
+    "bookQuick": "Book in under 2 minutes",
+    "showcaseDrillTitle": "Construction drill",
+    "showcaseDrillLocation": "Tunis",
+    "showcaseGoalsTitle": "Football goals",
+    "showcaseGoalsLocation": "Sfax",
+    "showcaseTentTitle": "Party tent",
+    "showcaseTentLocation": "Sousse",
+    "showcaseToolsTitle": "Power tools set",
+    "showcaseToolsLocation": "Nabeul",
+    "testimonialsEyebrow": "Testimonials",
+    "testimonialsTitle": "What renters say",
+    "testimonialsSubtitle": "Real stories from people who booked equipment on Ekri",
+    "testimonial1Quote": "I rented a concrete mixer for a weekend project. The process was seamless and the owner was incredibly helpful.",
+    "testimonial1Name": "Ahmed B.",
+    "testimonial1Meta": "Tunis · Construction",
+    "testimonial2Quote": "We needed football goals for a school tournament. Booking and pickup were easy, and the gear was in great shape.",
+    "testimonial2Name": "Sarra M.",
+    "testimonial2Meta": "Sfax · Sports",
+    "testimonial3Quote": "The party tent saved our outdoor event when the weather turned. Clear pricing and fast confirmation.",
+    "testimonial3Name": "Youssef K.",
+    "testimonial3Meta": "Sousse · Events"
+  },
+  "categories": {
+    "construction": {
+      "name": "Construction",
+      "description": "Heavy machinery and site equipment"
+    },
+    "sports": {
+      "name": "Sports",
+      "description": "Sports and outdoor gear"
+    },
+    "events": {
+      "name": "Events",
+      "description": "Events and party rentals"
+    },
+    "tools": {
+      "name": "Tools",
+      "description": "Tools and workshop equipment"
+    }
   },
   "auth": {
     "welcomeBack": "Welcome back",
@@ -202,7 +243,31 @@
     "readTermsCta": "Read Terms of Service →",
     "createAccountButton": "Create account",
     "phonePlaceholder": "+216 XX XXX XXX",
-    "phoneTooLong": "Phone number is too long"
+    "phoneTooLong": "Phone number is too long",
+    "passwordRequired": "Password is required",
+    "emailPlaceholder": "you@example.com",
+    "comingSoon": "Coming soon",
+    "signInNewHere": "New here?",
+    "signInCreateAccount": "Create an account",
+    "loginPanelTitle": "Welcome back to Tunisia's equipment marketplace",
+    "loginPanelSubtitle": "Sign in to manage bookings, list your gear, and connect with trusted renters and owners.",
+    "loginPerkVerified": "Verified local owners",
+    "loginPerkSecure": "Secure deposit handling",
+    "loginPerkDelivery": "Delivery included",
+    "loginBuiltFor": "© {{year}} {{name}} · Built for Tunisia",
+    "verifyEmailSent": "We sent a 6-digit code to {{email}}. Verify your email to continue.",
+    "goToVerification": "Go to verification",
+    "signInAgreePrefix": "By signing in you agree to our",
+    "signInAgreeAnd": "and",
+    "registerPanelTitle": "Join Tunisia's equipment rental community",
+    "registerPanelSubtitle": "Create your free account in minutes — rent what you need or earn by listing your gear.",
+    "registerWhyJoin": "Why join",
+    "registerStatUsers": "Renters and owners across Tunisia trust Ekri for local equipment.",
+    "registerPerkListings": "Thousands of listings",
+    "registerPerkDeposits": "Secure deposit handling",
+    "registerPerkDelivery": "Delivery available",
+    "registerPerkVerified": "Verified local owners",
+    "registerPerkPayments": "Transparent pricing in TND"
   },
   "search": {
     "title": "Search equipment",

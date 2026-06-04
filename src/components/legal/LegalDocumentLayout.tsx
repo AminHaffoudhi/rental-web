@@ -28,7 +28,7 @@ export function LegalDocumentLayout({
       <div className="border-b border-stone-200 bg-canvas-card/80">
         <div className="container max-w-3xl py-6 sm:py-8">
           <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-            <PlatformLogo size="sm" />
+            <PlatformLogo size="md" />
             <Link
               to="/"
               className="inline-flex items-center gap-1.5 text-sm font-medium text-stone-500 transition-colors hover:text-brand-600"

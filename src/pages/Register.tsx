@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
-import { AlertCircle, Check, Eye, EyeOff } from "lucide-react";
+import { AlertCircle, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
@@ -23,9 +23,12 @@ import {
 } from "@/components/ui/select";
 import { useAuth } from "@/hooks/useAuth";
 import { getApiErrorDetail } from "@/services/api";
+import { AuthBrandPanel } from "@/components/auth/AuthBrandPanel";
 import { TermsAcceptanceModal } from "@/components/legal/TermsAcceptanceModal";
 import { PlatformLogo } from "@/components/brand/PlatformLogo";
+import { ThemeToggle } from "@/components/shared/ThemeToggle";
 import { PLATFORM_NAME } from "@/config/brand";
+import { useLocaleStore } from "@/store/localeStore";
 import { cn } from "@/utils/cn";
 
 type FormValues = {
@@ -77,6 +80,7 @@ function passwordStrength(
 
 export function Register() {
   const { t } = useTranslation();
+  const isRtl = useLocaleStore((s) => s.language === "ar");
   const { register: registerUser } = useAuth();
   const schema = useMemo(() => createRegisterSchema(t), [t]);
   const strengthLabels = useMemo(
@@ -131,54 +135,46 @@ export function Register() {
   }
 
   return (
-    <div className="flex min-h-svh flex-col lg:flex-row">
-      <div className="relative hidden w-[40%] flex-col justify-center overflow-hidden bg-brand-600 px-12 py-16 text-white lg:flex">
-        <div
-          className="pointer-events-none absolute inset-0 opacity-[0.05]"
-          style={{
-            backgroundImage: "radial-gradient(#fff 1px, transparent 1px)",
-            backgroundSize: "14px 14px",
-          }}
-          aria-hidden
-        />
-        <div className="relative z-[1]">
-          <PlatformLogo size="2xl" linkTo="/" className="brightness-0 invert" />
-          <p className="mt-6 max-w-sm text-lg text-white/90">{t("auth.registerSidebar")}</p>
-          <ul className="mt-10 space-y-3 text-white/80">
-            <li className="flex items-center gap-2">
-              <Check className="h-4 w-4 shrink-0 text-white" strokeWidth={2.5} aria-hidden />
-              {t("auth.registerBulletListings")}
-            </li>
-            <li className="flex items-center gap-2">
-              <Check className="h-4 w-4 shrink-0 text-white" strokeWidth={2.5} aria-hidden />
-              {t("auth.registerBulletDeposits")}
-            </li>
-            <li className="flex items-center gap-2">
-              <Check className="h-4 w-4 shrink-0 text-white" strokeWidth={2.5} aria-hidden />
-              {t("auth.registerBulletDelivery")}
-            </li>
-          </ul>
-        </div>
-      </div>
+    <div className="flex min-h-svh flex-col bg-canvas lg:flex-row">
+      <AuthBrandPanel variant="register" />
 
-      <div className="flex flex-1 items-center justify-center bg-canvas px-4 py-12">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-md"
-        >
-          <div className="mb-8">
-            <PlatformLogo size="md" className="mb-6 lg:hidden" />
-            <h2 className="font-display text-3xl font-semibold text-stone-900">
-              {t("auth.createAccountTitle")}
-            </h2>
-            <p className="mt-2 text-sm text-stone-500">
-              {t("auth.loginPrompt")}{" "}
-              <Link to="/login" className="font-semibold text-brand-600 hover:underline">
-                {t("auth.loginLink")} →
-              </Link>
-            </p>
-          </div>
+      <main className="flex flex-1 flex-col">
+        <header className="flex items-center justify-end gap-2 border-b border-stone-200 bg-canvas-card px-4 py-4 sm:px-6 lg:hidden">
+          <ThemeToggle />
+          <Link
+            to="/"
+            className="text-sm font-medium text-stone-500 hover:text-brand-600"
+          >
+            {t("common.home")}
+          </Link>
+        </header>
+
+        <div className="flex flex-1 items-center justify-center bg-gradient-to-b from-brand-50/40 via-canvas to-canvas-card px-4 py-10 sm:px-6 sm:py-12">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            dir={isRtl ? "rtl" : "ltr"}
+            className="auth-form w-full max-w-md"
+          >
+            <div className="mb-6 flex justify-center lg:hidden">
+              <PlatformLogo size="3xl" centered />
+            </div>
+
+            <div className="auth-form-heading mb-8 text-start">
+              <h2 className="font-display text-3xl font-semibold text-stone-900">
+                {t("auth.createAccountTitle")}
+              </h2>
+              <p className="mt-2 text-sm text-stone-500">
+                {t("auth.loginPrompt")}{" "}
+                <Link
+                  to="/login"
+                  className="inline-flex items-center gap-1 font-semibold text-brand-600 hover:underline"
+                >
+                  {t("auth.loginLink")}
+                  <ArrowRight className="h-3.5 w-3.5 rtl:rotate-180" aria-hidden />
+                </Link>
+              </p>
+            </div>
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -201,7 +197,7 @@ export function Register() {
                     <FormItem>
                       <FormLabel>{t("auth.name")}</FormLabel>
                       <FormControl>
-                        <input className="input" {...field} />
+                        <input className="input text-start" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -221,7 +217,13 @@ export function Register() {
                     <FormItem>
                       <FormLabel>{t("auth.email")}</FormLabel>
                       <FormControl>
-                        <input type="email" autoComplete="email" className="input" {...field} />
+                        <input
+                          type="email"
+                          autoComplete="email"
+                          dir="ltr"
+                          className="input"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -247,6 +249,7 @@ export function Register() {
                           type="tel"
                           autoComplete="tel"
                           placeholder={t("auth.phonePlaceholder")}
+                          dir="ltr"
                           className="input"
                           {...field}
                         />
@@ -273,6 +276,7 @@ export function Register() {
                           <input
                             type={showPw ? "text" : "password"}
                             autoComplete="new-password"
+                            dir="ltr"
                             className="input pe-11"
                             {...field}
                           />
@@ -286,7 +290,7 @@ export function Register() {
                           </button>
                         </div>
                       </FormControl>
-                      <div className="mt-2 flex gap-1">
+                      <div className="auth-strength-bar mt-2 flex gap-1">
                         {[0, 1, 2, 3].map((i) => (
                           <div
                             key={i}
@@ -304,7 +308,7 @@ export function Register() {
                           />
                         ))}
                       </div>
-                      <p className="text-xs text-stone-500">{strength.label}</p>
+                      <p className="auth-field-hint text-xs text-stone-500">{strength.label}</p>
                       <FormMessage />
                     </FormItem>
                   </motion.div>
@@ -327,6 +331,7 @@ export function Register() {
                           <input
                             type={showPw2 ? "text" : "password"}
                             autoComplete="new-password"
+                            dir="ltr"
                             className="input pe-11"
                             {...field}
                           />
@@ -359,7 +364,7 @@ export function Register() {
                       <FormLabel>{t("auth.howUsePlatform", { name: PLATFORM_NAME })}</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
-                          <SelectTrigger className="input h-11 rounded-xl border-stone-200">
+                          <SelectTrigger className="input h-11 rounded-xl border-stone-200 rtl:flex-row-reverse rtl:text-right">
                             <SelectValue placeholder={t("auth.chooseRole")} />
                           </SelectTrigger>
                         </FormControl>
@@ -380,7 +385,7 @@ export function Register() {
                 name="acceptTerms"
                 render={({ field }) => (
                   <FormItem className="space-y-0 rounded-lg border border-stone-200 bg-canvas-card p-3">
-                    <div className="flex flex-row items-start gap-3">
+                    <div className="flex flex-row items-start gap-3 rtl:flex-row-reverse">
                       <FormControl>
                         <input
                           type="checkbox"
@@ -392,7 +397,7 @@ export function Register() {
                         />
                       </FormControl>
                       <div className="min-w-0 flex-1 space-y-2 leading-snug">
-                        <FormLabel className="font-normal text-stone-700">
+                        <FormLabel className="text-left font-normal text-stone-700 rtl:text-right">
                           {t("auth.termsAgreePrefix")}{" "}
                           <Link
                             to="/terms"
@@ -413,7 +418,7 @@ export function Register() {
                           </Link>
                         </FormLabel>
                         {!termsReviewed ? (
-                          <p id="terms-hint" className="text-xs text-stone-500">
+                          <p id="terms-hint" className="auth-field-hint text-xs text-stone-500">
                             {t("auth.termsReadHint")}
                           </p>
                         ) : null}
@@ -459,8 +464,9 @@ export function Register() {
               </motion.div>
             </form>
           </Form>
-        </motion.div>
-      </div>
+          </motion.div>
+        </div>
+      </main>
     </div>
   );
 }

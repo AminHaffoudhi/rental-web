@@ -21,6 +21,25 @@
     text-align: right;
   }
 
+  html[dir="rtl"] .form-label,
+  html[dir="rtl"] .form-message,
+  html[dir="rtl"] .auth-form-heading,
+  .auth-form[dir="rtl"] .form-label,
+  .auth-form[dir="rtl"] .form-message,
+  .auth-form[dir="rtl"] .auth-form-heading,
+  .auth-form[dir="rtl"] .auth-field-hint {
+    text-align: right;
+  }
+
+  .auth-form[dir="rtl"] label.form-label,
+  .auth-form[dir="rtl"] p.form-message {
+    text-align: right !important;
+  }
+
+  .auth-form[dir="rtl"] .auth-strength-bar {
+    direction: rtl;
+  }
+
   :root {
     /* Brand — shared across themes */
     --color-brand-500: #f97316;

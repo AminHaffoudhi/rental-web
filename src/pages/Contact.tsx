@@ -75,7 +75,7 @@ export function Contact() {
     <div className="min-h-screen bg-canvas">
       <div className="border-b border-stone-200 bg-canvas-card/80">
         <div className="container py-10 sm:py-12">
-          <PlatformLogo size="sm" className="mb-6" />
+          <PlatformLogo size="md" className="mb-6" />
           <p className="text-xs font-semibold uppercase tracking-widest text-brand-600 dark:text-brand-400">
             Support
           </p>

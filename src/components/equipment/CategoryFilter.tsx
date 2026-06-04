@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { CategoryIcon } from "@/components/equipment/CategoryIcon";
 import { ALL_CATEGORY_FILTER, buildCategoryFilters } from "@/config/categories";
 import { useCategories } from "@/hooks/useCategories";
+import { localizedCategory } from "@/i18n/categoryLocale";
 import { cn } from "@/utils/cn";
 
 interface CategoryFilterProps {
@@ -14,9 +15,17 @@ interface CategoryFilterProps {
 export function CategoryFilter({ selected = null, onSelect }: CategoryFilterProps) {
   const { t } = useTranslation();
   const { categories, isLoading } = useCategories();
-  const filters = buildCategoryFilters(categories).map((c) =>
-    c.value === ALL_CATEGORY_FILTER.value ? { ...c, label: t("search.allEquipment") } : c
-  );
+  const filters = buildCategoryFilters(categories).map((c) => {
+    if (c.value === ALL_CATEGORY_FILTER.value) {
+      return { ...c, label: t("search.allEquipment") };
+    }
+    const { name } = localizedCategory(
+      c.value,
+      { name: c.label, description: "description" in c ? c.description : undefined },
+      t
+    );
+    return { ...c, label: name };
+  });
 
   if (isLoading && categories.length === 0) {
     return (

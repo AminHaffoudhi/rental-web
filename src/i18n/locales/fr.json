@@ -31,7 +31,8 @@
     "noResults": "Aucun résultat",
     "perDay": "{{price}} TND/jour",
     "tnd": "TND",
-    "home": "Accueil"
+    "home": "Accueil",
+    "backToHome": "Retour à l'accueil"
   },
   "nav": {
     "browse": "Parcourir",
@@ -134,7 +135,47 @@
     "ctaBodyLong": "Proposez-le sur {{name}} et gagnez avec vos outils et machines — uniquement lorsque vous êtes réservé.",
     "ctaList": "Créer une annonce",
     "ctaBrowse": "Parcourir la marketplace",
-    "ctaFinePrint": "Publication gratuite · Pas d'abonnement · Commission uniquement sur vos gains"
+    "ctaFinePrint": "Publication gratuite · Pas d'abonnement · Commission uniquement sur vos gains",
+    "popularLabel": "Populaire :",
+    "bookQuick": "Réservez en moins de 2 minutes",
+    "showcaseDrillTitle": "Perceuse de chantier",
+    "showcaseDrillLocation": "Tunis",
+    "showcaseGoalsTitle": "Buts de football",
+    "showcaseGoalsLocation": "Sfax",
+    "showcaseTentTitle": "Tente de réception",
+    "showcaseTentLocation": "Sousse",
+    "showcaseToolsTitle": "Kit d'outils électriques",
+    "showcaseToolsLocation": "Nabeul",
+    "testimonialsEyebrow": "Témoignages",
+    "testimonialsTitle": "Ce que disent les locataires",
+    "testimonialsSubtitle": "Expériences réelles de personnes ayant loué sur Ekri",
+    "testimonial1Quote": "J'ai loué une bétonnière pour un chantier le week-end. Tout s'est passé sans accroc et le propriétaire était très serviable.",
+    "testimonial1Name": "Ahmed B.",
+    "testimonial1Meta": "Tunis · Construction",
+    "testimonial2Quote": "Il nous fallait des buts pour un tournoi scolaire. Réservation et retrait faciles, matériel en excellent état.",
+    "testimonial2Name": "Sarra M.",
+    "testimonial2Meta": "Sfax · Sport",
+    "testimonial3Quote": "La tente a sauvé notre événement en plein air. Tarifs clairs et confirmation rapide.",
+    "testimonial3Name": "Youssef K.",
+    "testimonial3Meta": "Sousse · Événementiel"
+  },
+  "categories": {
+    "construction": {
+      "name": "Construction",
+      "description": "Machines lourdes et matériel de chantier"
+    },
+    "sports": {
+      "name": "Sport",
+      "description": "Matériel sportif et de plein air"
+    },
+    "events": {
+      "name": "Événementiel",
+      "description": "Location pour fêtes et événements"
+    },
+    "tools": {
+      "name": "Outils",
+      "description": "Outils et équipement d'atelier"
+    }
   },
   "auth": {
     "welcomeBack": "Bon retour",
@@ -202,7 +243,31 @@
     "readTermsCta": "Lire les conditions →",
     "createAccountButton": "Créer le compte",
     "phonePlaceholder": "+216 XX XXX XXX",
-    "phoneTooLong": "Numéro de téléphone trop long"
+    "phoneTooLong": "Numéro de téléphone trop long",
+    "passwordRequired": "Le mot de passe est obligatoire",
+    "emailPlaceholder": "vous@exemple.com",
+    "comingSoon": "Bientôt disponible",
+    "signInNewHere": "Nouveau ici ?",
+    "signInCreateAccount": "Créer un compte",
+    "loginPanelTitle": "Bon retour sur la marketplace d'équipement en Tunisie",
+    "loginPanelSubtitle": "Connectez-vous pour gérer vos réservations, publier votre matériel et échanger avec des locataires et propriétaires de confiance.",
+    "loginPerkVerified": "Propriétaires locaux vérifiés",
+    "loginPerkSecure": "Gestion sécurisée des dépôts",
+    "loginPerkDelivery": "Livraison incluse",
+    "loginBuiltFor": "© {{year}} {{name}} · Conçu pour la Tunisie",
+    "verifyEmailSent": "Nous avons envoyé un code à 6 chiffres à {{email}}. Vérifiez votre e-mail pour continuer.",
+    "goToVerification": "Aller à la vérification",
+    "signInAgreePrefix": "En vous connectant, vous acceptez nos",
+    "signInAgreeAnd": "et notre",
+    "registerPanelTitle": "Rejoignez la communauté de location d'équipement en Tunisie",
+    "registerPanelSubtitle": "Créez votre compte gratuit en quelques minutes — louez ce dont vous avez besoin ou gagnez en publiant votre matériel.",
+    "registerWhyJoin": "Pourquoi nous rejoindre",
+    "registerStatUsers": "Locataires et propriétaires à travers la Tunisie font confiance à Ekri.",
+    "registerPerkListings": "Des milliers d'annonces",
+    "registerPerkDeposits": "Caution sécurisée",
+    "registerPerkDelivery": "Livraison disponible",
+    "registerPerkVerified": "Propriétaires locaux vérifiés",
+    "registerPerkPayments": "Tarifs transparents en TND"
   },
   "search": {
     "title": "Rechercher du matériel",

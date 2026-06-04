@@ -118,7 +118,7 @@ export function VerifyEmail() {
       <div className="flex min-h-svh flex-col items-center justify-center bg-canvas px-4">
         <div className="w-full max-w-md rounded-2xl border border-stone-200 bg-canvas-card p-8 shadow-sm">
           <div className="mb-6 flex justify-center">
-            <PlatformLogo size="md" linkTo="/" />
+            <PlatformLogo size="lg" linkTo="/" />
           </div>
           <h1 className="font-display text-xl font-semibold text-stone-900">{t("auth.verifyTitle")}</h1>
           <p className="mt-3 text-sm text-stone-600">{t("auth.verifyNoAccessBody")}</p>
@@ -143,7 +143,7 @@ export function VerifyEmail() {
     <div className="flex min-h-svh flex-col items-center justify-center bg-canvas px-4">
       <div className="w-full max-w-md rounded-2xl border border-stone-200 bg-canvas-card p-8 shadow-sm">
         <div className="mb-6 flex justify-center">
-          <PlatformLogo size="md" linkTo="/" />
+          <PlatformLogo size="lg" linkTo="/" />
         </div>
         <h1 className="font-display text-2xl font-semibold text-stone-900">{t("auth.verifyCheckEmail")}</h1>
         <p className="mt-2 text-sm text-stone-600">

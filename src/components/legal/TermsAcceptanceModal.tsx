@@ -59,7 +59,7 @@ export function TermsAcceptanceModal({ open, onOpenChange, onAccepted }: TermsAc
       <DialogContent className="flex max-h-[min(90vh,720px)] max-w-2xl flex-col gap-0 overflow-hidden border-stone-200 bg-canvas-card p-0 sm:rounded-2xl">
         <DialogHeader className="shrink-0 border-b border-stone-200 px-5 py-4 sm:px-6">
           <div className="flex items-start gap-3">
-            <PlatformLogo size="sm" linkTo={false} className="shrink-0" />
+            <PlatformLogo size="md" linkTo={false} className="shrink-0" />
             <div className="min-w-0 text-left">
               <DialogTitle className="font-display text-lg text-stone-900">
                 Terms of Service

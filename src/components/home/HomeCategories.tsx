@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { SectionHeading, SectionReveal } from "@/components/home/SectionReveal";
 import { CategoryIcon } from "@/components/equipment/CategoryIcon";
 import { ALL_CATEGORY_FILTER } from "@/config/categories";
+import { localizedCategory } from "@/i18n/categoryLocale";
 import { cn } from "@/utils/cn";
 
 type CategoryFilterItem = {
@@ -38,13 +39,24 @@ function categoryHref(cat: CategoryFilterItem): string {
 function CategoryCard({ cat }: { cat: CategoryFilterItem }) {
   const { t } = useTranslation();
   const iconUrl = "iconUrl" in cat ? cat.iconUrl : undefined;
+
+  const localized =
+    cat.value !== ALL_CATEGORY_FILTER.value
+      ? localizedCategory(cat.value, {
+          name: cat.label,
+          description: "description" in cat ? cat.description : undefined,
+        }, t)
+      : null;
+
   const label =
-    cat.value === ALL_CATEGORY_FILTER.value ? t("home.categoriesAll") : cat.label;
+    cat.value === ALL_CATEGORY_FILTER.value
+      ? t("home.categoriesAll")
+      : (localized?.name ?? cat.label);
   const description =
-    "description" in cat && cat.description
-      ? cat.description
-      : cat.value === ALL_CATEGORY_FILTER.value
-        ? t("home.categoriesBrowseAll")
+    cat.value === ALL_CATEGORY_FILTER.value
+      ? t("home.categoriesBrowseAll")
+      : localized?.description?.trim()
+        ? localized.description
         : t("home.categoriesExplore");
 
   return (
@@ -80,7 +92,7 @@ function CategoryCard({ cat }: { cat: CategoryFilterItem }) {
       </p>
       <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-brand-600 opacity-0 transition-opacity group-hover:opacity-100 sm:opacity-100">
         {t("common.explore")}
-        <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+        <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5" />
       </span>
     </Link>
   );
