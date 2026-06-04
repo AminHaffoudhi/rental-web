@@ -1,4 +1,13 @@
-import { CalendarCheck, LayoutDashboard, Package, Settings, User, Wallet } from "lucide-react";
+import {
+  Bot,
+  CalendarCheck,
+  LayoutDashboard,
+  Package,
+  Settings,
+  Sparkles,
+  User,
+  Wallet,
+} from "lucide-react";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuthStore } from "@/store/authStore";
@@ -32,6 +41,8 @@ export function useDashboardNav() {
                 icon: CalendarCheck,
               },
               { to: "/dashboard/earnings", label: t("dashboard.earnings"), icon: Wallet },
+              { to: "/dashboard/ai", label: t("dashboard.aiAgent"), icon: Bot },
+              { to: "/dashboard/assistant", label: t("dashboard.rentalAssistant"), icon: Sparkles },
             ] as DashboardNavItem[],
           },
           {
@@ -44,6 +55,7 @@ export function useDashboardNav() {
           { to: "/dashboard/listings", label: t("dashboard.listings"), icon: Package },
           { to: "/dashboard/bookings", label: t("dashboard.requests"), icon: CalendarCheck },
           { to: "/dashboard/earnings", label: t("dashboard.earnings"), icon: Wallet },
+          { to: "/dashboard/ai", label: t("dashboard.aiAgent"), icon: Bot },
           { to: "/profile", label: t("dashboard.myProfile"), icon: User },
         ] as DashboardNavItem[],
         breadcrumbs: {
@@ -51,6 +63,8 @@ export function useDashboardNav() {
           "/dashboard/listings": t("dashboard.myListings"),
           "/dashboard/bookings": t("dashboard.bookingRequests"),
           "/dashboard/earnings": t("dashboard.earnings"),
+          "/dashboard/ai": t("dashboard.aiAgent"),
+          "/dashboard/assistant": t("dashboard.rentalAssistant"),
           "/profile": t("dashboard.myProfile"),
           "/equipment/new": t("dashboard.newListing"),
         } as Record<string, string>,
@@ -65,6 +79,7 @@ export function useDashboardNav() {
           links: [
             { to: "/dashboard", label: t("dashboard.renterOverview"), icon: LayoutDashboard, end: true },
             { to: "/bookings", label: t("nav.myBookings"), icon: CalendarCheck },
+            { to: "/dashboard/assistant", label: t("dashboard.rentalAssistant"), icon: Sparkles },
           ] as DashboardNavItem[],
         },
         {
@@ -79,6 +94,7 @@ export function useDashboardNav() {
       ] as DashboardNavItem[],
       breadcrumbs: {
         "/dashboard": t("dashboard.renterOverview"),
+        "/dashboard/assistant": t("dashboard.rentalAssistant"),
         "/profile": t("nav.accountSettings"),
       } as Record<string, string>,
     };

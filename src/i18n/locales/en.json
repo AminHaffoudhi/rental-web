@@ -431,7 +431,31 @@
     "defaultTitle": "Dashboard",
     "closeMenu": "Close menu",
     "openMenu": "Open menu",
-    "closeSidebar": "Close sidebar"
+    "closeSidebar": "Close sidebar",
+    "aiAgent": "AI coach",
+    "rentalAssistant": "Rental assistant"
+  },
+  "assistant": {
+    "renterTitle": "Rental assistant",
+    "renterSubtitle": "Find top-rated equipment, trusted owners, and popular categories",
+    "renterWelcome": "Hi! I can help you discover quality equipment, compare prices, and find established owners on Ekri. Ask me anything—or tap a suggestion below.",
+    "renterPlaceholder": "e.g. Best excavators near Tunis? Top-rated owners?",
+    "renterPrompt1": "What are the highest-rated listings right now?",
+    "renterPrompt2": "Which owners have the most equipment and good reviews?",
+    "renterPrompt3": "Show me popular construction equipment with links",
+    "renterPrompt4": "Compare affordable options for a weekend project",
+    "ownerTitle": "AI business coach",
+    "ownerSubtitle": "Insights on earnings, pricing, listings, and bookings",
+    "ownerWelcome": "Hello! I have access to your dashboard stats, listings, and booking requests. Ask for advice on pricing, visibility, pending requests, or how to grow earnings.",
+    "ownerPlaceholder": "e.g. How should I price my excavator? What needs attention today?",
+    "ownerPrompt1": "Summarize my earnings and what changed this month",
+    "ownerPrompt2": "Which listings should I improve or adjust prices on?",
+    "ownerPrompt3": "Do I have pending booking requests to handle?",
+    "ownerPrompt4": "When should I raise or lower my daily rates?",
+    "thinking": "Thinking…",
+    "send": "Send",
+    "offline": "Offline",
+    "suggestionsLabel": "Try asking"
   },
   "bookings": {
     "title": "My bookings",

@@ -7,7 +7,9 @@ import { BookingDetail } from "@/pages/BookingDetail";
 import { Bookings } from "@/pages/Bookings";
 import { Dashboard } from "@/pages/Dashboard";
 import { DashboardBookings } from "@/pages/DashboardBookings";
+import { DashboardAssistant } from "@/pages/DashboardAssistant";
 import { DashboardEarnings } from "@/pages/DashboardEarnings";
+import { OwnerAssistant } from "@/pages/OwnerAssistant";
 import { DashboardListings } from "@/pages/DashboardListings";
 import { EquipmentDetail } from "@/pages/EquipmentDetail";
 import { Home } from "@/pages/Home";
@@ -39,8 +41,10 @@ export default function App() {
       <Route element={<ProtectedRoute />}>
         <Route element={<DashboardLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard/assistant" element={<DashboardAssistant />} />
           <Route path="/profile" element={<Profile />} />
           <Route element={<OwnerOnlyRoute />}>
+            <Route path="/dashboard/ai" element={<OwnerAssistant />} />
             <Route path="/dashboard/listings" element={<DashboardListings />} />
             <Route path="/dashboard/bookings" element={<DashboardBookings />} />
             <Route path="/dashboard/earnings" element={<DashboardEarnings />} />

@@ -431,7 +431,31 @@
     "defaultTitle": "Tableau de bord",
     "closeMenu": "Fermer le menu",
     "openMenu": "Ouvrir le menu",
-    "closeSidebar": "Fermer le panneau"
+    "closeSidebar": "Fermer le panneau",
+    "aiAgent": "Coach IA",
+    "rentalAssistant": "Assistant location"
+  },
+  "assistant": {
+    "renterTitle": "Assistant location",
+    "renterSubtitle": "Trouvez du matériel bien noté, des propriétaires fiables et des catégories populaires",
+    "renterWelcome": "Bonjour ! Je peux vous aider à découvrir du matériel de qualité, comparer les prix et trouver des propriétaires établis sur Ekri.",
+    "renterPlaceholder": "ex. Meilleures pelles près de Tunis ? Propriétaires les mieux notés ?",
+    "renterPrompt1": "Quelles sont les annonces les mieux notées en ce moment ?",
+    "renterPrompt2": "Quels propriétaires ont le plus d'équipements et de bons avis ?",
+    "renterPrompt3": "Montrez-moi du matériel BTP populaire avec des liens",
+    "renterPrompt4": "Comparez des options abordables pour un week-end",
+    "ownerTitle": "Coach business IA",
+    "ownerSubtitle": "Conseils sur revenus, tarifs, annonces et réservations",
+    "ownerWelcome": "Bonjour ! J'ai accès à vos statistiques, annonces et demandes de réservation. Demandez des conseils sur les prix, la visibilité ou la croissance.",
+    "ownerPlaceholder": "ex. Comment tarifer ma pelle ? Qu'est-ce qui est urgent aujourd'hui ?",
+    "ownerPrompt1": "Résumez mes revenus et l'évolution ce mois-ci",
+    "ownerPrompt2": "Quelles annonces dois-je améliorer ou retarifer ?",
+    "ownerPrompt3": "Ai-je des demandes de réservation en attente ?",
+    "ownerPrompt4": "Quand augmenter ou baisser mes tarifs journaliers ?",
+    "thinking": "Réflexion…",
+    "send": "Envoyer",
+    "offline": "Hors ligne",
+    "suggestionsLabel": "Suggestions"
   },
   "bookings": {
     "title": "Mes réservations",
