@@ -26,14 +26,14 @@ export function EquipmentCard({ equipment }: EquipmentCardProps) {
   return (
     <div
       className={cn(
-        "group/card relative w-full overflow-hidden rounded-2xl border border-stone-100 bg-white shadow-sm",
+        "group/card relative w-full overflow-hidden rounded-2xl border border-stone-200 bg-canvas-card shadow-elevated",
         "transition-all duration-[250ms] ease-[cubic-bezier(0.4,0,0.2,1)]",
         "hover:-translate-y-1 hover:border-stone-200 hover:shadow-lg"
       )}
     >
       <button
         type="button"
-        className="absolute right-2 top-2 z-20 flex h-8 w-8 items-center justify-center rounded-full bg-white/95 text-stone-400 shadow-sm ring-1 ring-stone-100 transition-colors hover:text-red-500"
+        className="absolute right-2 top-2 z-20 flex h-8 w-8 items-center justify-center rounded-full bg-canvas-card/95 text-stone-400 shadow-elevated ring-1 ring-stone-200 transition-colors hover:text-red-500"
         aria-label={favorited ? "Remove from favorites" : "Add to favorites"}
         onClick={(e) => {
           e.preventDefault();
@@ -73,8 +73,8 @@ export function EquipmentCard({ equipment }: EquipmentCardProps) {
             {equipment.title}
           </h3>
 
-          <p className="mt-2 flex items-center gap-1.5 text-[13px] text-stone-500">
-            <MapPin className="h-3 w-3 shrink-0 text-stone-400" aria-hidden />
+          <p className="mt-2 flex items-center gap-1.5 text-[13px] font-medium text-brand-500">
+            <MapPin className="h-3 w-3 shrink-0 text-brand-500" aria-hidden />
             <span className="min-w-0 truncate">{equipment.location}</span>
           </p>
 

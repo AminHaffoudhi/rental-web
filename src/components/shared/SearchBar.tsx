@@ -64,7 +64,7 @@ export function SearchBar({
         className={cn(
           "input input-lg w-full rounded-full border-stone-200 py-3 pl-12 shadow-sm transition-all duration-200",
           showButton ? "pr-[7.5rem]" : "pr-4",
-          focused && "border-brand-400 shadow-warm"
+          focused && "border-brand-500 shadow-elevated"
         )}
         aria-label="Search"
       />

@@ -100,9 +100,9 @@ export function BookingForm({
   return (
     <form
       onSubmit={(e) => void handleSubmit(e)}
-      className="rounded-2xl border border-stone-100 bg-white p-6 shadow-xl shadow-[rgba(120,83,40,0.08)]"
+      className="rounded-2xl border border-stone-200 bg-canvas-card p-6 shadow-xl shadow-[rgba(120,83,40,0.08)]"
     >
-      <div className="flex flex-wrap items-start justify-between gap-4 border-b border-stone-100 pb-4">
+      <div className="flex flex-wrap items-start justify-between gap-4 border-b border-stone-200 pb-4">
         <div>
           <p className="font-display text-3xl font-semibold text-stone-900">
             {Math.round(equipment.dailyRate)}{" "}
@@ -144,7 +144,7 @@ export function BookingForm({
                 setStartStr(e.target.value);
                 setDateError(null);
               }}
-              className="input w-full rounded-lg border-stone-200 bg-white p-3 text-sm"
+              className="input w-full rounded-lg p-3 text-sm"
             />
           </div>
           <div>
@@ -157,7 +157,7 @@ export function BookingForm({
                 setEndStr(e.target.value);
                 setDateError(null);
               }}
-              className="input w-full rounded-lg border-stone-200 bg-white p-3 text-sm"
+              className="input w-full rounded-lg p-3 text-sm"
             />
           </div>
         </div>
@@ -173,7 +173,7 @@ export function BookingForm({
             transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
             className="overflow-hidden"
           >
-            <div className="mt-6 space-y-3 border-t border-stone-100 pt-6 text-sm">
+            <div className="mt-6 space-y-3 border-t border-stone-200 pt-6 text-sm">
               <div className="flex justify-between text-stone-600">
                 <span>
                   {totals.days} days × {Math.round(equipment.dailyRate)} TND

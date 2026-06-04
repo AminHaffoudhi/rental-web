@@ -199,7 +199,7 @@ export function ImageUploader({
           {valueUrls.map((url, index) => (
             <div
               key={`${url}-${index}`}
-              className="group relative aspect-square overflow-hidden rounded-xl border border-stone-100 bg-stone-50"
+              className="group relative aspect-square overflow-hidden rounded-xl border border-stone-200 bg-stone-100 dark:bg-stone-800/50"
             >
               <img src={url} alt="" className="h-full w-full object-cover" />
               <div className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-green-500 shadow-sm">
@@ -265,7 +265,7 @@ function FilePreviewCard({
   const isPDF = entry.file.type === "application/pdf";
 
   return (
-    <div className="group relative aspect-square overflow-hidden rounded-xl border border-stone-100 bg-stone-50">
+    <div className="group relative aspect-square overflow-hidden rounded-xl border border-stone-200 bg-stone-100 dark:bg-stone-800/50">
       {isPDF ? (
         <div className="flex h-full w-full flex-col items-center justify-center gap-2 p-4">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-red-100">

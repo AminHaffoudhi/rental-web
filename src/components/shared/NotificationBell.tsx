@@ -4,7 +4,7 @@ import { useClickOutside } from "@/hooks/useClickOutside";
 import { formatDistanceToNow } from "date-fns";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  AlertTriangle,
+  BadgeCheck,
   Banknote,
   Bell,
   BellRing,
@@ -12,17 +12,19 @@ import {
   CalendarClock,
   CalendarX,
   CheckCheck,
-  Clock,
+  ClipboardList,
   CreditCard,
   ExternalLink,
+  MessageSquare,
   Package,
   PackageCheck,
   PackageX,
-  ShieldCheck,
+  RotateCcw,
+  Scale,
   ShieldX,
-  Star,
+  ThumbsUp,
   Truck,
-  UserPlus,
+  UserCircle,
   Wallet,
   X,
 } from "lucide-react";
@@ -43,6 +45,7 @@ import {
   markAllNotificationsRead,
   markNotificationRead,
 } from "@/lib/notificationState";
+import { cleanNotificationTitle } from "@/lib/notificationDisplay";
 import {
   equipmentIdFromNotification,
   notificationTargetPath,
@@ -65,27 +68,25 @@ type NotificationVisual = {
 };
 
 const TYPE_CONFIG: Record<string, NotificationVisual> = {
-  new_user: { Icon: UserPlus, bg: "bg-blue-50", iconClass: "text-blue-600" },
-  kyc_submitted: { Icon: ShieldCheck, bg: "bg-amber-50", iconClass: "text-amber-600" },
-  kyc_approved: { Icon: ShieldCheck, bg: "bg-emerald-50", iconClass: "text-emerald-600" },
-  kyc_rejected: { Icon: ShieldX, bg: "bg-red-50", iconClass: "text-red-600" },
-  booking_request: { Icon: CalendarClock, bg: "bg-brand-50", iconClass: "text-brand-600" },
-  booking_approved: { Icon: CalendarCheck, bg: "bg-emerald-50", iconClass: "text-emerald-600" },
-  booking_rejected: { Icon: CalendarX, bg: "bg-red-50", iconClass: "text-red-600" },
-  payment_confirmed: { Icon: CreditCard, bg: "bg-emerald-50", iconClass: "text-emerald-600" },
-  payment_received: { Icon: Wallet, bg: "bg-emerald-50", iconClass: "text-emerald-600" },
-  delivery_scheduled: { Icon: Truck, bg: "bg-blue-50", iconClass: "text-blue-600" },
-  return_reminder: { Icon: Clock, bg: "bg-amber-50", iconClass: "text-amber-600" },
-  dispute_opened: { Icon: AlertTriangle, bg: "bg-red-50", iconClass: "text-red-600" },
-  dispute_admin: { Icon: AlertTriangle, bg: "bg-red-50", iconClass: "text-red-600" },
-  payout_sent: { Icon: Banknote, bg: "bg-emerald-50", iconClass: "text-emerald-600" },
-  equipment_pending: { Icon: Package, bg: "bg-amber-50", iconClass: "text-amber-600" },
-  equipment_approved: { Icon: PackageCheck, bg: "bg-emerald-50", iconClass: "text-emerald-600" },
-  equipment_rejected: { Icon: PackageX, bg: "bg-red-50", iconClass: "text-red-600" },
-  review_owner_received: { Icon: Star, bg: "bg-amber-50", iconClass: "text-amber-600" },
-  review_equipment_received: { Icon: Star, bg: "bg-amber-50", iconClass: "text-amber-600" },
-  review_approved: { Icon: Star, bg: "bg-emerald-50", iconClass: "text-emerald-600" },
-  general: { Icon: Bell, bg: "bg-stone-100", iconClass: "text-stone-500" },
+  kyc_submitted: { Icon: ClipboardList, bg: "bg-amber-50 dark:bg-amber-500/15", iconClass: "text-amber-600" },
+  kyc_approved: { Icon: BadgeCheck, bg: "bg-emerald-50 dark:bg-emerald-500/15", iconClass: "text-emerald-600" },
+  kyc_rejected: { Icon: ShieldX, bg: "bg-red-50 dark:bg-red-500/15", iconClass: "text-red-600" },
+  booking_request: { Icon: CalendarClock, bg: "bg-brand-50 dark:bg-brand-500/15", iconClass: "text-brand-600" },
+  booking_approved: { Icon: CalendarCheck, bg: "bg-green-50 dark:bg-green-500/15", iconClass: "text-green-600" },
+  booking_rejected: { Icon: CalendarX, bg: "bg-red-50 dark:bg-red-500/15", iconClass: "text-red-600" },
+  payment_confirmed: { Icon: CreditCard, bg: "bg-teal-50 dark:bg-teal-500/15", iconClass: "text-teal-600" },
+  payment_received: { Icon: Wallet, bg: "bg-emerald-50 dark:bg-emerald-500/15", iconClass: "text-emerald-600" },
+  delivery_scheduled: { Icon: Truck, bg: "bg-blue-50 dark:bg-blue-500/15", iconClass: "text-blue-600" },
+  return_reminder: { Icon: RotateCcw, bg: "bg-orange-50 dark:bg-orange-500/15", iconClass: "text-orange-600" },
+  dispute_opened: { Icon: Scale, bg: "bg-rose-50 dark:bg-rose-500/15", iconClass: "text-rose-600" },
+  payout_sent: { Icon: Banknote, bg: "bg-lime-50 dark:bg-lime-500/15", iconClass: "text-lime-700" },
+  equipment_pending: { Icon: Package, bg: "bg-amber-50 dark:bg-amber-500/15", iconClass: "text-amber-600" },
+  equipment_approved: { Icon: PackageCheck, bg: "bg-emerald-50 dark:bg-emerald-500/15", iconClass: "text-emerald-600" },
+  equipment_rejected: { Icon: PackageX, bg: "bg-red-50 dark:bg-red-500/15", iconClass: "text-red-600" },
+  review_owner_received: { Icon: UserCircle, bg: "bg-sky-50 dark:bg-sky-500/15", iconClass: "text-sky-600" },
+  review_equipment_received: { Icon: MessageSquare, bg: "bg-indigo-50 dark:bg-indigo-500/15", iconClass: "text-indigo-600" },
+  review_approved: { Icon: ThumbsUp, bg: "bg-violet-50 dark:bg-violet-500/15", iconClass: "text-violet-600" },
+  general: { Icon: Bell, bg: "bg-stone-100 dark:bg-stone-800", iconClass: "text-stone-500" },
 };
 
 function loadNotifications(): AppNotification[] {
@@ -97,6 +98,7 @@ function loadNotifications(): AppNotification[] {
     const parsed = applyNotificationState(
       (JSON.parse(raw) as AppNotification[]).map((n) => ({
         ...n,
+        title: cleanNotificationTitle(n.title),
         timestamp: new Date(n.timestamp),
       }))
     );
@@ -162,7 +164,7 @@ export default function NotificationBell() {
         id: equipmentId
           ? `push-${type}-${equipmentId}-${Date.now()}`
           : `push-${type}-${Date.now()}`,
-        title,
+        title: cleanNotificationTitle(title),
         body,
         type,
         url,
@@ -182,7 +184,7 @@ export default function NotificationBell() {
       const rows = unwrap(res) as ApiNotificationRow[];
       const incoming: AppNotification[] = rows.map((n) => ({
         id: n.id,
-        title: n.title,
+        title: cleanNotificationTitle(n.title),
         body: n.body,
         type: n.type,
         url: n.url,
@@ -351,10 +353,10 @@ export default function NotificationBell() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: -6 }}
             transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute right-0 top-11 z-[100] w-[340px] overflow-hidden rounded-2xl border border-stone-100 bg-white shadow-xl"
+            className="absolute right-0 top-11 z-[100] w-[340px] overflow-hidden rounded-2xl border border-stone-200 bg-canvas-elevated shadow-elevated"
             role="menu"
           >
-            <div className="flex items-center justify-between border-b border-stone-100 bg-stone-50/80 px-4 py-3">
+            <div className="flex items-center justify-between border-b border-stone-200 bg-stone-100/80 px-4 py-3">
               <div className="flex items-center gap-2">
                 <Bell size={13} className="text-stone-400" />
                 <span className="text-sm font-semibold text-stone-800">Notifications</span>
@@ -375,14 +377,16 @@ export default function NotificationBell() {
             </div>
 
             {!permission ? (
-              <div className="mx-3 my-3 rounded-xl border border-brand-100 bg-brand-50 p-3">
+              <div className="mx-3 my-3 rounded-xl border border-brand-200/80 bg-brand-50 p-3 dark:border-brand-500/30 dark:bg-brand-500/10">
                 <div className="flex items-start gap-2.5">
                   <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-500">
                     <Bell size={14} className="text-white" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-xs font-semibold text-brand-900">Enable push notifications</p>
-                    <p className="mt-0.5 text-[11px] leading-relaxed text-brand-700">
+                    <p className="text-xs font-semibold text-brand-900 dark:text-brand-100">
+                      Enable push notifications
+                    </p>
+                    <p className="mt-0.5 text-[11px] leading-relaxed text-brand-700 dark:text-brand-300">
                       Get instant alerts for bookings, payments, and updates
                     </p>
                     <button
@@ -444,8 +448,10 @@ export default function NotificationBell() {
                           }
                         }}
                         className={cn(
-                          "group relative flex cursor-pointer gap-3 border-b border-stone-50 px-4 py-3 transition-colors last:border-0",
-                          n.read ? "hover:bg-stone-50/60" : "bg-brand-50/30 hover:bg-brand-50/50"
+                          "group relative flex cursor-pointer gap-3 border-b border-stone-200 px-4 py-3 transition-colors last:border-0 dark:border-stone-700",
+                          n.read
+                            ? "hover:bg-stone-100/60 dark:hover:bg-stone-800/50"
+                            : "bg-brand-50/30 hover:bg-brand-50/50 dark:bg-brand-500/10 dark:hover:bg-brand-500/15"
                         )}
                       >
                         <div
@@ -461,10 +467,10 @@ export default function NotificationBell() {
                           <p
                             className={cn(
                               "text-[13px] leading-snug",
-                              n.read ? "text-stone-600" : "font-semibold text-stone-900"
+                              n.read ? "text-stone-600" : "font-semibold text-stone-900 dark:text-stone-100"
                             )}
                           >
-                            {n.title}
+                            {cleanNotificationTitle(n.title)}
                           </p>
                           <p className="mt-0.5 line-clamp-2 text-[11px] leading-relaxed text-stone-500">
                             {n.body}
@@ -504,7 +510,7 @@ export default function NotificationBell() {
             </div>
 
             {notifications.length > 0 ? (
-              <div className="flex items-center justify-between border-t border-stone-100 bg-stone-50/80 px-4 py-2.5">
+              <div className="flex items-center justify-between border-t border-stone-200 bg-stone-100/80 px-4 py-2.5">
                 <span className="text-[11px] text-stone-400">
                   {notifications.length} notification{notifications.length !== 1 ? "s" : ""}
                 </span>

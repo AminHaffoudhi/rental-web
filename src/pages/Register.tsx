@@ -22,6 +22,9 @@ import {
 } from "@/components/ui/select";
 import { useAuth } from "@/hooks/useAuth";
 import { getApiErrorDetail } from "@/services/api";
+import { TermsAcceptanceModal } from "@/components/legal/TermsAcceptanceModal";
+import { PlatformLogo } from "@/components/brand/PlatformLogo";
+import { PLATFORM_NAME } from "@/config/brand";
 import { cn } from "@/utils/cn";
 
 const schema = z
@@ -61,6 +64,8 @@ export function Register() {
   const [showPw2, setShowPw2] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [termsModalOpen, setTermsModalOpen] = useState(false);
+  const [termsReviewed, setTermsReviewed] = useState(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -108,7 +113,7 @@ export function Register() {
           aria-hidden
         />
         <div className="relative z-[1]">
-          <p className="font-display text-3xl font-semibold">RentMarket</p>
+          <PlatformLogo size="2xl" linkTo="/" className="brightness-0 invert" />
           <p className="mt-6 max-w-sm text-lg text-white/90">
             Rent anything from trusted local owners
           </p>
@@ -129,13 +134,14 @@ export function Register() {
         </div>
       </div>
 
-      <div className="flex flex-1 items-center justify-center bg-stone-50 px-4 py-12">
+      <div className="flex flex-1 items-center justify-center bg-canvas px-4 py-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="w-full max-w-md"
         >
           <div className="mb-8">
+            <PlatformLogo size="md" className="mb-6 lg:hidden" />
             <h2 className="font-display text-3xl font-semibold text-stone-900">
               Create your account
             </h2>
@@ -153,7 +159,7 @@ export function Register() {
                 <motion.div
                   initial={{ x: [0, -8, 8, -8, 8, 0] }}
                   transition={{ duration: 0.4 }}
-                  className="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+                  className="flex items-start gap-2 rounded-lg border border-red-200 bg-red-500/10 px-4 py-3 text-sm text-red-700 dark:border-red-500/30 dark:text-red-300"
                 >
                   <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
                   {apiError}
@@ -321,7 +327,7 @@ export function Register() {
                     transition={{ delay: 0.16 }}
                   >
                     <FormItem>
-                      <FormLabel>How will you use RentMarket?</FormLabel>
+                      <FormLabel>How will you use {PLATFORM_NAME}?</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger className="input h-11 rounded-xl border-stone-200">
@@ -344,23 +350,65 @@ export function Register() {
                 control={form.control}
                 name="acceptTerms"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-start gap-3 space-y-0 rounded-lg border border-stone-200 bg-white p-3">
-                    <FormControl>
-                      <input
-                        type="checkbox"
-                        checked={!!field.value}
-                        onChange={(e) => field.onChange(e.target.checked)}
-                        className="mt-1 h-4 w-4 rounded border-stone-300 text-brand-500"
-                      />
-                    </FormControl>
-                    <div className="space-y-1 leading-none">
-                      <FormLabel className="font-normal text-stone-700">
-                        I agree to the Terms of Service and Privacy Policy
-                      </FormLabel>
-                      <FormMessage />
+                  <FormItem className="space-y-0 rounded-lg border border-stone-200 bg-canvas-card p-3">
+                    <div className="flex flex-row items-start gap-3">
+                      <FormControl>
+                        <input
+                          type="checkbox"
+                          checked={!!field.value}
+                          disabled={!termsReviewed}
+                          onChange={(e) => field.onChange(e.target.checked)}
+                          className="mt-1 h-4 w-4 rounded border-stone-300 text-brand-500 disabled:opacity-40"
+                          aria-describedby="terms-hint"
+                        />
+                      </FormControl>
+                      <div className="min-w-0 flex-1 space-y-2 leading-snug">
+                        <FormLabel className="font-normal text-stone-700">
+                          I agree to the{" "}
+                          <Link
+                            to="/terms"
+                            className="font-semibold text-brand-600 hover:text-brand-700"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            Terms of Service
+                          </Link>{" "}
+                          and{" "}
+                          <Link
+                            to="/privacy"
+                            className="font-semibold text-brand-600 hover:text-brand-700"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            Privacy Policy
+                          </Link>
+                        </FormLabel>
+                        {!termsReviewed ? (
+                          <p id="terms-hint" className="text-xs text-stone-500">
+                            Read and accept the Terms in our modal before checking this box.
+                          </p>
+                        ) : null}
+                        <button
+                          type="button"
+                          onClick={() => setTermsModalOpen(true)}
+                          className="text-xs font-semibold text-brand-600 hover:text-brand-700"
+                        >
+                          {termsReviewed ? "Review Terms again" : "Read Terms of Service →"}
+                        </button>
+                        <FormMessage />
+                      </div>
                     </div>
                   </FormItem>
                 )}
+              />
+
+              <TermsAcceptanceModal
+                open={termsModalOpen}
+                onOpenChange={setTermsModalOpen}
+                onAccepted={() => {
+                  setTermsReviewed(true);
+                  form.setValue("acceptTerms", true, { shouldValidate: true });
+                }}
               />
 
               <motion.div

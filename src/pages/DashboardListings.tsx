@@ -103,16 +103,16 @@ export function DashboardListings() {
       {mine.length > 0 ? (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {[
-            { label: "Total listings", value: stats.total, icon: Package, tone: "bg-stone-50 text-stone-700" },
-            { label: "Pending review", value: stats.pending, icon: Package, tone: "bg-amber-50 text-amber-800" },
-            { label: "Live in search", value: stats.live, icon: Eye, tone: "bg-green-50 text-green-700" },
-            { label: "Hidden / rejected", value: stats.hidden + stats.rejected, icon: EyeOff, tone: "bg-stone-100 text-stone-600" },
+            { label: "Total listings", value: stats.total, icon: Package, tone: "bg-stone-100 text-stone-700 dark:bg-stone-800/60 dark:text-stone-300" },
+            { label: "Pending review", value: stats.pending, icon: Package, tone: "bg-amber-50 text-amber-800 dark:bg-amber-500/15 dark:text-amber-300" },
+            { label: "Live in search", value: stats.live, icon: Eye, tone: "bg-green-50 text-green-700 dark:bg-green-500/15 dark:text-green-300" },
+            { label: "Hidden / rejected", value: stats.hidden + stats.rejected, icon: EyeOff, tone: "bg-stone-100 text-stone-600 dark:bg-stone-800/60 dark:text-stone-400" },
           ].map((stat) => {
             const Icon = stat.icon;
             return (
               <div
                 key={stat.label}
-                className="flex items-center gap-4 rounded-2xl border border-stone-100 bg-white p-4 shadow-sm"
+                className="flex items-center gap-4 rounded-2xl border border-stone-200 bg-canvas-card p-4 shadow-sm"
               >
                 <div className={cn("flex h-11 w-11 items-center justify-center rounded-xl", stat.tone)}>
                   <Icon className="h-5 w-5" aria-hidden />
@@ -146,7 +146,7 @@ export function DashboardListings() {
       {isLoading ? (
         <LoadingSkeleton count={3} />
       ) : !mine.length ? (
-        <div className="rounded-2xl border border-dashed border-stone-200 bg-white py-16">
+        <div className="rounded-2xl border border-dashed border-stone-200 bg-canvas-card py-16">
           <EmptyState
             icon={PackagePlus}
             title="No listings yet"
@@ -158,7 +158,7 @@ export function DashboardListings() {
           />
         </div>
       ) : filtered.length === 0 ? (
-        <p className="rounded-xl border border-stone-100 bg-white px-4 py-8 text-center text-sm text-stone-500">
+        <p className="rounded-xl border border-stone-200 bg-canvas-card px-4 py-8 text-center text-sm text-stone-500">
           No listings match &ldquo;{query}&rdquo;.
         </p>
       ) : (

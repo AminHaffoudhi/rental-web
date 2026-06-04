@@ -42,7 +42,7 @@ export function CategoryFilter({ selected = null, onSelect }: CategoryFilterProp
                 "flex shrink-0 items-center gap-2 rounded-full px-[18px] py-2 text-sm font-medium transition-all duration-200",
                 active
                   ? "bg-brand-500 text-white shadow-warm"
-                  : "border border-stone-200 bg-white text-stone-600 hover:border-stone-300"
+                  : "border border-stone-200 bg-canvas-card text-stone-600 hover:border-stone-300"
               )}
             >
               {c.value === ALL_CATEGORY_FILTER.value ? (

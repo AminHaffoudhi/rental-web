@@ -49,7 +49,7 @@ export function OwnerProfileHero({ profile, isOwnProfile }: OwnerProfileHeroProp
       <div className="container relative z-10 -mt-20 pb-6 sm:-mt-24">
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
-            <div className="shrink-0 rounded-2xl bg-white p-1.5 shadow-lg ring-4 ring-white">
+            <div className="shrink-0 rounded-2xl bg-canvas-card p-1.5 shadow-lg ring-4 ring-canvas-card">
               <UserAvatar
                 user={{ name: profile.name, image: profile.image ?? undefined }}
                 size="lg"
@@ -102,7 +102,7 @@ export function OwnerProfileHero({ profile, isOwnProfile }: OwnerProfileHeroProp
           {isOwnProfile ? (
             <Link
               to="/profile"
-              className="btn btn-secondary shrink-0 self-start bg-white/95 shadow-md sm:self-auto"
+              className="btn btn-secondary shrink-0 self-start bg-canvas-card/95 shadow-md sm:self-auto"
             >
               Edit profile
             </Link>
@@ -135,7 +135,7 @@ export function OwnerProfileHero({ profile, isOwnProfile }: OwnerProfileHeroProp
           ].map((stat) => (
             <div
               key={stat.label}
-              className="rounded-xl border border-white/20 bg-white/95 px-4 py-3 shadow-sm backdrop-blur-sm"
+              className="rounded-xl border border-stone-200/60 bg-canvas-card/95 px-4 py-3 shadow-sm backdrop-blur-sm dark:border-stone-600/60"
             >
               <div className="flex items-center gap-2 text-stone-500">
                 <stat.icon className="h-4 w-4 shrink-0" aria-hidden />

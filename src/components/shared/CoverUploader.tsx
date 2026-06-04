@@ -106,7 +106,7 @@ export function CoverUploader({
               type="button"
               disabled={uploading || cropOpen}
               onClick={() => inputRef.current?.click()}
-              className="absolute bottom-3 right-3 inline-flex items-center gap-2 rounded-full bg-white/95 px-4 py-2 text-sm font-semibold text-stone-800 shadow-md backdrop-blur-sm transition hover:bg-white disabled:opacity-60"
+              className="absolute bottom-3 right-3 inline-flex items-center gap-2 rounded-full bg-white/95 px-4 py-2 text-sm font-semibold text-stone-800 shadow-md backdrop-blur-sm transition hover:bg-canvas-card disabled:opacity-60"
             >
               {uploading ? (
                 <>

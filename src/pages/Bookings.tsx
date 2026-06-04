@@ -1,110 +1,177 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import { CalendarDays, Inbox, Search, Tag } from "lucide-react";
+import { BookingsPageHeader } from "@/components/booking/BookingsPageHeader";
+import { BookingFilterPills } from "@/components/booking/BookingFilterPills";
 import { MyBookingCard } from "@/components/booking/MyBookingCard";
 import { EmptyState } from "@/components/shared/EmptyState";
-import { LoadingSkeleton } from "@/components/shared/LoadingSkeleton";
 import { useMyBookings } from "@/hooks/useBooking";
-import { CalendarDays } from "lucide-react";
+import { useAuthStore } from "@/store/authStore";
+import { isOwnerRole } from "@/lib/roles";
+import type { Booking } from "@/types/booking";
 import { cn } from "@/utils/cn";
+
+type MainTab = "renter" | "owner";
+
+function countActive(list: Booking[]) {
+  return list.filter((b) =>
+    ["ACTIVE", "PICKUP_SCHEDULED", "IN_TRANSIT", "PAID", "PAYMENT_PENDING", "CONFIRMED"].includes(
+      b.status
+    )
+  ).length;
+}
 
 export function Bookings() {
   const { bookings, isLoading, error, refetch } = useMyBookings();
+  const role = useAuthStore((s) => s.user?.role);
+  const isOwner = isOwnerRole(role);
+  const [tab, setTab] = useState<MainTab>("renter");
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-stone-50">
-        <div className="container max-w-4xl py-10">
-          <LoadingSkeleton count={4} />
-        </div>
-      </div>
-    );
-  }
+  const stats = useMemo(() => {
+    if (!bookings) return null;
+    return {
+      renting: bookings.asRenter.length,
+      rentingActive: countActive(bookings.asRenter),
+      owner: bookings.asOwner.length,
+      ownerPending: bookings.asOwner.filter((b) => b.status === "PENDING").length,
+    };
+  }, [bookings]);
 
-  if (error || !bookings) {
-    return (
-      <div className="min-h-screen bg-stone-50">
-        <div className="container max-w-4xl py-16 text-center text-red-600">
-          {error?.message ?? "Could not load bookings"}
-        </div>
-      </div>
-    );
-  }
+  const list = !isOwner || tab === "renter" ? bookings?.asRenter ?? [] : bookings?.asOwner ?? [];
 
   return (
-    <div className="min-h-screen bg-stone-50">
-      <div className="container max-w-4xl pb-16 pt-10">
-        <h1 className="font-display text-3xl font-semibold text-stone-900">My Bookings</h1>
-        <p className="mt-2 text-stone-500">
-          Track rentals you’ve made and requests for your listings.
-        </p>
+    <div className="min-h-screen bg-canvas">
+      <div className="container max-w-4xl pb-20 pt-8 sm:pt-10 md:pb-16">
+        <BookingsPageHeader
+          eyebrow="Reservations"
+          title="My Bookings"
+          description={
+            isOwner
+              ? "Track rentals you've made and manage requests for your equipment."
+              : "Track equipment you've rented and follow each booking from request to return."
+          }
+          stats={
+            stats
+              ? isOwner
+                ? [
+                    {
+                      label: "I'm renting",
+                      value: stats.renting,
+                      icon: CalendarDays,
+                      tone: "blue" as const,
+                    },
+                    {
+                      label: "Active rentals",
+                      value: stats.rentingActive,
+                      icon: Inbox,
+                      tone: "green" as const,
+                    },
+                    {
+                      label: "My equipment",
+                      value: stats.owner,
+                      icon: Tag,
+                      tone: "brand" as const,
+                    },
+                    {
+                      label: "Pending requests",
+                      value: stats.ownerPending,
+                      icon: CalendarDays,
+                      tone: "amber" as const,
+                    },
+                  ]
+                : [
+                    {
+                      label: "Total bookings",
+                      value: stats.renting,
+                      icon: CalendarDays,
+                      tone: "blue" as const,
+                    },
+                    {
+                      label: "Active now",
+                      value: stats.rentingActive,
+                      icon: Inbox,
+                      tone: "green" as const,
+                    },
+                  ]
+              : undefined
+          }
+        />
 
-        <Tabs defaultValue="renter" className="mt-10">
-          <TabsList className="scrollbar-hide flex h-auto w-full flex-wrap justify-start gap-2 rounded-none bg-transparent p-0">
-            <TabsTrigger
-              value="renter"
-              className={cn(
-                "group rounded-full border px-5 py-2.5 text-sm font-medium shadow-none transition-colors",
-                "data-[state=active]:border-brand-500 data-[state=active]:bg-brand-500 data-[state=active]:text-white",
-                "data-[state=inactive]:border-stone-200 data-[state=inactive]:bg-white data-[state=inactive]:text-stone-600 hover:data-[state=inactive]:border-stone-300"
-              )}
-            >
-              I’m renting
-              <span className="ml-2 rounded-full bg-stone-100 px-2 py-0.5 text-xs text-stone-600 group-data-[state=active]:bg-white/20 group-data-[state=active]:text-white">
-                {bookings.asRenter.length}
-              </span>
-            </TabsTrigger>
-            <TabsTrigger
-              value="owner"
-              className={cn(
-                "group rounded-full border px-5 py-2.5 text-sm font-medium shadow-none transition-colors",
-                "data-[state=active]:border-brand-500 data-[state=active]:bg-brand-500 data-[state=active]:text-white",
-                "data-[state=inactive]:border-stone-200 data-[state=inactive]:bg-white data-[state=inactive]:text-stone-600 hover:data-[state=inactive]:border-stone-300"
-              )}
-            >
-              My equipment
-              <span className="ml-2 rounded-full bg-stone-100 px-2 py-0.5 text-xs text-stone-600 group-data-[state=active]:bg-white/20 group-data-[state=active]:text-white">
-                {bookings.asOwner.length}
-              </span>
-            </TabsTrigger>
-          </TabsList>
+        {isOwner ? (
+          <div className="mt-8 sm:mt-10">
+            <BookingFilterPills
+              tabs={[
+                {
+                  id: "renter",
+                  label: "I'm renting",
+                  count: bookings?.asRenter.length ?? 0,
+                },
+                {
+                  id: "owner",
+                  label: "My equipment",
+                  count: bookings?.asOwner.length ?? 0,
+                },
+              ]}
+              activeId={tab}
+              onChange={(id) => setTab(id as MainTab)}
+            />
+          </div>
+        ) : null}
 
-          <TabsContent value="renter" className="mt-8 space-y-4 focus-visible:outline-none">
-            {bookings.asRenter.length ? (
-              bookings.asRenter.map((b) => (
+        <div className="mt-8">
+          {isLoading ? (
+            <div className="space-y-4">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="skeleton h-48 rounded-2xl sm:h-36" />
+              ))}
+            </div>
+          ) : error || !bookings ? (
+            <div className="rounded-2xl border border-red-200 bg-red-500/10 px-6 py-12 text-center text-red-700 dark:border-red-500/30 dark:text-red-300">
+              {error?.message ?? "Could not load bookings"}
+            </div>
+          ) : list.length > 0 ? (
+            <div className="space-y-4">
+              {list.map((b) => (
                 <MyBookingCard
                   key={b.id}
                   booking={b}
-                  perspective="renter"
+                  perspective={tab}
                   onUpdated={() => refetch()}
                 />
-              ))
-            ) : (
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-dashed border-stone-200 bg-canvas-card px-4 py-4 shadow-elevated">
               <EmptyState
                 icon={CalendarDays}
-                title="No rentals yet"
-                subtitle="Browse listings and send your first booking request."
+                title={tab === "renter" ? "No rentals yet" : "No incoming bookings"}
+                subtitle={
+                  tab === "renter"
+                    ? "Browse listings and send your first booking request."
+                    : "List equipment to start receiving booking requests."
+                }
               />
-            )}
-          </TabsContent>
-
-          <TabsContent value="owner" className="mt-8 space-y-4 focus-visible:outline-none">
-            {bookings.asOwner.length ? (
-              bookings.asOwner.map((b) => (
-                <MyBookingCard
-                  key={b.id}
-                  booking={b}
-                  perspective="owner"
-                  onUpdated={() => refetch()}
-                />
-              ))
-            ) : (
-              <EmptyState
-                icon={CalendarDays}
-                title="No incoming bookings"
-                subtitle="Create a listing to receive booking requests."
-              />
-            )}
-          </TabsContent>
-        </Tabs>
+              <div className="flex justify-center pb-8">
+                <Link
+                  to={tab === "renter" ? "/search" : "/equipment/new"}
+                  className={cn("btn", tab === "renter" ? "btn-primary" : "btn-primary")}
+                >
+                  {tab === "renter" ? (
+                    <>
+                      <Search className="h-4 w-4" />
+                      Browse equipment
+                    </>
+                  ) : (
+                    <>
+                      <Tag className="h-4 w-4" />
+                      Add listing
+                    </>
+                  )}
+                </Link>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

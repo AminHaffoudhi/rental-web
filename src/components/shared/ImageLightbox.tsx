@@ -65,7 +65,7 @@ export function ImageLightbox({
         <button
           type="button"
           onClick={onClose}
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 transition-colors hover:bg-white/20"
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 transition-colors hover:bg-canvas-card/20"
           aria-label="Close"
         >
           <X className="h-5 w-5" />
@@ -86,7 +86,7 @@ export function ImageLightbox({
               e.stopPropagation();
               goPrev();
             }}
-            className="absolute left-2 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-sm hover:bg-white/25 sm:left-6"
+            className="absolute left-2 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-sm hover:bg-canvas-card/25 sm:left-6"
             aria-label="Previous"
           >
             <ChevronLeft className="h-6 w-6" />
@@ -107,7 +107,7 @@ export function ImageLightbox({
               e.stopPropagation();
               goNext();
             }}
-            className="absolute right-2 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-sm hover:bg-white/25 sm:right-6"
+            className="absolute right-2 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-sm hover:bg-canvas-card/25 sm:right-6"
             aria-label="Next"
           >
             <ChevronRight className="h-6 w-6" />

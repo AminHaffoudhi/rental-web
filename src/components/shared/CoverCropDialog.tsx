@@ -114,7 +114,7 @@ export function CoverCropDialog({
           />
         </div>
 
-        <DialogFooter className="gap-2 border-t border-stone-100 bg-stone-50 px-6 py-4 sm:gap-2">
+        <DialogFooter className="gap-2 border-t border-stone-200 bg-canvas-card px-6 py-4 sm:gap-2">
           <Button
             type="button"
             variant="outline"

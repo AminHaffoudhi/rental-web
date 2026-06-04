@@ -11,7 +11,7 @@ export function LoadingSkeleton({ count = 4 }: LoadingSkeletonProps) {
       {Array.from({ length: count }).map((_, i) => (
         <div
           key={i}
-          className="rounded-xl border border-stone-100 bg-white p-4 shadow-sm"
+          className="rounded-xl border border-stone-200 bg-canvas-card p-4 shadow-sm"
         >
           <div className="skeleton mb-3 h-5 w-2/3 max-w-xs" />
           <div className="skeleton mb-2 h-4 w-full max-w-md" />

@@ -11,19 +11,35 @@
 
 @layer base {
   :root {
-    /* Brand colors — warm amber/terracotta palette */
+    /* Brand — shared across themes */
+    --color-brand-500: #f97316;
+    --color-brand-600: #ea6c0a;
+
+    /* Light theme surfaces */
+    --canvas: #fafaf9;
+    --canvas-card: #ffffff;
+    --canvas-elevated: #ffffff;
+    --canvas-inverse: #1c1917;
+    --ink: #1c1917;
+    --ink-muted: #78716c;
+    --ink-disabled: #a8a29e;
+    --ink-on-inverse: #f5f5f4;
+    --border-subtle: #e7e5e4;
+    --brand-subtle: rgba(249, 115, 22, 0.12);
+    --shadow-elevated: 0 1px 3px rgba(120, 83, 40, 0.08), 0 1px 2px rgba(120, 83, 40, 0.06);
+    --input-focus-ring: rgba(249, 115, 22, 0.12);
+
+    /* Brand scale — light */
     --color-brand-50: #fff8f1;
     --color-brand-100: #ffefd9;
     --color-brand-200: #ffd9a8;
     --color-brand-300: #ffbc6b;
     --color-brand-400: #ff9d3d;
-    --color-brand-500: #f97316;
-    --color-brand-600: #ea6008;
     --color-brand-700: #c24b08;
     --color-brand-800: #9a3c10;
     --color-brand-900: #7c3210;
 
-    /* Neutral warm grays */
+    /* Stone scale — light */
     --color-stone-50: #fafaf9;
     --color-stone-100: #f5f5f4;
     --color-stone-200: #e7e5e4;
@@ -34,32 +50,31 @@
     --color-stone-700: #44403c;
     --color-stone-800: #292524;
     --color-stone-900: #1c1917;
+    --color-stone-inv: #1c1917;
+    --surface-inverse-border: #292524;
+    --surface-inverse-muted: #a8a29e;
+    --surface-inverse-fg: #f5f5f4;
 
-    /* Semantic */
     --color-success: #16a34a;
     --color-warning: #d97706;
     --color-error: #dc2626;
     --color-info: #2563eb;
 
-    /* Spacing scale */
     --radius-sm: 6px;
     --radius-md: 10px;
     --radius-lg: 16px;
     --radius-xl: 24px;
     --radius-2xl: 32px;
 
-    /* Shadows — warm tinted */
     --shadow-sm: 0 1px 3px rgba(120, 83, 40, 0.08), 0 1px 2px rgba(120, 83, 40, 0.06);
     --shadow-md: 0 4px 12px rgba(120, 83, 40, 0.1), 0 2px 6px rgba(120, 83, 40, 0.08);
     --shadow-lg: 0 10px 32px rgba(120, 83, 40, 0.12), 0 4px 12px rgba(120, 83, 40, 0.08);
     --shadow-xl: 0 24px 64px rgba(120, 83, 40, 0.14), 0 8px 24px rgba(120, 83, 40, 0.08);
 
-    /* Transitions */
     --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
     --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
     --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
 
-    /* shadcn/ui HSL bridge (warm marketplace) */
     --background: 40 24% 98%;
     --foreground: 24 10% 10%;
     --card: 0 0% 100%;
@@ -80,11 +95,71 @@
     --input: 40 13% 91%;
     --ring: 24 95% 53%;
     --radius: 0.625rem;
-    --chart-1: 24 95% 53%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+  }
+
+  .dark {
+    color-scheme: dark;
+
+    --canvas: #0f0f0f;
+    --canvas-card: #1a1a1a;
+    --canvas-elevated: #242424;
+    --canvas-inverse: #1a1a1a;
+    --ink: #f5f5f5;
+    --ink-muted: #a3a3a3;
+    --ink-disabled: #525252;
+    --ink-on-inverse: #f5f5f5;
+    --border-subtle: #2e2e2e;
+    --brand-subtle: rgba(249, 115, 22, 0.15);
+    --shadow-elevated: 0 0 0 1px #2e2e2e;
+    --input-focus-ring: rgba(249, 115, 22, 0.2);
+
+    --color-brand-50: rgba(249, 115, 22, 0.08);
+    --color-brand-100: rgba(249, 115, 22, 0.15);
+    --color-brand-200: rgba(249, 115, 22, 0.22);
+    --color-brand-300: rgba(249, 115, 22, 0.35);
+    --color-brand-400: #ff9d3d;
+    --color-brand-600: #ea6c0a;
+    --color-brand-700: #ffbc6b;
+    --color-brand-800: #ffd9a8;
+    --color-brand-900: #ffefd9;
+
+    --color-stone-50: #0f0f0f;
+    --color-stone-100: #1a1a1a;
+    --color-stone-200: #2e2e2e;
+    --color-stone-300: #3a3a3a;
+    --color-stone-400: #525252;
+    --color-stone-500: #a3a3a3;
+    --color-stone-600: #a3a3a3;
+    --color-stone-700: #c4c4c4;
+    --color-stone-800: #d4d4d4;
+    --color-stone-900: #f5f5f5;
+    --color-stone-inv: #141414;
+    --surface-inverse-border: #2e2e2e;
+    --surface-inverse-muted: #a3a3a3;
+    --surface-inverse-fg: #f5f5f5;
+
+    --shadow-sm: 0 0 0 1px #2e2e2e;
+    --shadow-md: 0 0 0 1px #2e2e2e;
+    --shadow-lg: 0 0 0 1px #2e2e2e;
+    --shadow-xl: 0 0 0 1px #2e2e2e;
+
+    --background: 0 0% 6%;
+    --foreground: 0 0% 96%;
+    --card: 0 0% 10%;
+    --card-foreground: 0 0% 96%;
+    --popover: 0 0% 14%;
+    --popover-foreground: 0 0% 96%;
+    --primary: 24 95% 53%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 14%;
+    --secondary-foreground: 0 0% 96%;
+    --muted: 0 0% 14%;
+    --muted-foreground: 0 0% 64%;
+    --accent: 24 30% 14%;
+    --accent-foreground: 0 0% 96%;
+    --border: 0 0% 18%;
+    --input: 0 0% 18%;
+    --ring: 24 95% 53%;
   }
 
   * {
@@ -96,7 +171,7 @@
   *,
   ::before,
   ::after {
-    border-color: hsl(var(--border));
+    border-color: var(--border-subtle);
   }
 
   html {
@@ -107,10 +182,11 @@
 
   body {
     font-family: "Plus Jakarta Sans", sans-serif;
-    background-color: var(--color-stone-50);
-    color: var(--color-stone-900);
+    background-color: var(--canvas);
+    color: var(--ink);
     line-height: 1.6;
     font-size: 15px;
+    transition: background-color var(--transition-normal), color var(--transition-normal);
   }
 
   #root {
@@ -125,7 +201,7 @@
   h4 {
     font-family: "Fraunces", serif;
     line-height: 1.2;
-    color: var(--color-stone-900);
+    color: var(--ink);
     letter-spacing: -0.02em;
   }
 
@@ -151,7 +227,7 @@
 
   ::selection {
     background: var(--color-brand-200);
-    color: var(--color-stone-900);
+    color: var(--ink);
   }
 
   :focus-visible {
@@ -177,7 +253,6 @@
 }
 
 @layer components {
-  /* ── Buttons ── */
   .btn {
     display: inline-flex;
     align-items: center;
@@ -204,7 +279,7 @@
 
   .btn-primary {
     background: var(--color-brand-500);
-    color: #fff;
+    color: #ffffff;
     box-shadow: 0 1px 3px rgba(249, 115, 22, 0.3);
   }
   .btn-primary:hover {
@@ -217,25 +292,24 @@
   }
 
   .btn-secondary {
-    background: #fff;
-    color: var(--color-stone-800);
-    border: 1.5px solid var(--color-stone-200);
-    box-shadow: var(--shadow-sm);
+    background: var(--canvas-elevated);
+    color: var(--ink);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-elevated);
   }
   .btn-secondary:hover {
     border-color: var(--color-stone-300);
-    background: var(--color-stone-50);
-    box-shadow: var(--shadow-md);
+    background: var(--color-stone-100);
     transform: translateY(-1px);
   }
 
   .btn-ghost {
     background: transparent;
-    color: var(--color-stone-600);
+    color: var(--ink-muted);
   }
   .btn-ghost:hover {
     background: var(--color-stone-100);
-    color: var(--color-stone-900);
+    color: var(--ink);
   }
 
   .btn-lg {
@@ -253,29 +327,28 @@
     border-radius: var(--radius-lg);
   }
 
-  /* ── Inputs ── */
   .input {
     width: 100%;
     font-family: "Plus Jakarta Sans", sans-serif;
     font-size: 14px;
-    color: var(--color-stone-900);
-    background: #fff;
-    border: 1.5px solid var(--color-stone-200);
+    color: var(--ink);
+    background: var(--canvas-card);
+    border: 1px solid var(--border-subtle);
     border-radius: var(--radius-md);
     padding: 11px 14px;
     transition: all var(--transition-fast);
     outline: none;
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-elevated);
   }
   .input::placeholder {
-    color: var(--color-stone-400);
+    color: var(--ink-disabled);
   }
   .input:hover {
     border-color: var(--color-stone-300);
   }
   .input:focus {
-    border-color: var(--color-brand-400);
-    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.12);
+    border-color: var(--color-brand-500);
+    box-shadow: 0 0 0 3px var(--input-focus-ring);
   }
   .input-lg {
     padding: 14px 18px;
@@ -286,27 +359,24 @@
     border-color: var(--color-error) !important;
   }
 
-  /* ── Cards ── */
   .card {
-    background: #fff;
+    background: var(--canvas-card);
     border-radius: var(--radius-xl);
-    border: 1px solid var(--color-stone-100);
-    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-elevated);
     overflow: hidden;
     transition: all var(--transition-normal);
   }
   .card:hover {
-    box-shadow: var(--shadow-lg);
+    border-color: var(--color-stone-300);
     transform: translateY(-2px);
-    border-color: var(--color-stone-200);
   }
   .card-flat {
-    background: #fff;
+    background: var(--canvas-card);
     border-radius: var(--radius-xl);
-    border: 1px solid var(--color-stone-100);
+    border: 1px solid var(--border-subtle);
   }
 
-  /* ── Badges ── */
   .badge {
     display: inline-flex;
     align-items: center;
@@ -318,31 +388,33 @@
     white-space: nowrap;
   }
   .badge-brand {
-    background: var(--color-brand-100);
-    color: var(--color-brand-700);
+    background: var(--brand-subtle);
+    color: var(--color-brand-500);
+  }
+  .dark .badge-brand {
+    color: var(--color-brand-400);
   }
   .badge-green {
-    background: #dcfce7;
-    color: #15803d;
+    background: rgba(22, 163, 74, 0.15);
+    color: #4ade80;
   }
   .badge-yellow {
-    background: #fef9c3;
-    color: #a16207;
+    background: rgba(217, 119, 6, 0.15);
+    color: #fbbf24;
   }
   .badge-red {
-    background: #fee2e2;
-    color: #b91c1c;
+    background: rgba(220, 38, 38, 0.15);
+    color: #f87171;
   }
   .badge-blue {
-    background: #dbeafe;
-    color: #1d4ed8;
+    background: rgba(37, 99, 235, 0.15);
+    color: #60a5fa;
   }
   .badge-stone {
     background: var(--color-stone-100);
-    color: var(--color-stone-600);
+    color: var(--ink-muted);
   }
 
-  /* ── Section wrappers ── */
   .container {
     width: 100%;
     max-width: 1280px;
@@ -365,7 +437,7 @@
 
   .divider {
     height: 1px;
-    background: var(--color-stone-100);
+    background: var(--border-subtle);
     width: 100%;
   }
 
@@ -399,13 +471,13 @@
     font-family: "Fraunces", serif;
     font-size: 1.25rem;
     font-weight: 600;
-    color: var(--color-stone-900);
+    color: var(--color-brand-500);
   }
   .price-tag span {
     font-family: "Plus Jakarta Sans", sans-serif;
     font-size: 0.75rem;
     font-weight: 400;
-    color: var(--color-stone-500);
+    color: var(--ink-muted);
   }
 }
 
@@ -414,19 +486,34 @@
     color: var(--color-brand-500);
   }
   .text-muted {
-    color: var(--color-stone-500);
+    color: var(--ink-muted);
   }
   .text-subtle {
-    color: var(--color-stone-400);
+    color: var(--ink-disabled);
+  }
+  .bg-canvas {
+    background-color: var(--canvas);
+  }
+  .bg-canvas-card {
+    background-color: var(--canvas-card);
+  }
+  .bg-canvas-elevated {
+    background-color: var(--canvas-elevated);
+  }
+  .bg-canvas-inverse {
+    background-color: var(--canvas-inverse);
   }
   .bg-warm {
     background-color: var(--color-brand-50);
   }
   .bg-warm-card {
-    background-color: #fffcf9;
+    background-color: var(--canvas-card);
   }
-  .border-warm {
-    border-color: var(--color-stone-200);
+  .border-subtle {
+    border-color: var(--border-subtle);
+  }
+  .shadow-elevated {
+    box-shadow: var(--shadow-elevated);
   }
   .shadow-warm {
     box-shadow: var(--shadow-md);
@@ -447,5 +534,49 @@
   }
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
+  }
+
+  .legal-content {
+    color: var(--ink-muted);
+    font-size: 15px;
+    line-height: 1.75;
+  }
+  .legal-content h2 {
+    font-family: "Fraunces", serif;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+    letter-spacing: -0.02em;
+  }
+  .legal-content h2:first-child {
+    margin-top: 0;
+  }
+  .legal-content p {
+    margin-bottom: 1rem;
+  }
+  .legal-content ul {
+    margin: 0 0 1rem 1.25rem;
+    list-style: disc;
+  }
+  .legal-content li {
+    margin-bottom: 0.35rem;
+  }
+  .legal-content a {
+    color: var(--color-brand-500);
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .legal-content a:hover {
+    color: var(--color-brand-600);
+  }
+  .legal-content strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .legal-content code {
+    font-size: 0.85em;
   }
 }

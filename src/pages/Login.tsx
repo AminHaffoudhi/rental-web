@@ -1,6 +1,16 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
-import { Check, Eye, EyeOff } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  BadgeCheck,
+  Eye,
+  EyeOff,
+  Lock,
+  Mail,
+  Shield,
+  Truck,
+} from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -15,7 +25,11 @@ import {
 } from "@/components/ui/form";
 import { useAuth } from "@/hooks/useAuth";
 import { getApiErrorDetail } from "@/services/api";
+import { PlatformLogo } from "@/components/brand/PlatformLogo";
+import { PLATFORM_NAME } from "@/config/brand";
+import { ThemeToggle } from "@/components/shared/ThemeToggle";
 import { useAuthStore } from "@/store/authStore";
+import { cn } from "@/utils/cn";
 
 const schema = z.object({
   email: z.string().email("Enter a valid email"),
@@ -23,6 +37,12 @@ const schema = z.object({
 });
 
 type FormValues = z.infer<typeof schema>;
+
+const perks = [
+  { icon: BadgeCheck, text: "Verified local owners" },
+  { icon: Shield, text: "Secure deposit handling" },
+  { icon: Truck, text: "Delivery included" },
+] as const;
 
 export function Login() {
   const { login } = useAuth();
@@ -62,202 +82,256 @@ export function Login() {
   }
 
   return (
-    <div className="flex min-h-svh flex-col lg:flex-row">
-      <div className="relative hidden w-[40%] flex-col justify-center overflow-hidden bg-brand-600 px-12 py-16 text-white lg:flex">
+    <div className="flex min-h-svh flex-col bg-canvas lg:flex-row">
+      {/* Brand panel — desktop */}
+      <aside className="relative hidden w-full max-w-[44%] flex-col justify-between overflow-hidden bg-gradient-to-br from-brand-600 via-brand-600 to-brand-700 px-10 py-12 text-white xl:px-14 xl:py-16 lg:flex">
         <div
-          className="pointer-events-none absolute inset-0 opacity-[0.05]"
+          className="pointer-events-none absolute -left-20 top-0 h-72 w-72 rounded-full bg-white/10 blur-3xl"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute -right-16 bottom-0 h-80 w-80 rounded-full bg-brand-400/30 blur-3xl"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.06]"
           style={{
             backgroundImage: "radial-gradient(#fff 1px, transparent 1px)",
-            backgroundSize: "14px 14px",
+            backgroundSize: "16px 16px",
           }}
           aria-hidden
         />
+
         <div className="relative z-[1]">
-          <p className="font-display text-3xl font-semibold">RentMarket</p>
-          <p className="mt-6 max-w-sm text-lg text-white/90">Rent anything from trusted local owners</p>
-          <ul className="mt-10 space-y-3 text-white/80">
-            <li className="flex items-center gap-2">
-              <Check className="h-4 w-4 shrink-0 text-white" strokeWidth={2.5} aria-hidden />
-              Thousands of listings
-            </li>
-            <li className="flex items-center gap-2">
-              <Check className="h-4 w-4 shrink-0 text-white" strokeWidth={2.5} aria-hidden />
-              Secure deposits
-            </li>
-            <li className="flex items-center gap-2">
-              <Check className="h-4 w-4 shrink-0 text-white" strokeWidth={2.5} aria-hidden />
-              Delivery included
-            </li>
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 text-sm font-medium text-white/80 transition-colors hover:text-white"
+          >
+            <ArrowLeft className="h-4 w-4" aria-hidden />
+            Back to home
+          </Link>
+          <div className="mt-10">
+            <PlatformLogo size="2xl" linkTo="/" className="brightness-0 invert" />
+          </div>
+        </div>
+
+        <div className="relative z-[1]">
+          <h1 className="font-display text-3xl font-semibold leading-tight tracking-tight xl:text-[2.35rem]">
+            Welcome back to Tunisia&apos;s equipment marketplace
+          </h1>
+          <p className="mt-4 max-w-md text-base leading-relaxed text-white/85">
+            Sign in to manage bookings, list your gear, and connect with trusted renters and owners.
+          </p>
+          <ul className="mt-10 space-y-4">
+            {perks.map(({ icon: Icon, text }) => (
+              <li key={text} className="flex items-center gap-3 text-white/90">
+                <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/15 ring-1 ring-white/20">
+                  <Icon className="h-4 w-4" strokeWidth={2} aria-hidden />
+                </span>
+                <span className="text-sm font-medium sm:text-base">{text}</span>
+              </li>
+            ))}
           </ul>
         </div>
-      </div>
 
-      <div className="flex flex-1 items-center justify-center bg-stone-50 px-4 py-12">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-md"
-        >
-          <div className="mb-8">
-            <h2 className="font-display text-3xl font-semibold text-stone-900">Welcome back</h2>
-            <p className="mt-2 text-sm text-stone-500">
-              Don&apos;t have an account?{" "}
-              <Link to="/register" className="font-semibold text-brand-600 hover:underline">
-                Register →
-              </Link>
-            </p>
-            {registeredEmail ? (
-              <div className="mt-4 rounded-lg border border-brand-200 bg-brand-50 px-4 py-3 text-sm text-brand-900">
-                <p>
-                  We sent a 6-digit code to <strong>{registeredEmail}</strong>. Enter it to verify your
-                  account.
-                </p>
-                <Link
-                  to="/verify-email"
-                  state={{ email: registeredEmail }}
-                  className="mt-3 inline-flex font-semibold text-brand-700 underline hover:text-brand-800"
-                >
-                  Go to verification →
-                </Link>
-              </div>
-            ) : null}
+        <p className="relative z-[1] text-sm text-white/60">
+          © {new Date().getFullYear()} {PLATFORM_NAME} · Built for Tunisia
+        </p>
+      </aside>
+
+      {/* Form panel */}
+      <main className="flex flex-1 flex-col">
+        <header className="flex items-center justify-between border-b border-stone-200 bg-canvas-card px-4 py-4 sm:px-6 lg:hidden">
+          <PlatformLogo size="sm" />
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <Link
+              to="/"
+              className="text-sm font-medium text-stone-500 hover:text-brand-600"
+            >
+              Home
+            </Link>
           </div>
+        </header>
 
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-              {apiError ? (
-                <motion.div
-                  initial={{ x: [0, -8, 8, -8, 8, 0] }}
-                  transition={{ duration: 0.4 }}
-                  className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
-                  role="alert"
-                >
-                  <p>{apiError}</p>
-                </motion.div>
+        <div className="flex flex-1 items-center justify-center bg-gradient-to-b from-brand-50/40 via-canvas to-canvas-card px-4 py-10 sm:px-6 sm:py-12">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+            className="w-full max-w-[420px]"
+          >
+            <div className="rounded-2xl border border-stone-200 bg-canvas-card p-6 shadow-elevated sm:p-8 sm:rounded-3xl">
+              <div className="mb-8">
+                <h2 className="font-display text-2xl font-semibold tracking-tight text-stone-900 sm:text-3xl">
+                  Sign in
+                </h2>
+                <p className="mt-2 text-sm text-stone-500 sm:text-base">
+                  New here?{" "}
+                  <Link
+                    to="/register"
+                    className="font-semibold text-brand-600 transition-colors hover:text-brand-700"
+                  >
+                    Create an account
+                  </Link>
+                </p>
+              </div>
+
+              {registeredEmail ? (
+                <div className="mb-6 rounded-xl border border-brand-200 bg-brand-50 px-4 py-3.5 text-sm text-brand-900">
+                  <p>
+                    We sent a 6-digit code to <strong>{registeredEmail}</strong>. Verify your email
+                    to continue.
+                  </p>
+                  <Link
+                    to="/verify-email"
+                    state={{ email: registeredEmail }}
+                    className="mt-2 inline-flex items-center gap-1 font-semibold text-brand-700 hover:text-brand-800"
+                  >
+                    Go to verification
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </div>
               ) : null}
 
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <motion.div
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.05 }}
-                  >
-                    <FormItem>
-                      <FormLabel>Email address</FormLabel>
-                      <FormControl>
-                        <input type="email" autoComplete="email" className="input" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  </motion.div>
-                )}
-              />
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+                  {apiError ? (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.98 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+                      role="alert"
+                    >
+                      {apiError}
+                    </motion.div>
+                  ) : null}
 
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <motion.div
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
-                  >
-                    <FormItem>
-                      <FormLabel>Password</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <input
-                            type={showPw ? "text" : "password"}
-                            autoComplete="current-password"
-                            className="input pr-11"
-                            {...field}
-                          />
-                          <button
-                            type="button"
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700"
-                            onClick={() => setShowPw((s) => !s)}
-                            aria-label={showPw ? "Hide password" : "Show password"}
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-stone-700">Email</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <Mail
+                              className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400"
+                              aria-hidden
+                            />
+                            <input
+                              type="email"
+                              autoComplete="email"
+                              placeholder="you@example.com"
+                              className="input pl-10"
+                              {...field}
+                            />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="flex items-center justify-between gap-2">
+                          <FormLabel className="text-stone-700">Password</FormLabel>
+                          <span
+                            className="cursor-not-allowed text-xs font-medium text-stone-400"
+                            title="Coming soon"
                           >
-                            {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                          </button>
+                            Forgot password?
+                          </span>
                         </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  </motion.div>
-                )}
-              />
+                        <FormControl>
+                          <div className="relative">
+                            <Lock
+                              className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400"
+                              aria-hidden
+                            />
+                            <input
+                              type={showPw ? "text" : "password"}
+                              autoComplete="current-password"
+                              placeholder="••••••••"
+                              className="input pl-10 pr-11"
+                              {...field}
+                            />
+                            <button
+                              type="button"
+                              className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-stone-400 transition-colors hover:bg-stone-100 hover:text-stone-700"
+                              onClick={() => setShowPw((s) => !s)}
+                              aria-label={showPw ? "Hide password" : "Show password"}
+                            >
+                              {showPw ? (
+                                <EyeOff className="h-4 w-4" />
+                              ) : (
+                                <Eye className="h-4 w-4" />
+                              )}
+                            </button>
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-              <div className="flex justify-end">
-                <span className="cursor-not-allowed text-xs text-stone-400" title="Coming soon">
-                  Forgot password?
-                </span>
-              </div>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className={cn(
+                      "btn btn-primary btn-lg relative mt-2 w-full gap-2 shadow-warm",
+                      loading && "pointer-events-none opacity-90"
+                    )}
+                  >
+                    {loading ? (
+                      <span className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                    ) : (
+                      <>
+                        Sign in
+                        <ArrowRight className="h-4 w-4" />
+                      </>
+                    )}
+                  </button>
+                </form>
+              </Form>
+            </div>
 
-              <motion.div
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.15 }}
+            <p className="mt-6 text-center text-xs leading-relaxed text-stone-400">
+              By signing in you agree to our{" "}
+              <Link
+                to="/terms"
+                className="font-semibold text-stone-500 underline-offset-2 hover:text-brand-600 hover:underline"
               >
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="btn btn-primary btn-lg relative w-full"
+                Terms of Service
+              </Link>{" "}
+              and{" "}
+              <Link
+                to="/privacy"
+                className="font-semibold text-stone-500 underline-offset-2 hover:text-brand-600 hover:underline"
+              >
+                Privacy Policy
+              </Link>
+            </p>
+
+            {/* Mobile perks */}
+            <ul className="mt-8 flex flex-wrap justify-center gap-3 lg:hidden">
+              {perks.map(({ icon: Icon, text }) => (
+                <li
+                  key={text}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-stone-200 bg-canvas-card px-3 py-1.5 text-xs font-medium text-stone-600 shadow-sm"
                 >
-                  {loading ? (
-                    <span className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                  ) : (
-                    "Login"
-                  )}
-                </button>
-              </motion.div>
-            </form>
-          </Form>
-
-          <div className="relative my-8">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-stone-200" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase tracking-wide">
-              <span className="bg-stone-50 px-3 text-stone-400">or continue with</span>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            disabled
-            title="Coming soon"
-            className="btn btn-secondary flex w-full items-center justify-center gap-2 opacity-60"
-          >
-            <svg className="h-5 w-5" viewBox="0 0 24 24" aria-hidden>
-              <path
-                fill="currentColor"
-                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-              />
-              <path
-                fill="currentColor"
-                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-              />
-              <path
-                fill="currentColor"
-                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-              />
-              <path
-                fill="currentColor"
-                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-              />
-            </svg>
-            Continue with Google
-          </button>
-
-          <p className="mt-8 text-center text-xs text-stone-400">
-            By continuing you agree to our Terms and Privacy Policy
-          </p>
-        </motion.div>
-      </div>
+                  <Icon className="h-3.5 w-3.5 text-brand-500" aria-hidden />
+                  {text}
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+        </div>
+      </main>
     </div>
   );
 }

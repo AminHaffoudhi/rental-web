@@ -1,4 +1,5 @@
 import { Navigate, Route, Routes, useParams } from "react-router-dom";
+import { OwnerOnlyRoute } from "@/components/auth/OwnerOnlyRoute";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { MainLayout } from "@/components/layout/MainLayout";
@@ -18,6 +19,10 @@ import { PublicProfile } from "@/pages/PublicProfile";
 import { Register } from "@/pages/Register";
 import { Search } from "@/pages/Search";
 import { VerifyEmail } from "@/pages/VerifyEmail";
+import { TermsOfService } from "@/pages/TermsOfService";
+import { PrivacyPolicy } from "@/pages/PrivacyPolicy";
+import { CookiePolicy } from "@/pages/CookiePolicy";
+import { Contact } from "@/pages/Contact";
 
 function RedirectLegacyProfile() {
   const { userId } = useParams<{ userId: string }>();
@@ -34,16 +39,22 @@ export default function App() {
       <Route element={<ProtectedRoute />}>
         <Route element={<DashboardLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/dashboard/listings" element={<DashboardListings />} />
-          <Route path="/dashboard/bookings" element={<DashboardBookings />} />
-          <Route path="/dashboard/earnings" element={<DashboardEarnings />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/equipment/new" element={<NewListing />} />
+          <Route element={<OwnerOnlyRoute />}>
+            <Route path="/dashboard/listings" element={<DashboardListings />} />
+            <Route path="/dashboard/bookings" element={<DashboardBookings />} />
+            <Route path="/dashboard/earnings" element={<DashboardEarnings />} />
+            <Route path="/equipment/new" element={<NewListing />} />
+          </Route>
         </Route>
       </Route>
 
       <Route element={<MainLayout />}>
         <Route path="/" element={<Home />} />
+        <Route path="/terms" element={<TermsOfService />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/cookies" element={<CookiePolicy />} />
+        <Route path="/contact" element={<Contact />} />
         <Route path="/search" element={<Search />} />
         <Route path="/equipment/:id" element={<EquipmentDetail />} />
         <Route path="/users/:userId" element={<PublicProfile />} />

@@ -1,3 +1,4 @@
+import { PLATFORM_NAME } from "@/config/brand";
 import { Link, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import {
@@ -36,7 +37,7 @@ import { equipmentReviewStats } from "@/utils/reviewStats";
 
 function DetailSkeleton() {
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div className="min-h-screen bg-canvas">
       <div className="container py-4">
         <div className="skeleton h-4 w-48 max-w-full" />
       </div>
@@ -61,7 +62,7 @@ function DescriptionBlock({ text }: { text: string }) {
   const shown = long && !open ? `${text.slice(0, 280)}…` : text;
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-stone-100 bg-white p-6 shadow-sm">
+    <section className="overflow-hidden rounded-2xl border border-stone-200 bg-canvas-card p-6 shadow-sm">
       <h3 className="font-display text-xl font-semibold text-stone-900">About this equipment</h3>
       <p className="mt-4 max-w-full whitespace-pre-wrap leading-relaxed text-stone-600 [overflow-wrap:anywhere]">
         {shown}
@@ -117,7 +118,7 @@ function PricingCard({ equipment }: { equipment: Equipment }) {
   ];
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-brand-100 bg-gradient-to-br from-brand-50 to-white shadow-sm">
+    <div className="overflow-hidden rounded-2xl border border-brand-100 bg-gradient-to-br from-brand-50 to-canvas-card shadow-sm">
       <div className="border-b border-brand-100/80 px-5 py-4">
         <p className="text-xs font-semibold uppercase tracking-widest text-brand-700">Pricing</p>
         <p className="mt-1 font-display text-3xl font-semibold text-stone-900">
@@ -130,7 +131,7 @@ function PricingCard({ equipment }: { equipment: Equipment }) {
           const Icon = row.icon;
           return (
             <div key={row.label} className="flex items-center gap-3 py-3.5">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white shadow-sm">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-canvas-card shadow-elevated">
                 <Icon className="h-4 w-4 text-brand-600" aria-hidden />
               </div>
               <div className="min-w-0 flex-1">
@@ -205,7 +206,7 @@ function OwnerCard({ equipment }: { equipment: Equipment }) {
   const isVerified = owner.kycStatus === "APPROVED";
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-stone-100 bg-white shadow-sm">
+    <section className="overflow-hidden rounded-2xl border border-stone-200 bg-canvas-card shadow-sm">
       <div className="p-6">
         <h3 className="text-xs font-semibold uppercase tracking-widest text-stone-400">
           Hosted by
@@ -226,7 +227,7 @@ function OwnerCard({ equipment }: { equipment: Equipment }) {
               {isVerified ? (
                 <span
                   className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold leading-none text-emerald-800 shadow-sm"
-                  title="Identity verified on RentMarket"
+                  title={`Identity verified on ${PLATFORM_NAME}`}
                 >
                   <BadgeCheck className="h-3.5 w-3.5 shrink-0 text-emerald-600" strokeWidth={2.5} />
                   Verified owner
@@ -251,10 +252,10 @@ function OwnerCard({ equipment }: { equipment: Equipment }) {
         </div>
       </div>
 
-      <div className="border-t border-stone-100 bg-stone-50/70 px-4 py-3 sm:px-6 sm:py-4">
+      <div className="border-t border-stone-200 bg-stone-100/70 px-4 py-3 sm:px-6 sm:py-4">
         <Link
           to={`/users/${owner.id}`}
-          className="group flex w-full items-center justify-center gap-2 rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm font-semibold text-stone-800 shadow-sm transition-all hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700 hover:shadow-md"
+          className="group flex w-full items-center justify-center gap-2 rounded-xl border border-stone-200 bg-canvas-card px-4 py-3 text-sm font-semibold text-stone-800 shadow-sm transition-all hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700 hover:shadow-md"
         >
           View profile
           <ChevronRight
@@ -308,8 +309,8 @@ function OwnerManagePanel({ equipment }: { equipment: Equipment }) {
   const rejected = equipment.approvalStatus === "REJECTED";
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-stone-100 bg-white shadow-lg">
-      <div className="bg-stone-900 px-5 py-4 text-white">
+    <div className="overflow-hidden rounded-2xl border border-stone-200 bg-canvas-card shadow-lg">
+      <div className="bg-stone-inv px-5 py-4 text-white">
         <p className="text-xs font-semibold uppercase tracking-widest text-stone-400">Your listing</p>
         <p className="mt-1 font-display text-lg font-semibold">Manage from dashboard</p>
       </div>
@@ -382,10 +383,10 @@ function ReviewsSection({
   }, [approvedReviews]);
 
   return (
-    <section className="rounded-2xl border border-stone-100 bg-white p-6 shadow-sm">
+    <section className="rounded-2xl border border-stone-200 bg-canvas-card p-6 shadow-sm">
       <h3 className="font-display text-xl font-semibold text-stone-900">Reviews</h3>
       {reviewCount > 0 && avg !== null ? (
-        <div className="mt-6 flex flex-wrap items-end gap-8 border-b border-stone-100 pb-8">
+        <div className="mt-6 flex flex-wrap items-end gap-8 border-b border-stone-200 pb-8">
           <div>
             <p className="font-display text-5xl font-semibold text-stone-900">{avg.toFixed(1)}</p>
             <div className="mt-1 flex gap-0.5" aria-hidden>
@@ -486,7 +487,7 @@ export function EquipmentDetail() {
 
   if (!equipment) {
     return (
-      <div className="flex min-h-[60vh] flex-col items-center justify-center bg-stone-50 px-4 text-center">
+      <div className="flex min-h-[60vh] flex-col items-center justify-center bg-canvas px-4 text-center">
         <p className="font-display text-xl font-semibold text-stone-900">Listing not found</p>
         <p className="mt-2 text-sm text-stone-500">
           {error?.message ?? "This equipment may have been removed."}
@@ -499,8 +500,8 @@ export function EquipmentDetail() {
   }
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-stone-50 pb-28 lg:pb-16">
-      <div className="border-b border-stone-100 bg-white">
+    <div className="min-h-screen overflow-x-hidden bg-canvas pb-28 lg:pb-16">
+      <div className="border-b border-stone-200 bg-canvas-card">
         <nav className="container flex flex-wrap items-center gap-1 py-3 text-sm text-stone-500">
           <Link to="/" className="inline-flex items-center gap-1 hover:text-brand-600">
             <Home className="h-4 w-4" aria-hidden />
@@ -532,7 +533,7 @@ export function EquipmentDetail() {
               <PricingCard equipment={equipment} />
             </div>
             <DescriptionBlock text={equipment.description} />
-            <section className="overflow-hidden rounded-2xl border border-stone-100 bg-white p-6 shadow-sm">
+            <section className="overflow-hidden rounded-2xl border border-stone-200 bg-canvas-card p-6 shadow-sm">
               <h3 className="font-display text-xl font-semibold text-stone-900">What&apos;s included</h3>
               <ul className="mt-4 grid gap-3 sm:grid-cols-2">
                 {[
@@ -585,7 +586,7 @@ export function EquipmentDetail() {
       </div>
 
       {!isOwner && equipment.approvalStatus === "APPROVED" && equipment.isAvailable ? (
-        <div className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-between gap-4 border-t border-stone-100 bg-white/95 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-8px_32px_rgba(0,0,0,0.08)] backdrop-blur-sm lg:hidden">
+        <div className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-between gap-4 border-t border-stone-200 bg-canvas-card/95 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-8px_32px_rgba(0,0,0,0.08)] backdrop-blur-sm lg:hidden">
           <div>
             <p className="text-[11px] font-medium uppercase tracking-wide text-stone-400">From</p>
             <p className="font-display text-xl font-semibold text-stone-900">

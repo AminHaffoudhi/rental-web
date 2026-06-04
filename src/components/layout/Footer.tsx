@@ -1,6 +1,8 @@
 import type { SVGProps } from "react";
 import { Heart } from "lucide-react";
 import { Link } from "react-router-dom";
+import { PlatformLogo } from "@/components/brand/PlatformLogo";
+import { PLATFORM_NAME } from "@/config/brand";
 
 function IconTwitter(props: SVGProps<SVGSVGElement>) {
   return (
@@ -35,28 +37,28 @@ const platformLinks = [
 
 const supportLinks = [
   { label: "Help Center", to: "/search" },
-  { label: "Contact Us", to: "/search" },
+  { label: "Contact Us", to: "/contact" },
   { label: "Safety Guide", to: "/search" },
-  { label: "Report an Issue", to: "/search" },
+  { label: "Report an Issue", to: "/contact?type=report" },
 ];
 
 const legalLinks = [
-  { label: "Terms of Service", to: "#" },
-  { label: "Privacy Policy", to: "#" },
-  { label: "Cookie Policy", to: "#" },
+  { label: "Terms of Service", to: "/terms" },
+  { label: "Privacy Policy", to: "/privacy" },
+  { label: "Cookie Policy", to: "/cookies" },
 ];
 
 export function Footer() {
   return (
-    <footer className="bg-stone-900 text-stone-100">
+    <footer className="bg-stone-inv text-[var(--surface-inverse-fg)]">
       <div className="container section-sm">
         <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
           <div className="space-y-4">
-            <p className="font-display text-xl font-semibold text-white">RentMarket</p>
+            <PlatformLogo size="lg" linkTo="/" className="brightness-0 invert" />
             <p className="text-sm font-medium text-stone-300">
               The trusted marketplace for equipment rental
             </p>
-            <p className="max-w-xs text-sm leading-relaxed text-stone-400">
+            <p className="max-w-xs text-sm leading-relaxed text-[var(--surface-inverse-muted)]/80">
               Connect with local equipment owners. Rent what you need, when you need it.
             </p>
             <div className="flex gap-3 pt-2">
@@ -64,7 +66,7 @@ export function Footer() {
                 href="https://twitter.com"
                 target="_blank"
                 rel="noreferrer"
-                className="rounded-full border border-stone-700 p-2 text-stone-400 transition-colors hover:border-stone-500 hover:text-white"
+                className="rounded-full border border-[var(--surface-inverse-border)] p-2 text-[var(--surface-inverse-muted)] transition-colors hover:border-stone-500 hover:text-white"
                 aria-label="Twitter"
               >
                 <IconTwitter className="h-4 w-4" />
@@ -73,7 +75,7 @@ export function Footer() {
                 href="https://instagram.com"
                 target="_blank"
                 rel="noreferrer"
-                className="rounded-full border border-stone-700 p-2 text-stone-400 transition-colors hover:border-stone-500 hover:text-white"
+                className="rounded-full border border-[var(--surface-inverse-border)] p-2 text-[var(--surface-inverse-muted)] transition-colors hover:border-stone-500 hover:text-white"
                 aria-label="Instagram"
               >
                 <IconInstagram className="h-4 w-4" />
@@ -82,7 +84,7 @@ export function Footer() {
                 href="https://linkedin.com"
                 target="_blank"
                 rel="noreferrer"
-                className="rounded-full border border-stone-700 p-2 text-stone-400 transition-colors hover:border-stone-500 hover:text-white"
+                className="rounded-full border border-[var(--surface-inverse-border)] p-2 text-[var(--surface-inverse-muted)] transition-colors hover:border-stone-500 hover:text-white"
                 aria-label="LinkedIn"
               >
                 <IconLinkedIn className="h-4 w-4" />
@@ -91,13 +93,13 @@ export function Footer() {
           </div>
 
           <div>
-            <p className="mb-4 font-display text-sm font-semibold uppercase tracking-wide text-stone-400">
+            <p className="mb-4 font-display text-sm font-semibold uppercase tracking-wide text-[var(--surface-inverse-muted)]">
               Platform
             </p>
             <ul className="space-y-3 text-sm">
               {platformLinks.map((l) => (
                 <li key={l.label}>
-                  <Link className="text-stone-300 transition-colors hover:text-white" to={l.to}>
+                  <Link className="text-[var(--surface-inverse-muted)] transition-colors hover:text-white" to={l.to}>
                     {l.label}
                   </Link>
                 </li>
@@ -106,13 +108,13 @@ export function Footer() {
           </div>
 
           <div>
-            <p className="mb-4 font-display text-sm font-semibold uppercase tracking-wide text-stone-400">
+            <p className="mb-4 font-display text-sm font-semibold uppercase tracking-wide text-[var(--surface-inverse-muted)]">
               Support
             </p>
             <ul className="space-y-3 text-sm">
               {supportLinks.map((l) => (
                 <li key={l.label}>
-                  <Link className="text-stone-300 transition-colors hover:text-white" to={l.to}>
+                  <Link className="text-[var(--surface-inverse-muted)] transition-colors hover:text-white" to={l.to}>
                     {l.label}
                   </Link>
                 </li>
@@ -121,38 +123,41 @@ export function Footer() {
           </div>
 
           <div className="space-y-4">
-            <p className="mb-4 font-display text-sm font-semibold uppercase tracking-wide text-stone-400">
+            <p className="mb-4 font-display text-sm font-semibold uppercase tracking-wide text-[var(--surface-inverse-muted)]">
               Legal
             </p>
             <ul className="space-y-3 text-sm">
               {legalLinks.map((l) => (
                 <li key={l.label}>
-                  <a className="text-stone-300 transition-colors hover:text-white" href={l.to}>
+                  <Link
+                    className="text-[var(--surface-inverse-muted)] transition-colors hover:text-white"
+                    to={l.to}
+                  >
                     {l.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
-            <p className="pt-4 text-xs text-stone-500">© 2026 RentMarket. All rights reserved.</p>
+            <p className="pt-4 text-xs text-[var(--surface-inverse-muted)]/70">© 2026 {PLATFORM_NAME}. All rights reserved.</p>
           </div>
         </div>
 
-        <div className="divider my-10 bg-stone-700" />
+        <div className="divider my-10 bg-[var(--surface-inverse-border)]" />
 
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-          <p className="flex items-center justify-center gap-1.5 text-center text-sm text-stone-400 lg:justify-start">
+          <p className="flex items-center justify-center gap-1.5 text-center text-sm text-[var(--surface-inverse-muted)] lg:justify-start">
             Made with
             <Heart className="inline h-4 w-4 fill-red-400/80 text-red-400/80" aria-hidden />
             for equipment owners and renters
           </p>
           <div className="flex flex-wrap justify-center gap-2 lg:justify-end">
-            <span className="rounded-full bg-stone-800 px-3 py-1 text-xs font-medium text-stone-300">
+            <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-[var(--surface-inverse-fg)]">
               Secure Payments
             </span>
-            <span className="rounded-full bg-stone-800 px-3 py-1 text-xs font-medium text-stone-300">
+            <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-[var(--surface-inverse-fg)]">
               Verified Users
             </span>
-            <span className="rounded-full bg-stone-800 px-3 py-1 text-xs font-medium text-stone-300">
+            <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-[var(--surface-inverse-fg)]">
               24/7 Support
             </span>
           </div>

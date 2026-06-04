@@ -186,9 +186,9 @@ export function Search() {
   const qDisplay = params.get("q")?.trim();
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div className="min-h-screen bg-canvas">
       {/* SearchHero */}
-      <div className="border-b border-stone-100 bg-white shadow-sm">
+      <div className="border-b border-stone-200 bg-canvas-card shadow-sm">
         <div className="container py-6">
           <div className="relative mb-5">
             <SearchIcon
@@ -209,7 +209,7 @@ export function Search() {
                 }
               }}
               placeholder="Search equipment, tools, gear..."
-              className="input input-lg w-full rounded-full border-stone-200 py-3 pl-12 pr-4 shadow-sm transition-all focus:border-brand-400 focus:shadow-warm"
+              className="input input-lg w-full rounded-full border-stone-200 py-3 pl-12 pr-4 shadow-sm transition-all focus:border-brand-500 focus:shadow-elevated"
               aria-label="Search listings"
             />
           </div>
@@ -226,10 +226,10 @@ export function Search() {
       </div>
 
       <div className="container">
-        <div className="flex gap-8 py-10">
+        <div className="flex flex-col gap-8 py-8 sm:py-10 lg:flex-row">
           {/* Desktop sidebar */}
           <aside className="hidden w-[280px] shrink-0 lg:block">
-            <div className="sticky top-[88px] rounded-2xl border border-stone-100 bg-white p-6 shadow-sm">
+            <div className="sticky top-[88px] rounded-2xl border border-stone-200 bg-canvas-card p-6 shadow-sm">
               <FilterFields
                 draftMin={draftMin}
                 setDraftMin={setDraftMin}
@@ -284,7 +284,7 @@ export function Search() {
                     })
                   }
                 >
-                  <SelectTrigger className="input h-10 w-full min-w-[200px] rounded-xl border-stone-200 bg-white sm:w-[220px]">
+                  <SelectTrigger className="input h-10 w-full min-w-[200px] rounded-xl border-stone-200 bg-canvas-card sm:w-[220px]">
                     <SelectValue placeholder="Sort" />
                   </SelectTrigger>
                   <SelectContent>
@@ -324,7 +324,7 @@ export function Search() {
                           "flex h-9 min-w-9 items-center justify-center rounded-full px-3 text-sm font-medium transition-colors",
                           p === page
                             ? "bg-brand-500 text-white"
-                            : "bg-white text-stone-600 ring-1 ring-stone-200 hover:bg-stone-50"
+                            : "bg-canvas-card text-stone-600 ring-1 ring-stone-200 hover:bg-stone-100"
                         )}
                         onClick={() => patchParams({ page: String(p) })}
                       >
@@ -364,7 +364,7 @@ export function Search() {
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ type: "spring", damping: 32, stiffness: 380 }}
-              className="absolute bottom-0 left-0 right-0 max-h-[85vh] overflow-y-auto rounded-t-2xl bg-white px-4 pb-8 pt-2 shadow-xl"
+              className="absolute bottom-0 left-0 right-0 max-h-[85vh] overflow-y-auto rounded-t-2xl bg-canvas-card px-4 pb-8 pt-2 shadow-xl"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-stone-200" aria-hidden />
@@ -446,21 +446,21 @@ function FilterFields({
         <div className="mt-3 flex flex-wrap gap-2">
           <button
             type="button"
-            className="rounded-full border border-stone-200 bg-stone-50 px-3 py-1.5 text-xs font-medium text-stone-600 transition-colors hover:border-brand-200 hover:bg-brand-50"
+            className="rounded-full border border-stone-200 bg-stone-100 px-3 py-1.5 text-xs font-medium text-stone-600 transition-colors hover:border-brand-200 hover:bg-brand-50 dark:bg-stone-800 dark:text-stone-400 dark:hover:bg-brand-500/15"
             onClick={() => presetPrice("", "50")}
           >
             Under 50
           </button>
           <button
             type="button"
-            className="rounded-full border border-stone-200 bg-stone-50 px-3 py-1.5 text-xs font-medium text-stone-600 transition-colors hover:border-brand-200 hover:bg-brand-50"
+            className="rounded-full border border-stone-200 bg-stone-100 px-3 py-1.5 text-xs font-medium text-stone-600 transition-colors hover:border-brand-200 hover:bg-brand-50 dark:bg-stone-800 dark:text-stone-400 dark:hover:bg-brand-500/15"
             onClick={() => presetPrice("50", "150")}
           >
             50–150
           </button>
           <button
             type="button"
-            className="rounded-full border border-stone-200 bg-stone-50 px-3 py-1.5 text-xs font-medium text-stone-600 transition-colors hover:border-brand-200 hover:bg-brand-50"
+            className="rounded-full border border-stone-200 bg-stone-100 px-3 py-1.5 text-xs font-medium text-stone-600 transition-colors hover:border-brand-200 hover:bg-brand-50 dark:bg-stone-800 dark:text-stone-400 dark:hover:bg-brand-500/15"
             onClick={() => presetPrice("150", "")}
           >
             150+

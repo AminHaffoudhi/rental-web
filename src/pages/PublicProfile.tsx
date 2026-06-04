@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { ArrowLeft, MessageSquare, Package, Sparkles, User } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { Link, Navigate, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { EquipmentGrid } from "@/components/equipment/EquipmentGrid";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { OwnerProfileHero } from "@/components/user/OwnerProfileHero";
@@ -10,7 +10,10 @@ import { ReviewCard } from "@/components/user/ReviewCard";
 import { useAuthStore } from "@/store/authStore";
 import * as userService from "@/services/user.service";
 import type { PublicUserProfile } from "@/services/user.service";
+import { PLATFORM_NAME } from "@/config/brand";
+import { isOwnerRole } from "@/lib/roles";
 import { cn } from "@/utils/cn";
+import { UserAvatar } from "@/components/user/UserAvatar";
 import { useNotificationHighlight } from "@/hooks/useNotificationHighlight";
 
 type ProfileTab = "listings" | "reviews" | "about";
@@ -69,6 +72,8 @@ export function PublicProfile() {
     [currentUser, profile]
   );
 
+  const isHostProfile = profile ? isOwnerRole(profile.role) : false;
+
   if (error) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 px-4">
@@ -82,7 +87,7 @@ export function PublicProfile() {
 
   if (!profile) {
     return (
-      <div className="min-h-screen bg-stone-100">
+      <div className="min-h-screen bg-canvas">
         <div className="h-52 animate-pulse bg-stone-200" />
         <div className="container -mt-16 space-y-4 py-8">
           <div className="h-28 w-28 animate-pulse rounded-2xl bg-stone-200" />
@@ -97,15 +102,48 @@ export function PublicProfile() {
     );
   }
 
+  if (isOwnProfile && profile.role === "RENTER") {
+    return <Navigate to="/profile" replace />;
+  }
+
+  if (!isHostProfile) {
+    return (
+      <div className="min-h-screen bg-canvas">
+        <div className="border-b border-stone-200 bg-canvas-card/80 dark:border-stone-800">
+          <div className="container flex items-center gap-2 py-3">
+            <Link
+              to="/search"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-stone-600 transition-colors hover:text-brand-600"
+            >
+              <ArrowLeft className="h-4 w-4" aria-hidden />
+              Back to search
+            </Link>
+          </div>
+        </div>
+        <div className="container flex min-h-[50vh] flex-col items-center justify-center py-16 text-center">
+          <UserAvatar user={profile} size="lg" className="mb-4" />
+          <h1 className="font-display text-2xl font-semibold text-stone-900 dark:text-stone-100">
+            {profile.name}
+          </h1>
+          <p className="mt-2 max-w-md text-sm text-stone-500 dark:text-stone-400">
+            This member rents equipment on {PLATFORM_NAME}. Public host profiles are only available
+            for equipment owners.
+          </p>
+          <Link to="/search" className="btn btn-primary mt-8">
+            Browse equipment
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   const bioText =
     profile.bio?.trim() ||
-    (profile.role === "OWNER" || profile.role === "BOTH"
-      ? `${profile.name} rents out quality equipment on RentMarket. Browse their listings below and book with confidence.`
-      : `${profile.name} is a member of the RentMarket community.`);
+    `${profile.name} rents out quality equipment on ${PLATFORM_NAME}. Browse their listings below and book with confidence.`;
 
   return (
-    <div className="min-h-screen bg-stone-50">
-      <div className="border-b border-stone-200/80 bg-stone-900/5">
+    <div className="min-h-screen bg-canvas">
+      <div className="border-b border-stone-200 bg-canvas-card/80">
         <div className="container flex items-center gap-2 py-3">
           <Link
             to="/search"
@@ -132,7 +170,7 @@ export function PublicProfile() {
                   "inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-all",
                   active
                     ? "bg-brand-500 text-white shadow-warm"
-                    : "bg-white text-stone-600 ring-1 ring-stone-200 hover:bg-stone-50"
+                    : "bg-canvas-card text-stone-600 ring-1 ring-stone-200 hover:bg-stone-100"
                 )}
               >
                 <t.icon className="h-4 w-4" aria-hidden />
@@ -242,7 +280,7 @@ export function PublicProfile() {
                   ))}
                 </div>
               ) : (
-                <div className="rounded-2xl border border-dashed border-stone-200 bg-white px-6 py-12 text-center">
+                <div className="rounded-2xl border border-dashed border-stone-200 bg-canvas-card px-6 py-12 text-center">
                   <Sparkles className="mx-auto h-10 w-10 text-stone-300" aria-hidden />
                   <p className="mt-3 font-medium text-stone-700">No reviews yet</p>
                   <p className="mt-1 text-sm text-stone-500">
@@ -255,13 +293,13 @@ export function PublicProfile() {
 
           {tab === "about" ? (
             <div className="mx-auto max-w-2xl space-y-6">
-              <div className="rounded-2xl border border-stone-100 bg-white p-6 shadow-sm">
+              <div className="rounded-2xl border border-stone-200 bg-canvas-card p-6 shadow-sm">
                 <h2 className="font-display text-xl font-semibold text-stone-900">About</h2>
                 <p className="mt-4 whitespace-pre-wrap text-sm leading-relaxed text-stone-600">
                   {bioText}
                 </p>
               </div>
-              <div className="rounded-2xl border border-stone-100 bg-white p-6 shadow-sm">
+              <div className="rounded-2xl border border-stone-200 bg-canvas-card p-6 shadow-sm">
                 <h3 className="text-sm font-semibold uppercase tracking-wide text-stone-400">
                   Trust & verification
                 </h3>
@@ -269,7 +307,7 @@ export function PublicProfile() {
                   <li className="flex gap-2">
                     <span className="text-brand-500">✓</span>
                     {profile.kycStatus === "APPROVED"
-                      ? "Identity verified by RentMarket"
+                      ? `Identity verified by ${PLATFORM_NAME}`
                       : "Identity verification pending"}
                   </li>
                   <li className="flex gap-2">

@@ -144,7 +144,7 @@ function FormSection({
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, delay, ease: [0.16, 1, 0.3, 1] }}
-      className="rounded-2xl border border-stone-100 bg-white p-6 shadow-sm sm:p-7"
+      className="rounded-2xl border border-stone-200 bg-canvas-card p-6 shadow-sm sm:p-7"
     >
       <motion.div className="mb-6 flex items-start gap-3">
         <motion.div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-50">
@@ -347,7 +347,7 @@ export function EquipmentForm({
                               "flex flex-col items-center gap-2 rounded-xl border-2 px-3 py-3 text-center transition-all duration-150",
                               selected
                                 ? "border-brand-500 bg-brand-50 shadow-sm"
-                                : "border-stone-100 bg-stone-50/50 hover:border-stone-200 hover:bg-white"
+                                : "border-stone-100 bg-stone-100/50 hover:border-stone-200 hover:bg-canvas-card"
                             )}
                           >
                             <span
@@ -540,7 +540,7 @@ export function EquipmentForm({
           />
         </FormSection>
 
-        <div className="border-t border-stone-100 pt-6">
+        <div className="border-t border-stone-200 pt-6">
           <button
             type="submit"
             disabled={isSubmitting}

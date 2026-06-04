@@ -25,7 +25,7 @@ export function EquipmentDetailGallery({ equipment }: EquipmentDetailGalleryProp
 
   if (!imgs.length) {
     return (
-      <div className="flex aspect-[4/3] items-center justify-center rounded-2xl border border-stone-100 bg-gradient-to-br from-brand-50 to-stone-50 md:aspect-[16/9]">
+      <div className="flex aspect-[4/3] items-center justify-center rounded-2xl border border-stone-200 bg-gradient-to-br from-brand-50 to-stone-50 md:aspect-[16/9]">
         <CategoryIcon
           iconUrl={cat?.iconUrl}
           name={cat?.name}
@@ -66,7 +66,7 @@ export function EquipmentDetailGallery({ equipment }: EquipmentDetailGalleryProp
                   e.stopPropagation();
                   goPrev();
                 }}
-                className="absolute left-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-stone-800 shadow-md transition-opacity hover:bg-white"
+                className="absolute left-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-canvas-card/95 text-stone-800 shadow-elevated transition-opacity hover:bg-canvas-card dark:text-stone-100"
                 aria-label="Previous photo"
               >
                 <ChevronLeft className="h-5 w-5" />
@@ -77,7 +77,7 @@ export function EquipmentDetailGallery({ equipment }: EquipmentDetailGalleryProp
                   e.stopPropagation();
                   goNext();
                 }}
-                className="absolute right-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-stone-800 shadow-md transition-opacity hover:bg-white"
+                className="absolute right-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-canvas-card/95 text-stone-800 shadow-elevated transition-opacity hover:bg-canvas-card dark:text-stone-100"
                 aria-label="Next photo"
               >
                 <ChevronRight className="h-5 w-5" />

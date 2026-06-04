@@ -1,12 +1,12 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { BookingActions } from "@/components/booking/BookingActions";
-import { BookingStatus } from "@/components/booking/BookingStatus";
+import { CalendarClock, Inbox } from "lucide-react";
+import { BookingsPageHeader } from "@/components/booking/BookingsPageHeader";
+import { BookingFilterPills } from "@/components/booking/BookingFilterPills";
+import { MyBookingCard } from "@/components/booking/MyBookingCard";
+import { EmptyState } from "@/components/shared/EmptyState";
 import { useMyBookings } from "@/hooks/useBooking";
 import type { BookingStatus as BS } from "@/types/booking";
-import { formatCurrency } from "@/utils/currency";
-import { formatDateRange } from "@/utils/dates";
-import { cn } from "@/utils/cn";
 
 const TABS: { id: string; label: string; match?: (s: BS) => boolean }[] = [
   { id: "ALL", label: "All" },
@@ -30,100 +30,84 @@ export function DashboardBookings() {
   const { bookings, refetch, isLoading } = useMyBookings();
   const [tab, setTab] = useState("ALL");
 
+  const ownerList = bookings?.asOwner ?? [];
+
   const rows = useMemo(() => {
-    const list = bookings?.asOwner ?? [];
     const cfg = TABS.find((t) => t.id === tab);
-    if (!cfg?.match) return list;
-    return list.filter((b) => cfg.match!(b.status));
-  }, [bookings?.asOwner, tab]);
+    if (!cfg?.match) return ownerList;
+    return ownerList.filter((b) => cfg.match!(b.status));
+  }, [ownerList, tab]);
 
   const counts = useMemo(() => {
-    const list = bookings?.asOwner ?? [];
-    const map: Record<string, number> = { ALL: list.length };
+    const map: Record<string, number> = { ALL: ownerList.length };
     for (const t of TABS) {
-      if (t.match) map[t.id] = list.filter((b) => t.match!(b.status)).length;
+      if (t.match) map[t.id] = ownerList.filter((b) => t.match!(b.status)).length;
     }
     return map;
-  }, [bookings?.asOwner]);
+  }, [ownerList]);
+
+  const pending = ownerList.filter((b) => b.status === "PENDING").length;
+  const active = ownerList.filter((b) =>
+    ["ACTIVE", "PICKUP_SCHEDULED", "IN_TRANSIT", "PAID"].includes(b.status)
+  ).length;
 
   return (
     <div className="space-y-8">
-      <h2 className="font-display text-2xl font-semibold text-stone-900">Booking Requests</h2>
+      <BookingsPageHeader
+        eyebrow="Owner dashboard"
+        title="Booking requests"
+        description="Review, approve, and manage rentals for your equipment."
+        stats={[
+          { label: "Total", value: ownerList.length, icon: Inbox, tone: "stone" },
+          { label: "Pending", value: pending, icon: CalendarClock, tone: "amber" },
+          { label: "Active", value: active, icon: Inbox, tone: "green" },
+        ]}
+      />
 
-      <div className="scrollbar-hide flex gap-2 overflow-x-auto pb-1">
-        {TABS.map((t) => (
-          <button
-            key={t.id}
-            type="button"
-            onClick={() => setTab(t.id)}
-            className={cn(
-              "flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors",
-              tab === t.id
-                ? "bg-brand-500 text-white shadow-warm"
-                : "border border-stone-200 bg-white text-stone-600 hover:border-stone-300"
-            )}
-          >
-            {t.label}
-            <span
-              className={cn(
-                "rounded-full px-2 py-0.5 text-xs",
-                tab === t.id ? "bg-white/20 text-white" : "bg-stone-100 text-stone-600"
-              )}
-            >
-              {counts[t.id] ?? 0}
-            </span>
-          </button>
-        ))}
-      </div>
+      <BookingFilterPills
+        tabs={TABS.map((t) => ({
+          id: t.id,
+          label: t.label,
+          count: counts[t.id] ?? 0,
+        }))}
+        activeId={tab}
+        onChange={setTab}
+      />
 
       {isLoading ? (
-        <p className="text-stone-500">Loading…</p>
-      ) : (
+        <div className="space-y-4">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="skeleton h-40 rounded-2xl" />
+          ))}
+        </div>
+      ) : rows.length > 0 ? (
         <div className="space-y-4">
           {rows.map((b) => (
-            <div
+            <MyBookingCard
               key={b.id}
-              className="flex flex-col gap-4 rounded-xl border border-stone-100 bg-white p-5 shadow-sm md:flex-row md:items-center"
-            >
-              <div className="h-20 w-28 shrink-0 overflow-hidden rounded-lg bg-stone-100">
-                {b.equipment.images[0] ? (
-                  <img
-                    src={b.equipment.images[0]}
-                    alt=""
-                    className="h-full w-full object-cover"
-                  />
-                ) : null}
-              </div>
-              <div className="min-w-0 flex-1 space-y-1">
-                <Link
-                  to={`/equipment/${b.equipment.id}`}
-                  className="font-semibold text-stone-900 hover:text-brand-600"
-                >
-                  {b.equipment.title}
-                </Link>
-                <p className="text-sm text-stone-600">{b.renter.name}</p>
-                <p className="text-sm text-stone-500">
-                  {formatDateRange(b.startDate, b.endDate)}
-                </p>
-                <p className="font-display text-lg font-semibold text-brand-600">
-                  {formatCurrency(b.totalPrice)}
-                </p>
-              </div>
-              <div className="flex flex-col items-stretch gap-3 md:items-end">
-                <BookingStatus status={b.status} />
-                <div className="flex flex-wrap justify-end gap-2">
-                  <BookingActions booking={b} onUpdated={() => refetch()} />
-                  <Link to={`/bookings/${b.id}`} className="btn btn-ghost btn-sm">
-                    Details
-                  </Link>
-                </div>
-              </div>
-            </div>
+              booking={b}
+              perspective="owner"
+              onUpdated={() => refetch()}
+            />
           ))}
-          {!rows.length ? (
-            <p className="rounded-xl border border-dashed border-stone-200 bg-white py-16 text-center text-stone-500">
-              No bookings in this category.
-            </p>
+        </div>
+      ) : (
+        <div className="rounded-2xl border border-dashed border-stone-200 bg-canvas-card shadow-elevated">
+          <EmptyState
+            icon={Inbox}
+            title="No bookings in this category"
+            subtitle={
+              tab === "ALL"
+                ? "New requests from renters will show up here."
+                : "Try another filter to see more bookings."
+            }
+          />
+          {tab === "ALL" ? (
+            <div className="flex justify-center pb-8">
+              <Link to="/search" className="btn btn-secondary btn-sm">
+                Share your listings
+              </Link>
+            </div>
           ) : null}
         </div>
       )}

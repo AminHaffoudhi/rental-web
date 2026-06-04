@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from "re
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { Loader2 } from "lucide-react";
+import { PlatformLogo } from "@/components/brand/PlatformLogo";
 import * as authService from "@/services/auth.service";
 import { getApiErrorDetail } from "@/services/api";
 import { useAuthStore } from "@/store/authStore";
@@ -112,8 +113,11 @@ export function VerifyEmail() {
 
   if (!canAccessVerifyFlow) {
     return (
-      <div className="flex min-h-svh flex-col items-center justify-center bg-stone-50 px-4">
-        <div className="w-full max-w-md rounded-2xl border border-stone-100 bg-white p-8 shadow-sm">
+      <div className="flex min-h-svh flex-col items-center justify-center bg-canvas px-4">
+        <div className="w-full max-w-md rounded-2xl border border-stone-200 bg-canvas-card p-8 shadow-sm">
+          <div className="mb-6 flex justify-center">
+            <PlatformLogo size="md" linkTo="/" />
+          </div>
           <h1 className="font-display text-xl font-semibold text-stone-900">Verify your email</h1>
           <p className="mt-3 text-sm text-stone-600">
             Register to receive a 6-digit code, or use Login if you need to reach the verification page with your
@@ -137,8 +141,11 @@ export function VerifyEmail() {
   }
 
   return (
-    <div className="flex min-h-svh flex-col items-center justify-center bg-stone-50 px-4">
-      <div className="w-full max-w-md rounded-2xl border border-stone-100 bg-white p-8 shadow-sm">
+    <div className="flex min-h-svh flex-col items-center justify-center bg-canvas px-4">
+      <div className="w-full max-w-md rounded-2xl border border-stone-200 bg-canvas-card p-8 shadow-sm">
+        <div className="mb-6 flex justify-center">
+          <PlatformLogo size="md" linkTo="/" />
+        </div>
         <h1 className="font-display text-2xl font-semibold text-stone-900">Check your email</h1>
         <p className="mt-2 text-sm text-stone-600">
           We sent a 6-digit code to{" "}
@@ -161,7 +168,7 @@ export function VerifyEmail() {
               disabled={submitting}
               onChange={(e) => handleDigitInput(i, e.target.value.slice(-1))}
               onKeyDown={(e) => handleKeyDown(i, e)}
-              className="h-14 w-12 rounded-xl border-2 border-stone-200 bg-white text-center text-2xl font-bold text-stone-900 outline-none transition-all focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
+              className="input h-14 w-12 rounded-xl border-2 text-center text-2xl font-bold outline-none"
             />
           ))}
         </div>

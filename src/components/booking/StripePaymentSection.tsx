@@ -13,7 +13,7 @@ interface StripePaymentSectionProps {
 export function StripePaymentSection({ booking }: StripePaymentSectionProps) {
   const [loading, setLoading] = useState(false);
   const [stripeEnabled, setStripeEnabled] = useState<boolean | null>(null);
-  const [currency, setCurrency] = useState("eur");
+  const [currency, setCurrency] = useState("tnd");
 
   const payment = booking.payment;
   const rentalDue = payment?.amount ?? booking.totalPrice;
@@ -42,7 +42,7 @@ export function StripePaymentSection({ booking }: StripePaymentSectionProps) {
   }
 
   return (
-    <section className="rounded-2xl border border-brand-100 bg-gradient-to-br from-brand-50/80 to-white p-6 shadow-sm">
+    <section className="rounded-2xl border border-brand-200/80 bg-gradient-to-br from-brand-50/80 to-canvas-card p-6 shadow-elevated dark:border-brand-500/30 dark:from-brand-500/10 dark:to-canvas-card">
       <div className="flex items-start gap-3">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-500 text-white">
           <CreditCard className="h-5 w-5" aria-hidden />
@@ -56,7 +56,7 @@ export function StripePaymentSection({ booking }: StripePaymentSectionProps) {
         </div>
       </div>
 
-      <dl className="mt-5 space-y-2 rounded-xl bg-white/80 px-4 py-3 text-sm ring-1 ring-stone-100">
+      <dl className="mt-5 space-y-2 rounded-xl border border-stone-200 bg-canvas-elevated/80 px-4 py-3 text-sm dark:border-stone-600">
         <div className="flex justify-between gap-4">
           <dt className="text-stone-500">Rental + fees</dt>
           <dd className="font-medium tabular-nums text-stone-900">{formatCurrency(rentalDue)}</dd>
@@ -67,16 +67,16 @@ export function StripePaymentSection({ booking }: StripePaymentSectionProps) {
             <dd className="font-medium tabular-nums text-stone-900">{formatCurrency(depositDue)}</dd>
           </div>
         ) : null}
-        <div className="flex justify-between gap-4 border-t border-stone-100 pt-2">
-          <dt className="font-semibold text-stone-800">Total due now</dt>
-          <dd className="font-display text-lg font-semibold tabular-nums text-brand-700">
+        <div className="flex justify-between gap-4 border-t border-stone-200 pt-2 dark:border-stone-600">
+          <dt className="font-semibold text-stone-800 dark:text-stone-200">Total due now</dt>
+          <dd className="font-display text-lg font-semibold tabular-nums text-brand-600">
             {formatCurrency(totalDue)}
           </dd>
         </div>
       </dl>
 
       {stripeEnabled === false ? (
-        <p className="mt-4 text-sm text-amber-800">
+        <p className="mt-4 text-sm text-amber-800 dark:text-amber-300">
           Online payment is temporarily unavailable. Ask the platform admin to confirm your bank
           transfer.
         </p>
