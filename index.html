@@ -12,6 +12,18 @@
         document.documentElement.classList.add(d ? "dark" : "light");
         document.documentElement.style.colorScheme = d ? "dark" : "light";
       })();
+      (function () {
+        try {
+          var raw = localStorage.getItem("ekri-language");
+          if (!raw) return;
+          var parsed = JSON.parse(raw);
+          var lang = parsed && parsed.state && parsed.state.language;
+          if (lang) {
+            document.documentElement.lang = lang;
+            document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+          }
+        } catch (e) {}
+      })();
     </script>
     <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="apple-touch-icon" href="/favicon.png" />

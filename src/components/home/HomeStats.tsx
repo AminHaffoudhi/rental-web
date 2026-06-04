@@ -1,6 +1,7 @@
 import { Star } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { SectionReveal } from "@/components/home/SectionReveal";
+import { cn } from "@/utils/cn";
 
 export function HomeStats() {
   const { t } = useTranslation();
@@ -20,11 +21,12 @@ export function HomeStats() {
             {stats.map((s, i) => (
               <div
                 key={s.label}
-                className={`flex flex-col items-center px-4 py-7 text-center sm:px-6 sm:py-9 ${
-                  i % 2 === 0 ? "border-r border-stone-200 rtl:border-l rtl:border-r-0" : ""
-                } ${i < 2 ? "border-b border-stone-200 sm:border-b-0" : ""} ${
-                  i > 0 && i < 4 ? "sm:border-l sm:border-stone-200 rtl:sm:border-r rtl:sm:border-l-0" : ""
-                }`}
+                className={cn(
+                  "flex flex-col items-center px-4 py-7 text-center sm:px-6 sm:py-9",
+                  i % 2 === 0 && "border-e border-stone-200",
+                  i < 2 && "border-b border-stone-200 sm:border-b-0",
+                  i > 0 && i < 4 && "sm:border-e sm:border-stone-200"
+                )}
               >
                 {"showStar" in s && s.showStar ? (
                   <p className="flex items-center gap-1.5 font-display text-2xl font-semibold tabular-nums text-stone-900 sm:text-3xl">

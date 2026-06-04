@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { LegalDocumentLayout } from "@/components/legal/LegalDocumentLayout";
-import { TermsOfServiceContent, LEGAL_LAST_UPDATED } from "@/content/legal/termsContent";
+import { TermsOfServiceContent } from "@/content/legal/termsContent";
 import { PLATFORM_NAME } from "@/config/brand";
 
 export function TermsOfService() {
@@ -10,7 +10,6 @@ export function TermsOfService() {
     <LegalDocumentLayout
       title={t("legal.termsTitle")}
       description={t("legal.termsDesc", { name: PLATFORM_NAME })}
-      lastUpdated={LEGAL_LAST_UPDATED}
     >
       <TermsOfServiceContent />
     </LegalDocumentLayout>

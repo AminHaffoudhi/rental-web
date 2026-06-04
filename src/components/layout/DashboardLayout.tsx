@@ -21,7 +21,7 @@ function DashboardPageTitle({
   const location = useLocation();
   const label = labels[location.pathname] ?? fallback;
   return (
-    <h1 className="app-topbar-title min-w-0 truncate font-display text-lg font-semibold leading-tight text-stone-900 dark:text-stone-100">
+    <h1 className="app-topbar-title min-w-0 truncate text-start font-display text-lg font-semibold leading-tight text-stone-900 dark:text-stone-100">
       {label}
     </h1>
   );
@@ -136,7 +136,7 @@ export function DashboardLayout() {
   return (
     <div className="flex h-[100dvh] flex-col overflow-hidden bg-canvas">
       <header className="app-topbar z-30 flex h-16 w-full shrink-0 flex-nowrap items-center justify-between gap-3 border-b border-stone-200 bg-canvas-card px-4 sm:px-6 lg:px-8 dark:border-stone-800">
-        <div className="flex min-w-0 flex-1 flex-nowrap items-center gap-3">
+        <div className="flex min-w-0 flex-1 flex-nowrap items-center gap-3 text-start">
           <button
             type="button"
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-stone-600 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-800 lg:hidden"
@@ -160,7 +160,7 @@ export function DashboardLayout() {
         </div>
       </header>
 
-      <div className="relative flex min-h-0 flex-1 overflow-hidden">
+      <div className="relative flex min-h-0 min-w-0 flex-1 flex-row overflow-hidden">
         {mobileNavOpen ? (
           <button
             type="button"
@@ -172,8 +172,11 @@ export function DashboardLayout() {
 
         <aside
           className={cn(
-            "fixed bottom-0 start-0 top-16 z-50 flex w-60 shrink-0 flex-col bg-stone-inv transition-transform duration-200 lg:static lg:top-auto lg:h-full lg:translate-x-0",
-            mobileNavOpen ? "translate-x-0" : "-translate-x-full rtl:translate-x-full lg:translate-x-0"
+            "fixed bottom-0 top-16 z-50 flex w-60 shrink-0 flex-col bg-stone-inv transition-transform duration-200",
+            "inset-inline-start-0 lg:static lg:top-auto lg:h-full lg:translate-x-0",
+            mobileNavOpen
+              ? "translate-x-0"
+              : "max-lg:-translate-x-full max-lg:rtl:translate-x-full"
           )}
         >
         <button

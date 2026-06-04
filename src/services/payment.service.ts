@@ -4,7 +4,12 @@ import type { Payment } from "@/types/payment";
 export interface StripeConfig {
   enabled: boolean;
   publishableKey: string | null;
+  /** ISO code Stripe charges at checkout (e.g. eur). */
   currency: string;
+  /** Platform display currency for listings/bookings (tnd). */
+  displayCurrency: string;
+  /** TND per 1 unit of `currency` (e.g. 3.35 TND = 1 EUR). */
+  tndPerCheckoutUnit: number;
 }
 
 export async function getPaymentByBooking(bookingId: string): Promise<Payment> {
@@ -14,7 +19,17 @@ export async function getPaymentByBooking(bookingId: string): Promise<Payment> {
 
 export async function getStripeConfig(): Promise<StripeConfig> {
   const res = await api.get(`/payments/stripe-config`);
-  return unwrap(res);
+  const cfg = unwrap(res) as Partial<StripeConfig> & Pick<StripeConfig, "enabled" | "currency">;
+  return {
+    enabled: Boolean(cfg.enabled),
+    publishableKey: cfg.publishableKey ?? null,
+    currency: (cfg.currency ?? "eur").toLowerCase(),
+    displayCurrency: (cfg.displayCurrency ?? "tnd").toLowerCase(),
+    tndPerCheckoutUnit:
+      typeof cfg.tndPerCheckoutUnit === "number" && cfg.tndPerCheckoutUnit > 0
+        ? cfg.tndPerCheckoutUnit
+        : 3.35,
+  };
 }
 
 export async function createCheckoutSession(

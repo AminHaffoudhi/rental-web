@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
 import { Clock, Mail, MessageSquare, Phone, Send } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -16,27 +16,41 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { PlatformLogo } from "@/components/brand/PlatformLogo";
-import { PLATFORM_NAME } from "@/config/brand";
 import { getApiErrorDetail } from "@/services/api";
 import * as contactService from "@/services/contact.service";
 
-const schema = z.object({
-  firstName: z.string().trim().min(1, "First name is required"),
-  lastName: z.string().trim().min(1, "Last name is required"),
-  email: z.string().trim().email("Enter a valid email"),
-  phone: z.string().trim().max(30).optional(),
-  subject: z.string().trim().max(200).optional(),
-  message: z.string().trim().min(10, "Please enter at least 10 characters").max(5000),
-});
-
-type FormValues = z.infer<typeof schema>;
+type FormValues = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+  subject?: string;
+  message: string;
+};
 
 export function Contact() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [searchParams] = useSearchParams();
   const isReport = searchParams.get("type") === "report";
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
+
+  const schema = useMemo(
+    () =>
+      z.object({
+        firstName: z.string().trim().min(1, t("contact.validation.firstNameRequired")),
+        lastName: z.string().trim().min(1, t("contact.validation.lastNameRequired")),
+        email: z.string().trim().email(t("contact.validation.emailInvalid")),
+        phone: z.string().trim().max(30).optional(),
+        subject: z.string().trim().max(200).optional(),
+        message: z
+          .string()
+          .trim()
+          .min(10, t("contact.validation.messageMin"))
+          .max(5000),
+      }),
+    [t, i18n.language]
+  );
 
   const pageTitle = isReport ? t("contact.typeReport") : t("contact.title");
   const pageDescription = t("contact.subtitle");
@@ -59,7 +73,7 @@ export function Contact() {
       const result = await contactService.submitContactForm({
         ...values,
         type: isReport ? "REPORT" : "CONTACT",
-        subject: values.subject || (isReport ? "Issue report" : undefined),
+        subject: values.subject || (isReport ? t("contact.defaultSubjectReport") : undefined),
       });
       toast.success(result.message);
       setSent(true);
@@ -77,7 +91,7 @@ export function Contact() {
         <div className="container py-10 sm:py-12">
           <PlatformLogo size="md" className="mb-6" />
           <p className="text-xs font-semibold uppercase tracking-widest text-brand-600 dark:text-brand-400">
-            Support
+            {t("contact.eyebrow")}
           </p>
           <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight text-stone-900 sm:text-4xl dark:text-stone-100">
             {pageTitle}
@@ -96,21 +110,21 @@ export function Contact() {
             className="space-y-6"
           >
             <div className="rounded-2xl border border-stone-200 bg-canvas-card p-6 shadow-elevated">
-              <h2 className="font-display text-lg font-semibold text-stone-900">
-                How we can help
+              <h2 className="font-display text-lg font-semibold text-stone-900 dark:text-stone-100">
+                {t("contact.helpTitle")}
               </h2>
-              <ul className="mt-4 space-y-4 text-sm text-stone-600">
+              <ul className="mt-4 space-y-4 text-sm text-stone-600 dark:text-stone-400">
                 <li className="flex gap-3">
                   <Mail className="h-5 w-5 shrink-0 text-brand-500" aria-hidden />
-                  <span>Booking issues, cancellations, and payment questions</span>
+                  <span>{t("contact.helpBooking")}</span>
                 </li>
                 <li className="flex gap-3">
                   <MessageSquare className="h-5 w-5 shrink-0 text-brand-500" aria-hidden />
-                  <span>Listing approval, KYC verification, and owner payouts</span>
+                  <span>{t("contact.helpListing")}</span>
                 </li>
                 <li className="flex gap-3">
                   <Phone className="h-5 w-5 shrink-0 text-brand-500" aria-hidden />
-                  <span>Account access, privacy requests, and safety reports</span>
+                  <span>{t("contact.helpAccount")}</span>
                 </li>
               </ul>
             </div>
@@ -118,19 +132,22 @@ export function Contact() {
             <div className="flex items-start gap-3 rounded-2xl border border-brand-200/60 bg-brand-50/80 p-4 dark:border-brand-500/25 dark:bg-brand-500/10">
               <Clock className="h-5 w-5 shrink-0 text-brand-600 dark:text-brand-400" aria-hidden />
               <p className="text-sm text-stone-600 dark:text-stone-400">
-                Typical response time is <strong className="text-stone-800 dark:text-stone-200">1–2 business days</strong>.
-                For urgent booking matters, include your booking reference in the message.
+                {t("contact.responseTimePrefix")}{" "}
+                <strong className="text-stone-800 dark:text-stone-200">
+                  {t("contact.responseTimeDays")}
+                </strong>
+                . {t("contact.responseTimeSuffix")}
               </p>
             </div>
 
-            <p className="text-sm text-stone-500">
-              Legal inquiries: see our{" "}
-              <Link to="/privacy" className="font-semibold text-brand-600 hover:text-brand-700">
-                Privacy Policy
+            <p className="text-sm text-stone-500 dark:text-stone-400">
+              {t("contact.legalNote")}{" "}
+              <Link to="/privacy" className="font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400">
+                {t("footer.privacy")}
               </Link>{" "}
-              and{" "}
-              <Link to="/terms" className="font-semibold text-brand-600 hover:text-brand-700">
-                Terms of Service
+              {t("contact.legalAnd")}{" "}
+              <Link to="/terms" className="font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400">
+                {t("footer.terms")}
               </Link>
               .
             </p>
@@ -147,13 +164,15 @@ export function Contact() {
                 <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-green-500/15 text-green-600 dark:text-green-400">
                   <Send className="h-7 w-7" aria-hidden />
                 </div>
-                <p className="mt-4 font-display text-xl font-semibold text-stone-900">{t("contact.success")}</p>
+                <p className="mt-4 font-display text-xl font-semibold text-stone-900 dark:text-stone-100">
+                  {t("contact.success")}
+                </p>
                 <button
                   type="button"
                   className="btn btn-secondary mt-6"
                   onClick={() => setSent(false)}
                 >
-                  Send another message
+                  {t("contact.sendAnother")}
                 </button>
               </div>
             ) : (
@@ -165,9 +184,9 @@ export function Contact() {
                       name="firstName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{t("contact.name")}</FormLabel>
+                          <FormLabel>{t("contact.firstName")}</FormLabel>
                           <FormControl>
-                            <input className="input" autoComplete="name" {...field} />
+                            <input className="input" autoComplete="given-name" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -178,7 +197,7 @@ export function Contact() {
                       name="lastName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{t("auth.name")}</FormLabel>
+                          <FormLabel>{t("contact.lastName")}</FormLabel>
                           <FormControl>
                             <input className="input" autoComplete="family-name" {...field} />
                           </FormControl>
@@ -221,7 +240,7 @@ export function Contact() {
                             type="tel"
                             className="input"
                             autoComplete="tel"
-                            placeholder="+216 …"
+                            placeholder={t("contact.placeholderPhone")}
                             {...field}
                           />
                         </FormControl>
@@ -245,7 +264,9 @@ export function Contact() {
                           <input
                             className="input"
                             placeholder={
-                              isReport ? "e.g. Booking #12345 — payment issue" : "What is this about?"
+                              isReport
+                                ? t("contact.placeholderSubjectReport")
+                                : t("contact.placeholderSubject")
                             }
                             {...field}
                           />
@@ -265,7 +286,7 @@ export function Contact() {
                           <textarea
                             rows={5}
                             className="input min-h-[120px] resize-y"
-                            placeholder="Describe your question or issue…"
+                            placeholder={t("contact.placeholderMessage")}
                             {...field}
                           />
                         </FormControl>

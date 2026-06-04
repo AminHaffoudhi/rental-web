@@ -1,16 +1,11 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import i18n, { LANGUAGE_STORAGE_KEY, type AppLanguage } from "@/i18n";
+import { applyDocumentDirection } from "@/lib/direction";
 
 interface LocaleState {
   language: AppLanguage;
   setLanguage: (language: AppLanguage) => void;
-}
-
-function applyDocumentLanguage(language: AppLanguage): void {
-  const root = document.documentElement;
-  root.lang = language;
-  root.dir = language === "ar" ? "rtl" : "ltr";
 }
 
 export const useLocaleStore = create<LocaleState>()(
@@ -18,8 +13,8 @@ export const useLocaleStore = create<LocaleState>()(
     (set) => ({
       language: "en",
       setLanguage: (language) => {
+        applyDocumentDirection(language);
         void i18n.changeLanguage(language);
-        applyDocumentLanguage(language);
         set({ language });
       },
     }),
@@ -28,11 +23,9 @@ export const useLocaleStore = create<LocaleState>()(
       partialize: (state) => ({ language: state.language }),
       onRehydrateStorage: () => (state) => {
         const lang = state?.language ?? "en";
+        applyDocumentDirection(lang);
         void i18n.changeLanguage(lang);
-        applyDocumentLanguage(lang);
       },
     }
   )
 );
-
-applyDocumentLanguage("en");

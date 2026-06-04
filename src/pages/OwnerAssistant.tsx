@@ -17,8 +17,9 @@ export function OwnerAssistant() {
   );
 
   return (
-    <div className="w-full">
+    <div className="flex min-h-0 w-full min-w-0 flex-col">
       <AssistantChat
+        className="flex-1"
         variant="owner"
         title={t("assistant.ownerTitle")}
         subtitle={t("assistant.ownerSubtitle")}

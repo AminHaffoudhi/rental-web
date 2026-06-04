@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import toast from "react-hot-toast";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,14 +11,17 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { BookingStripePayButton } from "@/components/booking/BookingStripePayButton";
 import * as bookingService from "@/services/booking.service";
 import { getApiErrorDetail } from "@/services/api";
 import type { Booking } from "@/types/booking";
 import { useAuthStore } from "@/store/authStore";
+import { cn } from "@/utils/cn";
 
 interface BookingActionsProps {
   booking: Booking;
   onUpdated: () => Promise<void> | void;
+  className?: string;
 }
 
 const ACTIVE_LIKE = new Set([
@@ -26,7 +31,35 @@ const ACTIVE_LIKE = new Set([
   "INSPECTING",
 ]);
 
-export function BookingActions({ booking, onUpdated }: BookingActionsProps) {
+const TERMINAL = new Set(["REJECTED", "CANCELLED", "REFUNDED", "COMPLETED"]);
+
+export function bookingHasSidebarActions(
+  booking: Booking,
+  userId: string | undefined
+): boolean {
+  if (!userId) return false;
+  const isOwner = userId === booking.owner.id;
+  const isRenter = userId === booking.renter.id;
+  if (!isOwner && !isRenter) return false;
+
+  if (booking.status === "PENDING" && (isOwner || isRenter)) return true;
+  if (booking.status === "PAYMENT_PENDING") return true;
+  if (booking.status === "PAID" && isOwner) return true;
+  if (ACTIVE_LIKE.has(booking.status)) return true;
+  if (TERMINAL.has(booking.status)) return true;
+  if (booking.status === "PAID" && isRenter) return true;
+  if (booking.status === "DISPUTED") return true;
+  return false;
+}
+
+function ActionHint({ children, className }: { children: React.ReactNode; className?: string }) {
+  return (
+    <p className={cn("text-sm text-stone-600 dark:text-stone-400", className)}>{children}</p>
+  );
+}
+
+export function BookingActions({ booking, onUpdated, className }: BookingActionsProps) {
+  const { t } = useTranslation();
   const userId = useAuthStore((s) => s.user?.id);
   const [rejectOpen, setRejectOpen] = useState(false);
   const [disputeOpen, setDisputeOpen] = useState(false);
@@ -52,27 +85,27 @@ export function BookingActions({ booking, onUpdated }: BookingActionsProps) {
   }
 
   const canComplete = ACTIVE_LIKE.has(booking.status) && (isOwner || isRenter);
-  const canStartRental = booking.status === "PAID" && isOwner;
+  const canCancelPaymentPending = booking.status === "PAYMENT_PENDING" && isRenter;
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className={cn("flex flex-col gap-3", className)}>
       {booking.status === "PENDING" && isOwner ? (
-        <>
+        <div className="flex flex-wrap gap-2">
           <Button
             type="button"
             onClick={() =>
               void run(
                 () => bookingService.approveBooking(booking.id),
-                "Approved — renter can pay now"
+                t("bookings.toastApproved")
               )
             }
           >
-            Approve booking
+            {t("bookings.approveBooking")}
           </Button>
           <Button type="button" variant="destructive" onClick={() => setRejectOpen(true)}>
-            Reject
+            {t("bookings.rejectBooking")}
           </Button>
-        </>
+        </div>
       ) : null}
 
       {booking.status === "PENDING" && isRenter ? (
@@ -80,60 +113,115 @@ export function BookingActions({ booking, onUpdated }: BookingActionsProps) {
           type="button"
           variant="outline"
           onClick={() =>
-            void run(() => bookingService.cancelBooking(booking.id), "Booking cancelled")
+            void run(() => bookingService.cancelBooking(booking.id), t("bookings.toastCancelled"))
           }
         >
-          Cancel request
+          {t("bookings.cancelRequest")}
         </Button>
       ) : null}
 
-      {canStartRental ? (
+      {booking.status === "PAYMENT_PENDING" && isRenter ? (
+        <>
+          <ActionHint>{t("bookings.actionPayHint")}</ActionHint>
+          <BookingStripePayButton booking={booking} fullWidth />
+          {canCancelPaymentPending ? (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() =>
+                void run(
+                  () => bookingService.cancelBooking(booking.id),
+                  t("bookings.toastCancelled")
+                )
+              }
+            >
+              {t("bookings.cancelRequest")}
+            </Button>
+          ) : null}
+        </>
+      ) : null}
+
+      {booking.status === "PAYMENT_PENDING" && isOwner ? (
+        <ActionHint>{t("bookings.actionAwaitingPayment")}</ActionHint>
+      ) : null}
+
+      {booking.status === "PAID" && isOwner ? (
         <Button
           type="button"
           onClick={() =>
-            void run(
-              () => bookingService.ownerHandover(booking.id),
-              "Rental started"
-            )
+            void run(() => bookingService.ownerHandover(booking.id), t("bookings.toastRentalStarted"))
           }
         >
-          Start rental
+          {t("bookings.startRental")}
         </Button>
       ) : null}
 
-      {canComplete ? (
-        <Button
-          type="button"
-          onClick={() =>
-            void run(
-              () => bookingService.completeRental(booking.id),
-              "Rental completed"
-            )
-          }
-        >
-          Complete rental
-        </Button>
+      {booking.status === "PAID" && isRenter ? (
+        <ActionHint>{t("bookings.actionAwaitingHandover")}</ActionHint>
       ) : null}
 
       {canComplete ? (
-        <Button type="button" variant="destructive" onClick={() => setDisputeOpen(true)}>
-          Report a problem
+        <div className="flex flex-wrap gap-2">
+          <Button
+            type="button"
+            onClick={() =>
+              void run(
+                () => bookingService.completeRental(booking.id),
+                t("bookings.toastRentalCompleted")
+              )
+            }
+          >
+            {t("bookings.completeRental")}
+          </Button>
+          <Button type="button" variant="destructive" onClick={() => setDisputeOpen(true)}>
+            {t("bookings.reportProblem")}
+          </Button>
+        </div>
+      ) : null}
+
+      {booking.status === "REJECTED" ? (
+        <>
+          <ActionHint>
+            {isOwner ? t("bookings.actionRejectedOwner") : t("bookings.actionRejectedRenter")}
+          </ActionHint>
+          <Button type="button" variant="outline" asChild>
+            <Link to="/search">{t("bookings.browseEquipment")}</Link>
+          </Button>
+        </>
+      ) : null}
+
+      {booking.status === "CANCELLED" ? (
+        <>
+          <ActionHint>{t("bookings.actionCancelled")}</ActionHint>
+          <Button type="button" variant="outline" asChild>
+            <Link to="/search">{t("bookings.browseEquipment")}</Link>
+          </Button>
+        </>
+      ) : null}
+
+      {booking.status === "COMPLETED" && isRenter ? (
+        <Button type="button" variant="outline" asChild>
+          <Link to={`/bookings/${booking.id}#review`}>{t("bookingCard.leaveReview")}</Link>
         </Button>
+      ) : null}
+
+      {booking.status === "DISPUTED" ? (
+        <ActionHint>{t("bookings.actionDisputed")}</ActionHint>
       ) : null}
 
       <Dialog open={rejectOpen} onOpenChange={setRejectOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Reject booking</DialogTitle>
+            <DialogTitle>{t("bookings.rejectDialogTitle")}</DialogTitle>
           </DialogHeader>
           <Textarea
             value={rejectReason}
             onChange={(e) => setRejectReason(e.target.value)}
-            placeholder="Optional reason for the renter"
+            placeholder={t("bookings.rejectReasonPlaceholder")}
           />
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setRejectOpen(false)}>
-              Close
+              {t("common.close")}
             </Button>
             <Button
               type="button"
@@ -141,12 +229,12 @@ export function BookingActions({ booking, onUpdated }: BookingActionsProps) {
               onClick={() =>
                 void run(
                   () => bookingService.rejectBooking(booking.id, rejectReason || undefined),
-                  "Rejected",
+                  t("bookings.toastRejected"),
                   () => setRejectOpen(false)
                 )
               }
             >
-              Reject
+              {t("bookings.rejectBooking")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -155,16 +243,16 @@ export function BookingActions({ booking, onUpdated }: BookingActionsProps) {
       <Dialog open={disputeOpen} onOpenChange={setDisputeOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Report a problem</DialogTitle>
+            <DialogTitle>{t("bookings.disputeDialogTitle")}</DialogTitle>
           </DialogHeader>
           <Textarea
             value={disputeReason}
             onChange={(e) => setDisputeReason(e.target.value)}
-            placeholder="Describe the issue"
+            placeholder={t("bookings.disputeReasonPlaceholder")}
           />
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setDisputeOpen(false)}>
-              Close
+              {t("common.close")}
             </Button>
             <Button
               type="button"
@@ -173,12 +261,12 @@ export function BookingActions({ booking, onUpdated }: BookingActionsProps) {
               onClick={() =>
                 void run(
                   () => bookingService.raiseDispute(booking.id, disputeReason.trim()),
-                  "Report submitted",
+                  t("bookings.toastDisputeSubmitted"),
                   () => setDisputeOpen(false)
                 )
               }
             >
-              Submit
+              {t("bookings.disputeSubmit")}
             </Button>
           </DialogFooter>
         </DialogContent>

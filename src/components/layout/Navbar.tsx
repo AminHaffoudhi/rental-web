@@ -98,13 +98,13 @@ export function Navbar() {
 
           <div
             className={cn(
-              "mx-auto max-w-[420px] flex-1 md:justify-center",
-              hideNavSearch ? "hidden" : "hidden md:flex"
+              "mx-auto hidden min-w-0 max-w-[420px] flex-1 md:block",
+              hideNavSearch && "md:hidden"
             )}
           >
             <div className="relative w-full">
               <Search
-                className="pointer-events-none absolute top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400 ltr:left-4 rtl:right-4"
+                className="pointer-events-none absolute start-4 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400"
                 aria-hidden
               />
               <input
@@ -114,7 +114,7 @@ export function Navbar() {
                 onKeyDown={onSearchKeyDown}
                 placeholder={t("nav.searchEquipmentPlaceholder")}
                 className={cn(
-                  "input w-full rounded-full border-stone-200 bg-stone-100 py-2.5 transition-all duration-300 ltr:pl-11 ltr:pr-4 rtl:pr-11 rtl:pl-4",
+                  "input w-full rounded-full border-stone-200 bg-stone-100 py-2.5 ps-11 pe-4 text-start transition-all duration-300",
                   "focus:border-brand-500 focus:bg-canvas-card focus:shadow-elevated"
                 )}
                 aria-label={t("common.search")}
@@ -122,7 +122,7 @@ export function Navbar() {
             </div>
           </div>
 
-          <div className="ms-auto flex shrink-0 items-center gap-1 md:gap-2">
+          <div className="flex shrink-0 items-center gap-1 md:gap-2">
             <LanguageSwitcher compact className="hidden sm:flex" />
             <ThemeToggle className="hidden sm:flex" />
             {!isAuthenticated ? (
@@ -253,15 +253,14 @@ export function Navbar() {
                 <LanguageSwitcher className="w-full justify-center" />
                 <ThemeToggle variant="pill" className="w-full justify-center" />
                 <div className="relative">
-                  <Search className="pointer-events-none absolute top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400 ltr:left-4 rtl:right-4" />
+                  <Search className="pointer-events-none absolute start-4 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400" />
                   <input
                     type="search"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     onKeyDown={onSearchKeyDown}
                     placeholder={t("nav.searchEquipmentPlaceholder")}
-                    dir={isArabic ? "rtl" : "ltr"}
-                    className="input w-full rounded-full border-stone-200 bg-stone-100 py-3 text-start ltr:pl-11 ltr:pr-4 rtl:pr-11 rtl:pl-4 focus:border-brand-500 focus:bg-canvas-card focus:shadow-elevated"
+                    className="input w-full rounded-full border-stone-200 bg-stone-100 py-3 ps-11 pe-4 text-start focus:border-brand-500 focus:bg-canvas-card focus:shadow-elevated"
                   />
                 </div>
 

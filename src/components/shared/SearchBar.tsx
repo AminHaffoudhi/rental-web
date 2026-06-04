@@ -1,6 +1,7 @@
 import { Search } from "lucide-react";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useDebounce } from "@/hooks/useDebounce";
 import { cn } from "@/utils/cn";
 
@@ -14,15 +15,17 @@ interface SearchBarProps {
 }
 
 export function SearchBar({
-  placeholder = "Search equipment, tools, gear…",
+  placeholder,
   onSearch,
   defaultValue = "",
   instant = true,
   showButton = false,
 }: SearchBarProps) {
+  const { t } = useTranslation();
   const [value, setValue] = useState(defaultValue);
   const [focused, setFocused] = useState(false);
   const debounced = useDebounce(value, 300);
+  const resolvedPlaceholder = placeholder ?? t("nav.searchEquipmentPlaceholder");
 
   useEffect(() => {
     setValue(defaultValue);
@@ -45,7 +48,7 @@ export function SearchBar({
       transition={{ duration: 0.2 }}
     >
       <Search
-        className="pointer-events-none absolute left-4 top-1/2 z-[1] h-5 w-5 -translate-y-1/2 text-stone-400"
+        className="pointer-events-none absolute start-4 top-1/2 z-[1] h-5 w-5 -translate-y-1/2 text-stone-400"
         aria-hidden
       />
       <input
@@ -60,21 +63,21 @@ export function SearchBar({
         }}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
-        placeholder={placeholder}
+        placeholder={resolvedPlaceholder}
         className={cn(
-          "input input-lg w-full rounded-full border-stone-200 py-3 pl-12 shadow-sm transition-all duration-200",
-          showButton ? "pr-[7.5rem]" : "pr-4",
+          "input input-lg w-full rounded-full border-stone-200 py-3 ps-12 text-start shadow-sm transition-all duration-200",
+          showButton ? "pe-[7.5rem]" : "pe-4",
           focused && "border-brand-500 shadow-elevated"
         )}
-        aria-label="Search"
+        aria-label={t("common.search")}
       />
       {showButton ? (
         <button
           type="button"
           onClick={submit}
-          className="btn btn-primary btn-sm absolute right-2 top-1/2 -translate-y-1/2"
+          className="btn btn-primary btn-sm absolute end-2 top-1/2 -translate-y-1/2"
         >
-          Search
+          {t("common.search")}
         </button>
       ) : null}
     </motion.div>

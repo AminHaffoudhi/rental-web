@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { PlatformLogo } from "@/components/brand/PlatformLogo";
 import {
   Dialog,
@@ -20,6 +21,7 @@ type TermsAcceptanceModalProps = {
 };
 
 export function TermsAcceptanceModal({ open, onOpenChange, onAccepted }: TermsAcceptanceModalProps) {
+  const { t } = useTranslation();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [scrolledToEnd, setScrolledToEnd] = useState(false);
 
@@ -60,12 +62,12 @@ export function TermsAcceptanceModal({ open, onOpenChange, onAccepted }: TermsAc
         <DialogHeader className="shrink-0 border-b border-stone-200 px-5 py-4 sm:px-6">
           <div className="flex items-start gap-3">
             <PlatformLogo size="md" linkTo={false} className="shrink-0" />
-            <div className="min-w-0 text-left">
+            <div className="min-w-0 text-start">
               <DialogTitle className="font-display text-lg text-stone-900">
-                Terms of Service
+                {t("legal.termsModalTitle")}
               </DialogTitle>
               <DialogDescription className="mt-1 text-sm text-stone-500">
-                Please read the terms for {PLATFORM_NAME} before creating your account.
+                {t("legal.termsModalDesc", { name: PLATFORM_NAME })}
               </DialogDescription>
             </div>
           </div>
@@ -81,19 +83,19 @@ export function TermsAcceptanceModal({ open, onOpenChange, onAccepted }: TermsAc
 
         {!scrolledToEnd ? (
           <p className="shrink-0 border-t border-stone-200 bg-stone-100/80 px-5 py-2 text-center text-xs text-stone-500 dark:bg-stone-800/50">
-            Scroll to the end to continue
+            {t("legal.scrollToEnd")}
           </p>
         ) : null}
 
         <DialogFooter className="shrink-0 flex-col gap-2 border-t border-stone-200 bg-canvas-card px-5 py-4 sm:flex-row sm:justify-between sm:px-6">
-          <p className="w-full text-center text-xs text-stone-500 sm:text-left">
-            Also see our{" "}
+          <p className="w-full text-center text-xs text-stone-500 sm:text-start">
+            {t("legal.alsoSeePrivacy")}{" "}
             <Link
               to="/privacy"
               className="font-semibold text-brand-600 hover:text-brand-700"
               onClick={() => onOpenChange(false)}
             >
-              Privacy Policy
+              {t("footer.privacy")}
             </Link>
           </p>
           <button
@@ -105,7 +107,7 @@ export function TermsAcceptanceModal({ open, onOpenChange, onAccepted }: TermsAc
               !scrolledToEnd && "cursor-not-allowed opacity-50"
             )}
           >
-            I have read and accept the Terms
+            {t("legal.acceptTerms")}
           </button>
         </DialogFooter>
       </DialogContent>

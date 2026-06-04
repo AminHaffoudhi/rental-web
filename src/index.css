@@ -17,10 +17,6 @@
     font-family: "Noto Sans Arabic", "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
   }
 
-  html[dir="rtl"] {
-    text-align: right;
-  }
-
   html[dir="rtl"] .form-label,
   html[dir="rtl"] .form-message,
   html[dir="rtl"] .auth-form-heading,
@@ -39,18 +35,6 @@
   .app-topbar {
     box-sizing: border-box;
     transform: none;
-  }
-
-  html[dir="rtl"] .app-topbar .app-topbar-title {
-    text-align: right;
-  }
-
-  html[dir="ltr"] .app-topbar .app-topbar-title {
-    text-align: left;
-  }
-
-  html[dir="rtl"] .app-topbar .input[type="search"] {
-    text-align: right;
   }
 
   .auth-form[dir="rtl"] .auth-strength-bar {

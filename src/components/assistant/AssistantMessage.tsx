@@ -194,7 +194,8 @@ export function AssistantMessage({
   return (
     <div
       className={cn(
-        "assistant-prose w-full min-w-0 text-sm leading-relaxed text-stone-700 dark:text-stone-200",
+        "assistant-prose min-w-0 max-w-full text-start text-sm leading-relaxed text-stone-700 dark:text-stone-200",
+        "[&_a]:break-words",
         className
       )}
     >

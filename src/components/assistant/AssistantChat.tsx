@@ -3,7 +3,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import toast from "react-hot-toast";
 import { AssistantMessage } from "@/components/assistant/AssistantMessage";
-import type { AppLanguage } from "@/i18n";
 import type { ChatMessage } from "@/services/assistant.service";
 import { fetchAssistantStatus } from "@/services/assistant.service";
 import { useLocaleStore } from "@/store/localeStore";
@@ -19,6 +18,7 @@ type AssistantChatProps = {
   suggestedPrompts?: string[];
   onSend: (messages: ChatMessage[]) => Promise<string>;
   onLoadSuggestions?: () => Promise<string[]>;
+  className?: string;
 };
 
 export function AssistantChat({
@@ -30,6 +30,7 @@ export function AssistantChat({
   suggestedPrompts = [],
   onSend,
   onLoadSuggestions,
+  className,
 }: AssistantChatProps) {
   const { t, i18n } = useTranslation();
   const language = useLocaleStore((s) => s.language);
@@ -111,17 +112,16 @@ export function AssistantChat({
   return (
     <div
       className={cn(
-        "flex w-full flex-col overflow-hidden rounded-2xl border border-stone-200 bg-canvas-card shadow-elevated dark:border-stone-700 dark:bg-stone-900",
-        "min-h-[min(720px,calc(100vh-11rem))]"
+        "flex w-full min-w-0 flex-col overflow-hidden rounded-2xl border border-stone-200 bg-canvas-card shadow-elevated dark:border-stone-700 dark:bg-stone-900",
+        "min-h-[min(720px,calc(100dvh-11rem))] lg:min-h-[min(720px,calc(100dvh-9rem))]",
+        className
       )}
     >
       <div className="flex shrink-0 items-start gap-3 border-b border-stone-200 bg-stone-50/80 px-5 py-4 dark:border-stone-700 dark:bg-stone-800/50 sm:px-6">
         <div
           className={cn(
             "flex h-12 w-12 shrink-0 items-center justify-center rounded-xl shadow-sm",
-            isOwner
-              ? "bg-violet-500 text-white"
-              : "bg-brand-500 text-white"
+            isOwner ? "bg-violet-500 text-white" : "bg-brand-500 text-white"
           )}
         >
           {isOwner ? <Bot className="h-6 w-6" /> : <Sparkles className="h-6 w-6" />}
@@ -141,61 +141,63 @@ export function AssistantChat({
 
       <div className="flex min-h-0 flex-1 flex-col">
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-6 sm:px-6">
-          <div className="mx-auto flex w-full max-w-4xl flex-col gap-5">
+          <div className="mx-auto flex w-full max-w-3xl flex-col gap-5">
             {displayMessages.map((m, i) => {
               const isUser = m.role === "user";
               return (
                 <div
                   key={`${m.role}-${i}`}
-                  className={cn("flex gap-3", isUser ? "flex-row-reverse" : "flex-row")}
+                  className={cn("flex w-full gap-3", isUser ? "justify-end" : "justify-start")}
                 >
-                  <div
-                    className={cn(
-                      "flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
-                      isUser
-                        ? "bg-brand-100 text-brand-600 dark:bg-brand-500/20 dark:text-brand-300"
-                        : isOwner
+                  {!isUser ? (
+                    <div
+                      className={cn(
+                        "flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
+                        isOwner
                           ? "bg-violet-100 text-violet-600 dark:bg-violet-500/20 dark:text-violet-300"
                           : "bg-stone-200 text-stone-600 dark:bg-stone-700 dark:text-stone-300"
-                    )}
-                    aria-hidden
-                  >
-                    {isUser ? (
-                      <User className="h-4 w-4" />
-                    ) : isOwner ? (
-                      <Bot className="h-4 w-4" />
-                    ) : (
-                      <Sparkles className="h-4 w-4" />
-                    )}
-                  </div>
+                      )}
+                      aria-hidden
+                    >
+                      {isOwner ? (
+                        <Bot className="h-4 w-4" />
+                      ) : (
+                        <Sparkles className="h-4 w-4" />
+                      )}
+                    </div>
+                  ) : null}
 
                   <div
                     className={cn(
-                      "min-w-0 flex-1",
-                      isUser ? "flex justify-end" : "flex justify-start"
+                      "min-w-0 max-w-[min(100%,36rem)]",
+                      isUser
+                        ? "rounded-2xl rounded-ee-md bg-brand-500 px-4 py-3 text-white shadow-sm"
+                        : "rounded-2xl rounded-es-md border border-stone-200 bg-white px-4 py-4 shadow-sm dark:border-stone-600 dark:bg-stone-800/80 sm:px-5 sm:py-4"
                     )}
                   >
-                    <div
-                      className={cn(
-                        "w-full text-start",
-                        isUser
-                          ? "max-w-xl rounded-2xl rounded-ee-md bg-brand-500 px-4 py-3 text-white shadow-sm"
-                          : "rounded-2xl rounded-es-md border border-stone-200 bg-white px-4 py-4 shadow-sm dark:border-stone-600 dark:bg-stone-800/80 sm:px-5 sm:py-5"
-                      )}
-                    >
-                      {isUser ? (
-                        <p className="whitespace-pre-wrap text-sm leading-relaxed">{m.content}</p>
-                      ) : (
-                        <AssistantMessage content={m.content} />
-                      )}
-                    </div>
+                    {isUser ? (
+                      <p className="whitespace-pre-wrap text-start text-sm leading-relaxed">
+                        {m.content}
+                      </p>
+                    ) : (
+                      <AssistantMessage content={m.content} />
+                    )}
                   </div>
+
+                  {isUser ? (
+                    <div
+                      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-100 text-brand-600 dark:bg-brand-500/20 dark:text-brand-300"
+                      aria-hidden
+                    >
+                      <User className="h-4 w-4" />
+                    </div>
+                  ) : null}
                 </div>
               );
             })}
 
             {loading ? (
-              <div className="flex gap-3">
+              <div className="flex justify-start gap-3">
                 <div
                   className={cn(
                     "flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
@@ -206,7 +208,7 @@ export function AssistantChat({
                 >
                   <Bot className="h-4 w-4 animate-pulse" />
                 </div>
-                <div className="flex items-center gap-2 rounded-2xl border border-stone-200 bg-white px-4 py-3 text-sm text-stone-500 dark:border-stone-600 dark:bg-stone-800">
+                <div className="inline-flex items-center gap-2 rounded-2xl border border-stone-200 bg-white px-4 py-3 text-sm text-stone-500 dark:border-stone-600 dark:bg-stone-800">
                   <Loader2 className="h-4 w-4 animate-spin text-brand-500" />
                   {t("assistant.thinking")}
                 </div>
@@ -221,7 +223,7 @@ export function AssistantChat({
             <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-stone-400">
               {t("assistant.suggestionsLabel")}
             </p>
-            <div className="flex flex-wrap gap-2">
+            <div className="mx-auto flex w-full max-w-3xl flex-wrap gap-2">
               {loadingPrompts ? (
                 <span className="text-xs text-stone-400">{t("assistant.loadingSuggestions")}</span>
               ) : null}
@@ -231,7 +233,7 @@ export function AssistantChat({
                   type="button"
                   disabled={loading || enabled === false}
                   onClick={() => void sendMessage(p)}
-                  className="rounded-xl border border-stone-200 bg-white px-3.5 py-2 text-left text-sm font-medium text-stone-700 shadow-sm transition-all hover:border-brand-300 hover:bg-brand-50 hover:text-brand-800 disabled:opacity-50 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200 dark:hover:border-brand-500/40 dark:hover:bg-brand-500/10"
+                  className="rounded-xl border border-stone-200 bg-white px-3.5 py-2 text-start text-sm font-medium text-stone-700 shadow-sm transition-all hover:border-brand-300 hover:bg-brand-50 hover:text-brand-800 disabled:opacity-50 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200 dark:hover:border-brand-500/40 dark:hover:bg-brand-500/10"
                 >
                   {p}
                 </button>
@@ -247,7 +249,7 @@ export function AssistantChat({
             void sendMessage(input);
           }}
         >
-          <div className="mx-auto flex w-full max-w-4xl gap-2">
+          <div className="mx-auto flex w-full max-w-3xl gap-2">
             <input
               type="text"
               value={input}
@@ -265,7 +267,7 @@ export function AssistantChat({
                 isOwner ? "bg-violet-600 hover:bg-violet-700" : "btn-primary"
               )}
             >
-              <Send className="h-4 w-4" />
+              <Send className="h-4 w-4 rtl:rotate-180" />
               <span className="sr-only">{t("assistant.send")}</span>
             </button>
           </div>

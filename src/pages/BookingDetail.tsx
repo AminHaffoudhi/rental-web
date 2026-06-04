@@ -14,7 +14,7 @@ import {
   Package,
   MapPin,
 } from "lucide-react";
-import { BookingActions } from "@/components/booking/BookingActions";
+import { BookingActions, bookingHasSidebarActions } from "@/components/booking/BookingActions";
 import { BookingStatus } from "@/components/booking/BookingStatus";
 import { BookingTimeline } from "@/components/booking/BookingTimeline";
 import { StripePaymentSection } from "@/components/booking/StripePaymentSection";
@@ -517,19 +517,25 @@ export function BookingDetail() {
               </div>
             </section>
 
-            <section className={cn(sectionClass, "hidden lg:block")}>
-              <h3 className="font-display text-lg font-semibold text-stone-900">{t("bookings.actions")}</h3>
-              <div className="mt-4">
-                <BookingActions booking={booking} onUpdated={() => refetch()} />
-              </div>
-            </section>
+            {bookingHasSidebarActions(booking, user?.id) ? (
+              <section className={cn(sectionClass, "hidden lg:block")}>
+                <h3 className="font-display text-lg font-semibold text-stone-900 dark:text-stone-100">
+                  {t("bookings.actions")}
+                </h3>
+                <div className="mt-4">
+                  <BookingActions booking={booking} onUpdated={() => refetch()} />
+                </div>
+              </section>
+            ) : null}
           </div>
         </div>
       </div>
 
-      <div className="fixed bottom-0 start-0 end-0 z-40 border-t border-stone-200 bg-canvas-card/95 px-4 py-3 shadow-elevated backdrop-blur-md lg:hidden safe-bottom">
-        <BookingActions booking={booking} onUpdated={() => refetch()} />
-      </div>
+      {bookingHasSidebarActions(booking, user?.id) ? (
+        <div className="fixed bottom-0 start-0 end-0 z-40 border-t border-stone-200 bg-canvas-card/95 px-4 py-3 shadow-elevated backdrop-blur-md lg:hidden safe-bottom">
+          <BookingActions booking={booking} onUpdated={() => refetch()} />
+        </div>
+      ) : null}
     </div>
   );
 }

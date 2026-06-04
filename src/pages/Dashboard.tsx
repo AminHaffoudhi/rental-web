@@ -33,17 +33,8 @@ import { useLocaleStore } from "@/store/localeStore";
 import { isOwnerRole } from "@/lib/roles";
 import { formatCurrency } from "@/utils/currency";
 import { formatDateRange } from "@/utils/dates";
+import { summarizeRenterBookings } from "@/utils/renterBookingStats";
 import { cn } from "@/utils/cn";
-
-const RENTER_ACTIVE = ["ACTIVE", "PICKUP_SCHEDULED", "IN_TRANSIT", "PAID"];
-const RENTER_UPCOMING = [
-  "CONFIRMED",
-  "PAYMENT_PENDING",
-  "PAID",
-  "PICKUP_SCHEDULED",
-  "IN_TRANSIT",
-  "ACTIVE",
-];
 
 function greetingForNow(t: (key: string) => string): string {
   const h = new Date().getHours();
@@ -119,20 +110,10 @@ export function Dashboard() {
     [bookings?.asRenter]
   );
 
-  const renterStats = useMemo(() => {
-    const list = bookings?.asRenter ?? [];
-    return {
-      active: list.filter((b) => RENTER_ACTIVE.includes(b.status)).length,
-      upcoming: list.filter((b) => RENTER_UPCOMING.includes(b.status)).length,
-      pending: list.filter((b) =>
-        ["PENDING", "PAYMENT_PENDING", "CONFIRMED"].includes(b.status)
-      ).length,
-      completed: list.filter((b) => b.status === "COMPLETED").length,
-      totalSpent: list
-        .filter((b) => ["PAID", "ACTIVE", "COMPLETED"].includes(b.status))
-        .reduce((sum, b) => sum + b.totalPrice, 0),
-    };
-  }, [bookings?.asRenter]);
+  const renterStats = useMemo(
+    () => summarizeRenterBookings(bookings?.asRenter ?? []),
+    [bookings?.asRenter]
+  );
 
   const loading = dashLoading || bookingsLoading;
   const greet = greetingForNow(t);

@@ -29,7 +29,7 @@ export function HomeTrust() {
       <SectionReveal className="container">
         <div className="overflow-hidden rounded-3xl border border-stone-200 bg-canvas-card shadow-elevated">
           <div className="grid lg:grid-cols-[1.1fr_0.9fr]">
-            <div className="relative border-b border-stone-200 bg-gradient-to-br from-brand-50 via-canvas-card to-canvas-card p-8 sm:p-10 lg:border-b-0 lg:border-r lg:border-stone-200 rtl:lg:border-l rtl:lg:border-r-0">
+            <div className="relative border-b border-stone-200 bg-gradient-to-br from-brand-50 via-canvas-card to-canvas-card p-8 sm:p-10 lg:border-b-0 lg:border-e lg:border-stone-200">
               <Quote
                 className="absolute end-6 top-6 h-16 w-16 text-brand-100 sm:h-20 sm:w-20"
                 aria-hidden

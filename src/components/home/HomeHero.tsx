@@ -88,8 +88,8 @@ export function HomeHero() {
       />
 
       <div className="container relative py-10 sm:py-14 md:py-16 lg:py-20">
-        <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-14 xl:gap-20">
-          <div className="min-w-0">
+        <div className="flex flex-col items-center gap-10 lg:flex-row lg:items-center lg:gap-14 xl:gap-20">
+          <div className="min-w-0 flex-1 lg:max-w-[52%]">
             <motion.span
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
@@ -190,7 +190,7 @@ export function HomeHero() {
             </motion.ul>
           </div>
 
-          <div className="relative mx-auto w-full max-w-md lg:max-w-none lg:justify-self-end">
+          <div className="relative mx-auto w-full max-w-md shrink-0 lg:max-w-[48%] lg:flex-1">
             <div
               className="pointer-events-none absolute inset-4 rounded-[2rem] bg-gradient-to-br from-brand-100/80 to-transparent blur-2xl"
               aria-hidden
