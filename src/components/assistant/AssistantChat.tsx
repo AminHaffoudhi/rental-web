@@ -3,8 +3,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import toast from "react-hot-toast";
 import { AssistantMessage } from "@/components/assistant/AssistantMessage";
+import type { AppLanguage } from "@/i18n";
 import type { ChatMessage } from "@/services/assistant.service";
 import { fetchAssistantStatus } from "@/services/assistant.service";
+import { useLocaleStore } from "@/store/localeStore";
 import { cn } from "@/utils/cn";
 import { getApiErrorDetail } from "@/services/api";
 
@@ -29,12 +31,14 @@ export function AssistantChat({
   onSend,
   onLoadSuggestions,
 }: AssistantChatProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const language = useLocaleStore((s) => s.language);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [enabled, setEnabled] = useState<boolean | null>(null);
   const [prompts, setPrompts] = useState(suggestedPrompts);
+  const [loadingPrompts, setLoadingPrompts] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const isOwner = variant === "owner";
 
@@ -45,12 +49,30 @@ export function AssistantChat({
   }, []);
 
   useEffect(() => {
-    if (isOwner && onLoadSuggestions && prompts.length === 0) {
-      void onLoadSuggestions()
-        .then(setPrompts)
-        .catch(() => {});
+    if (!onLoadSuggestions) {
+      setPrompts(suggestedPrompts);
+      return;
     }
-  }, [isOwner, onLoadSuggestions, prompts.length]);
+
+    let cancelled = false;
+    setLoadingPrompts(true);
+    void onLoadSuggestions(language)
+      .then((dynamic) => {
+        if (!cancelled) {
+          setPrompts(dynamic.length > 0 ? dynamic : suggestedPrompts);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setPrompts(suggestedPrompts);
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingPrompts(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [language, onLoadSuggestions, suggestedPrompts, i18n.language]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -68,7 +90,7 @@ export function AssistantChat({
       setLoading(true);
 
       try {
-        const reply = await onSend(next);
+        const reply = await onSend(next, language);
         setMessages((prev) => [...prev, { role: "assistant", content: reply }]);
       } catch (e) {
         toast.error(getApiErrorDetail(e).message);
@@ -78,7 +100,7 @@ export function AssistantChat({
         setLoading(false);
       }
     },
-    [loading, messages, onSend]
+    [loading, messages, onSend, language]
   );
 
   const displayMessages =
@@ -194,12 +216,15 @@ export function AssistantChat({
           </div>
         </div>
 
-        {messages.length === 0 && prompts.length > 0 ? (
+        {messages.length === 0 && (prompts.length > 0 || loadingPrompts) ? (
           <div className="shrink-0 border-t border-stone-200 bg-stone-50/50 px-4 py-4 dark:border-stone-700 dark:bg-stone-800/30 sm:px-6">
             <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-stone-400">
               {t("assistant.suggestionsLabel")}
             </p>
             <div className="flex flex-wrap gap-2">
+              {loadingPrompts ? (
+                <span className="text-xs text-stone-400">{t("assistant.loadingSuggestions")}</span>
+              ) : null}
               {prompts.map((p) => (
                 <button
                   key={p}

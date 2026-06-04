@@ -1,3 +1,4 @@
+import type { AppLanguage } from "@/i18n";
 import { api, unwrap } from "@/services/api";
 
 export type ChatMessage = { role: "user" | "assistant"; content: string };
@@ -7,20 +8,26 @@ export async function fetchAssistantStatus(): Promise<{ enabled: boolean; model:
   return unwrap(res) as { enabled: boolean; model: string };
 }
 
-export async function chatRenter(messages: ChatMessage[]): Promise<string> {
-  const res = await api.post("/assistant/renter", { messages });
+export async function chatRenter(
+  messages: ChatMessage[],
+  language: AppLanguage
+): Promise<string> {
+  const res = await api.post("/assistant/renter", { messages, language });
   const data = unwrap(res) as { reply: string };
   return data.reply;
 }
 
-export async function chatOwner(messages: ChatMessage[]): Promise<string> {
-  const res = await api.post("/assistant/owner", { messages });
+export async function chatOwner(
+  messages: ChatMessage[],
+  language: AppLanguage
+): Promise<string> {
+  const res = await api.post("/assistant/owner", { messages, language });
   const data = unwrap(res) as { reply: string };
   return data.reply;
 }
 
-export async function fetchOwnerSuggestions(): Promise<string[]> {
-  const res = await api.get("/assistant/owner/suggestions");
+export async function fetchOwnerSuggestions(language: AppLanguage): Promise<string[]> {
+  const res = await api.get("/assistant/owner/suggestions", { params: { lang: language } });
   const data = unwrap(res) as { suggestions: string[] };
   return data.suggestions;
 }

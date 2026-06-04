@@ -455,7 +455,8 @@
     "thinking": "جاري التفكير…",
     "send": "إرسال",
     "offline": "غير متصل",
-    "suggestionsLabel": "جرّب أن تسأل"
+    "suggestionsLabel": "جرّب أن تسأل",
+    "loadingSuggestions": "جاري تحميل الاقتراحات…"
   },
   "bookings": {
     "title": "حجوزاتي",

@@ -455,7 +455,8 @@
     "thinking": "Thinking…",
     "send": "Send",
     "offline": "Offline",
-    "suggestionsLabel": "Try asking"
+    "suggestionsLabel": "Try asking",
+    "loadingSuggestions": "Loading suggestions…"
   },
   "bookings": {
     "title": "My bookings",

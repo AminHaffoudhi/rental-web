@@ -455,7 +455,8 @@
     "thinking": "Réflexion…",
     "send": "Envoyer",
     "offline": "Hors ligne",
-    "suggestionsLabel": "Suggestions"
+    "suggestionsLabel": "Suggestions",
+    "loadingSuggestions": "Chargement des suggestions…"
   },
   "bookings": {
     "title": "Mes réservations",
