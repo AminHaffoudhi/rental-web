@@ -16,18 +16,36 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+function isAccountBlockedResponse(error: unknown): boolean {
+  if (!axios.isAxiosError(error) || !error.response?.data || typeof error.response.data !== "object") {
+    return false;
+  }
+  const data = error.response.data as { code?: unknown };
+  return data.code === "ACCOUNT_BLOCKED";
+}
+
+function redirectToLoginAfterAuthLoss(blocked = false): void {
+  useAuthStore.getState().clearAuth();
+  const path = window.location.pathname;
+  if (
+    path.startsWith("/login") ||
+    path.startsWith("/register") ||
+    path.startsWith("/verify-email")
+  ) {
+    return;
+  }
+  const target = blocked ? "/login?blocked=1" : "/login";
+  window.location.assign(target);
+}
+
 api.interceptors.response.use(
   (response) => response,
   (error: unknown) => {
-    if (axios.isAxiosError(error) && error.response?.status === 401) {
-      useAuthStore.getState().clearAuth();
-      const path = window.location.pathname;
-      if (
-        !path.startsWith("/login") &&
-        !path.startsWith("/register") &&
-        !path.startsWith("/verify-email")
-      ) {
-        window.location.assign("/login");
+    if (axios.isAxiosError(error)) {
+      if (error.response?.status === 401) {
+        redirectToLoginAfterAuthLoss(false);
+      } else if (error.response?.status === 403 && isAccountBlockedResponse(error)) {
+        redirectToLoginAfterAuthLoss(true);
       }
     }
     return Promise.reject(error);

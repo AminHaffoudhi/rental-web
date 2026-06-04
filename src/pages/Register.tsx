@@ -31,7 +31,11 @@ const schema = z
   .object({
     name: z.string().min(1, "Name is required"),
     email: z.string().email("Enter a valid email"),
-    phone: z.string().optional(),
+    phone: z
+      .string()
+      .trim()
+      .min(8, "Enter a valid phone number")
+      .max(30, "Phone number is too long"),
     password: z.string().min(8, "At least 8 characters"),
     confirm: z.string().min(8),
     role: z.enum(["RENTER", "OWNER", "BOTH"]),
@@ -91,7 +95,7 @@ export function Register() {
         name: values.name,
         email: values.email,
         password: values.password,
-        phone: values.phone || undefined,
+        phone: values.phone.trim(),
         role: values.role,
       });
     } catch (e) {
@@ -212,7 +216,9 @@ export function Register() {
                     transition={{ delay: 0.1 }}
                   >
                     <FormItem>
-                      <FormLabel>Phone</FormLabel>
+                      <FormLabel>
+                        Phone <span className="text-destructive">*</span>
+                      </FormLabel>
                       <FormControl>
                         <input
                           type="tel"

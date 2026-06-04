@@ -11,9 +11,9 @@ import {
   Shield,
   Truck,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { z } from "zod";
 import {
   Form,
@@ -74,6 +74,9 @@ export function Login() {
         clearAuth();
         navigate("/verify-email", { replace: true, state: { email: values.email } });
         return;
+      }
+      if (code === "ACCOUNT_BLOCKED") {
+        clearAuth();
       }
       setApiError(message);
     } finally {
