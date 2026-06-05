@@ -28,10 +28,9 @@ export function useAuth() {
     const result = await authService.register(data);
     setAuth(result.user, result.token);
     toast.success(result.message);
-    navigate("/verify-email", {
-      replace: true,
-      state: { email: data.email },
-    });
+    // Email OTP disabled temporarily — go straight to dashboard after signup.
+    // navigate("/verify-email", { replace: true, state: { email: data.email } });
+    navigate("/dashboard", { replace: true });
   }
 
   function logout() {

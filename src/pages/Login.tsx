@@ -4,7 +4,7 @@ import { ArrowRight, Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { z } from "zod";
 import { AuthBrandPanel } from "@/components/auth/AuthBrandPanel";
 import {
@@ -42,13 +42,6 @@ export function Login() {
 
   const { login } = useAuth();
   const clearAuth = useAuthStore((s) => s.clearAuth);
-  const navigate = useNavigate();
-  const location = useLocation();
-  const registeredEmail =
-    (location.state as { registeredEmail?: string; email?: string } | null)?.registeredEmail ??
-    (location.state as { email?: string } | null)?.email ??
-    null;
-
   const [showPw, setShowPw] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -65,11 +58,12 @@ export function Login() {
       await login(values);
     } catch (e) {
       const { message, code } = getApiErrorDetail(e);
-      if (code === "EMAIL_NOT_VERIFIED") {
-        clearAuth();
-        navigate("/verify-email", { replace: true, state: { email: values.email } });
-        return;
-      }
+      // Email OTP disabled temporarily
+      // if (code === "EMAIL_NOT_VERIFIED") {
+      //   clearAuth();
+      //   navigate("/verify-email", { replace: true, state: { email: values.email } });
+      //   return;
+      // }
       if (code === "ACCOUNT_BLOCKED") {
         clearAuth();
         setApiError(t("auth.blockedAccount"));
@@ -124,6 +118,7 @@ export function Login() {
                 </p>
               </div>
 
+              {/* Email OTP disabled temporarily
               {registeredEmail ? (
                 <div className="mb-6 rounded-xl border border-brand-200 bg-brand-50 px-4 py-3.5 text-sm text-brand-900 text-start">
                   <p>{t("auth.verifyEmailSent", { email: registeredEmail })}</p>
@@ -137,6 +132,7 @@ export function Login() {
                   </Link>
                 </div>
               ) : null}
+              */}
 
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">

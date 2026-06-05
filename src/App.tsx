@@ -20,7 +20,7 @@ import { Profile } from "@/pages/Profile";
 import { PublicProfile } from "@/pages/PublicProfile";
 import { Register } from "@/pages/Register";
 import { Search } from "@/pages/Search";
-import { VerifyEmail } from "@/pages/VerifyEmail";
+// import { VerifyEmail } from "@/pages/VerifyEmail";
 import { TermsOfService } from "@/pages/TermsOfService";
 import { PrivacyPolicy } from "@/pages/PrivacyPolicy";
 import { CookiePolicy } from "@/pages/CookiePolicy";
@@ -36,7 +36,8 @@ export default function App() {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
-      <Route path="/verify-email" element={<VerifyEmail />} />
+      {/* Email OTP disabled temporarily */}
+      <Route path="/verify-email" element={<Navigate to="/dashboard" replace />} />
 
       <Route element={<ProtectedRoute />}>
         <Route element={<DashboardLayout />}>
