@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight, Package } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { GalleryZoomHint, ImageLightbox } from "@/components/shared/ImageLightbox";
 import { CategoryIcon } from "@/components/equipment/CategoryIcon";

@@ -3,7 +3,6 @@ import {
   ExternalLink,
   MapPin,
   MoreVertical,
-  Package,
   Trash2,
 } from "lucide-react";
 import { useEffect, useState } from "react";

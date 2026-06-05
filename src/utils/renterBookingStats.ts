@@ -70,7 +70,7 @@ export function summarizeRenterBookings(bookings: Booking[], now: Date = new Dat
 
     if (
       ["PAID", "ACTIVE", "COMPLETED", "PICKUP_SCHEDULED", "IN_TRANSIT"].includes(b.status) &&
-      b.payment?.status !== "REFUNDED"
+      b.status !== "REFUNDED"
     ) {
       totalSpent += b.totalPrice;
     }

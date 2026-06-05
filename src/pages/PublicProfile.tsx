@@ -123,7 +123,11 @@ export function PublicProfile() {
           </div>
         </div>
         <div className="container flex min-h-[50vh] flex-col items-center justify-center py-16 text-center">
-          <UserAvatar user={profile} size="lg" className="mb-4" />
+          <UserAvatar
+            user={{ name: profile.name, image: profile.image ?? undefined }}
+            size="lg"
+            className="mb-4"
+          />
           <h1 className="font-display text-2xl font-semibold text-stone-900 dark:text-stone-100">
             {profile.name}
           </h1>

@@ -13,7 +13,6 @@ export function shouldSkipOneSignalInit(): boolean {
 
 export function oneSignalSkipReason(): string {
   const origin = typeof window !== "undefined" ? window.location.origin : "";
-  const configured = import.meta.env.VITE_ONESIGNAL_SITE_URL?.trim() ?? "(not set)";
   return `[OneSignal] Skipped on ${origin}. Add this URL in OneSignal → Web → Site URL, or set VITE_ONESIGNAL_SITE_URL=${origin}`;
 }
 

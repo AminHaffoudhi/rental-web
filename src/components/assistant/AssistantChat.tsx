@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import toast from "react-hot-toast";
 import { AssistantMessage } from "@/components/assistant/AssistantMessage";
+import type { AppLanguage } from "@/i18n";
 import type { ChatMessage } from "@/services/assistant.service";
 import { fetchAssistantStatus } from "@/services/assistant.service";
 import { useLocaleStore } from "@/store/localeStore";
@@ -16,8 +17,8 @@ type AssistantChatProps = {
   welcomeMessage: string;
   placeholder: string;
   suggestedPrompts?: string[];
-  onSend: (messages: ChatMessage[]) => Promise<string>;
-  onLoadSuggestions?: () => Promise<string[]>;
+  onSend: (messages: ChatMessage[], language: AppLanguage) => Promise<string>;
+  onLoadSuggestions?: (language: AppLanguage) => Promise<string[]>;
   className?: string;
 };
 

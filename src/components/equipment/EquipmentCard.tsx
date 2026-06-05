@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Heart, MapPin, Package, Star } from "lucide-react";
+import { Heart, MapPin, Star } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { UserAvatar } from "@/components/user/UserAvatar";
